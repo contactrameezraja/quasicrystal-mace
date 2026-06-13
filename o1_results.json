@@ -1,0 +1,22 @@
+[
+  {
+    "model": "MACE-MPA-0",
+    "energy_per_atom": -5.043,
+    "max_force": 0.0088,
+    "vol_change_pct": -1.03,
+    "max_disp_A": 0.471,
+    "mean_T_K": 174.8,
+    "min_dist_A": 2.221,
+    "intact": "YES"
+  },
+  {
+    "model": "MatterSim-v1-1M",
+    "energy_per_atom": -5.058300018310547,
+    "max_force": 0.009399999864399433,
+    "vol_change_pct": 0.47,
+    "max_disp_A": 1.049,
+    "mean_T_K": 176.5,
+    "min_dist_A": 2.259,
+    "intact": "YES"
+  }
+]
