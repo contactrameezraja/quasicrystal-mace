@@ -7,7 +7,9 @@
     "max_disp_A": 0.471,
     "mean_T_K": 174.8,
     "min_dist_A": 2.221,
-    "intact": "YES"
+    "intact": "YES",
+    "structure": "W-AlCoNi",
+    "n_atoms": 265
   },
   {
     "model": "MatterSim-v1-1M",
@@ -17,6 +19,32 @@
     "max_disp_A": 1.049,
     "mean_T_K": 176.5,
     "min_dist_A": 2.259,
-    "intact": "YES"
+    "intact": "YES",
+    "structure": "W-AlCoNi",
+    "n_atoms": 265
+  },
+  {
+    "model": "MACE-MPA-0",
+    "energy_per_atom": -5.6399,
+    "max_force": 0.0092,
+    "vol_change_pct": 0.31,
+    "max_disp_A": 0.045,
+    "mean_T_K": 170.3,
+    "min_dist_A": 2.322,
+    "intact": "YES",
+    "structure": "Al2CoNi",
+    "n_atoms": 60
+  },
+  {
+    "model": "MACE-MPA-0",
+    "energy_per_atom": -5.106,
+    "max_force": 0.0066,
+    "vol_change_pct": -1.13,
+    "max_disp_A": 0.06,
+    "mean_T_K": 173.6,
+    "min_dist_A": 2.301,
+    "intact": "YES",
+    "structure": "Al9Co2Ni2",
+    "n_atoms": 26
   }
 ]
