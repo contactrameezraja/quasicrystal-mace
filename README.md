@@ -47,3 +47,21 @@ Each runs in its own conda environment to avoid dependency conflicts. All three 
 * The W-phase max displacement is the aluminium atom adjacent to a dropped partial-occupancy placeholder relaxing into the freed space, confirmed by all three models.
 * NVE energy conservation is good (0.004 meV/atom drift), confirming well-behaved dynamics and an appropriate timestep.
 * The 1.8 A collapse threshold is justified by a numerical experiment showing the energy penalty climbs steeply below it.
+
+* ## Crystal Lookup and Verify (tool)
+
+A small web app (`crystal_lookup_app.py`) that looks up structures on the
+Materials Project and runs the same O1-style MLIP stability check on any of them.
+
+Setup:
+
+    conda activate mattersim-env      # needs mp-api, mattersim, ase, flask
+    pip install flask
+    export MP_API_KEY="your_materials_project_key"
+    python crystal_lookup_app.py
+
+Then open http://127.0.0.1:5000. Type a chemical system (Al-Co-Ni), formula
+(Al2CoNi), or mp-id (mp-1229050), and click Verify on any result to relax it
+and see the stability diagnostics. Get a free key at
+https://next-gen.materialsproject.org. The key is read from the MP_API_KEY
+environment variable, so it is not stored in the code.
