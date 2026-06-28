@@ -1,0 +1,29 @@
+[
+  {
+    "structure": "Al9Co2Ni2",
+    "n_atoms": 26,
+    "model": "MatterSim-v1",
+    "dE_per_atom_meV": -2.299999952316284,
+    "max_force_initial": 0.2759999930858612,
+    "vol_change_pct": 0.67,
+    "max_disp_A": 0.095
+  },
+  {
+    "structure": "Al2CoNi",
+    "n_atoms": 60,
+    "model": "MatterSim-v1",
+    "dE_per_atom_meV": -3.9000000953674316,
+    "max_force_initial": 0.7379999756813049,
+    "vol_change_pct": -0.14,
+    "max_disp_A": 0.083
+  },
+  {
+    "structure": "W-AlCoNi",
+    "n_atoms": 265,
+    "model": "MatterSim-v1",
+    "dE_per_atom_meV": -3.799999952316284,
+    "max_force_initial": 0.45899999141693115,
+    "vol_change_pct": 0.47,
+    "max_disp_A": 1.05
+  }
+]

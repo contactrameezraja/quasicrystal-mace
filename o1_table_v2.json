@@ -1,0 +1,29 @@
+[
+  {
+    "structure": "Al9Co2Ni2",
+    "n_atoms": 26,
+    "model": "MACE-MPA-0",
+    "dE_per_atom_meV": -1.7,
+    "max_force_initial": 0.177,
+    "vol_change_pct": -1.13,
+    "max_disp_A": 0.06
+  },
+  {
+    "structure": "Al2CoNi",
+    "n_atoms": 60,
+    "model": "MACE-MPA-0",
+    "dE_per_atom_meV": -1.3,
+    "max_force_initial": 0.33,
+    "vol_change_pct": 0.31,
+    "max_disp_A": 0.045
+  },
+  {
+    "structure": "W-AlCoNi",
+    "n_atoms": 265,
+    "model": "MACE-MPA-0",
+    "dE_per_atom_meV": -1.9,
+    "max_force_initial": 0.297,
+    "vol_change_pct": -1.03,
+    "max_disp_A": 0.471
+  }
+]

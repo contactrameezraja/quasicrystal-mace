@@ -1,0 +1,29 @@
+[
+  {
+    "structure": "Al9Co2Ni2",
+    "n_atoms": 26,
+    "model": "SevenNet-0",
+    "dE_per_atom_meV": -2.0,
+    "max_force_initial": 0.1979999989271164,
+    "vol_change_pct": 0.21,
+    "max_disp_A": 0.161
+  },
+  {
+    "structure": "Al2CoNi",
+    "n_atoms": 60,
+    "model": "SevenNet-0",
+    "dE_per_atom_meV": -1.9,
+    "max_force_initial": 0.33500000834465027,
+    "vol_change_pct": 0.38,
+    "max_disp_A": 0.06
+  },
+  {
+    "structure": "W-AlCoNi",
+    "n_atoms": 265,
+    "model": "SevenNet-0",
+    "dE_per_atom_meV": -2.4,
+    "max_force_initial": 0.3160000145435333,
+    "vol_change_pct": 0.4,
+    "max_disp_A": 0.583
+  }
+]
