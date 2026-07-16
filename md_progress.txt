@@ -1,0 +1,37 @@
+=== MD run started: 208 atoms, 300 K ===
+NVT equilibration (5 ps)...
+  equilibration done in 5336s, T = 318 K
+NVE burn-in (1 ps)...
+NVE production: 30 ps on 208 atoms, 30 blocks...
+  block 1/30 | 18 min elapsed | ~525 min left | 250 samples
+  block 2/30 | 35 min elapsed | ~486 min left | 500 samples
+  block 3/30 | 51 min elapsed | ~462 min left | 750 samples
+  block 4/30 | 71 min elapsed | ~459 min left | 1000 samples
+  block 5/30 | 91 min elapsed | ~453 min left | 1250 samples
+  block 6/30 | 111 min elapsed | ~446 min left | 1500 samples
+  block 7/30 | 127 min elapsed | ~419 min left | 1750 samples
+  block 8/30 | 144 min elapsed | ~395 min left | 2000 samples
+  block 9/30 | 160 min elapsed | ~373 min left | 2250 samples
+  block 10/30 | 179 min elapsed | ~358 min left | 2500 samples
+  block 11/30 | 195 min elapsed | ~338 min left | 2750 samples
+  block 12/30 | 212 min elapsed | ~318 min left | 3000 samples
+  block 13/30 | 228 min elapsed | ~298 min left | 3250 samples
+  block 14/30 | 245 min elapsed | ~280 min left | 3500 samples
+  block 15/30 | 261 min elapsed | ~261 min left | 3750 samples
+  block 16/30 | 277 min elapsed | ~243 min left | 4000 samples
+  block 17/30 | 294 min elapsed | ~225 min left | 4250 samples
+  block 18/30 | 310 min elapsed | ~206 min left | 4500 samples
+  block 19/30 | 325 min elapsed | ~188 min left | 4750 samples
+  block 20/30 | 341 min elapsed | ~171 min left | 5000 samples
+  block 21/30 | 358 min elapsed | ~153 min left | 5250 samples
+  block 22/30 | 374 min elapsed | ~136 min left | 5500 samples
+  block 23/30 | 390 min elapsed | ~119 min left | 5750 samples
+  block 24/30 | 406 min elapsed | ~101 min left | 6000 samples
+  block 25/30 | 422 min elapsed | ~84 min left | 6250 samples
+  block 26/30 | 438 min elapsed | ~67 min left | 6500 samples
+  block 27/30 | 454 min elapsed | ~50 min left | 6750 samples
+  block 28/30 | 470 min elapsed | ~34 min left | 7000 samples
+  block 29/30 | 487 min elapsed | ~17 min left | 7250 samples
+  block 30/30 | 503 min elapsed | ~0 min left | 7500 samples
+FINISHED. Velocities: (7500, 208, 3)
+Energy drift: 0.039 meV/atom
