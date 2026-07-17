@@ -122,9 +122,18 @@ def benchmark(base, device):
         GPUs rate-limit double precision heavily. MD normally runs float32.
 
     If either is the cause, the laptop number does not transfer.
+
+    Two traps this avoids:
+      - ASE caches force results. Calling get_forces() twice without moving the
+        atoms returns the cached array instantly, so the timing is meaningless.
+        rattle() perturbs positions to invalidate the cache.
+      - CUDA calls are asynchronous. Without synchronize() you time the queueing
+        rather than the work.
     """
+    import torch
+
     log("=== BENCHMARK ===")
-    log(f"{'dtype':>8} {'cell':>7} {'atoms':>7} {'s/force-eval':>14} {'200ps (h)':>11}")
+    log(f"{'dtype':>8} {'cell':>7} {'atoms':>7} {'s/step':>10} {'200ps (h)':>11}")
     for dtype in ("float32", "float64"):
         calc = mace_mp(model="medium-mpa-0", device=device, default_dtype=dtype)
         for n in (2, 3, 4):
@@ -132,12 +141,17 @@ def benchmark(base, device):
             sc.calc = calc
             try:
                 sc.get_forces()                    # warm-up, not timed
+                if device == "cuda":
+                    torch.cuda.synchronize()
                 t0 = time.time()
                 for _ in range(5):
+                    sc.rattle(0.0001)              # invalidate ASE's force cache
                     sc.get_forces()
+                if device == "cuda":
+                    torch.cuda.synchronize()       # wait for the GPU to finish
                 dt = (time.time() - t0) / 5
-                log(f"{dtype:>8} {n}x{n}x{n:<3} {len(sc):7d} {dt:14.3f} "
-                    f"{dt * 100000 / 3600:11.1f}")
+                log(f"{dtype:>8} {n}x{n}x{n:<3} {len(sc):7d} {dt:10.4f} "
+                    f"{dt * 100000 / 3600:11.2f}")
             except Exception as e:
                 log(f"{dtype:>8} {n}x{n}x{n:<3} {len(sc):7d}  FAILED: "
                     f"{type(e).__name__}: {e}")
