@@ -169,10 +169,11 @@ def benchmark(base, device):
                     f"{type(e).__name__}: {e}")
 
 
-def run_md(calc, base, n, n_steps, T, out, seed=None, store_positions=False):
-    sc = make_supercell(base, np.diag([n, n, n]))
+def run_md(calc, base, dims, n_steps, T, out, seed=None, store_positions=False):
+    sc = make_supercell(base, np.diag(dims))
     sc.calc = calc
-    log(f"=== MD: {n}x{n}x{n}, {len(sc)} atoms, {3*len(sc)} modes, {T} K ===")
+    tag = "x".join(str(d) for d in dims)
+    log(f"=== MD: {tag}, {len(sc)} atoms, {3*len(sc)} modes, {T} K ===")
     log(f"    {dict(Counter(sc.get_chemical_symbols()))}")
 
     timestep = 2.0 * units.fs
@@ -242,7 +243,12 @@ def run_md(calc, base, n, n_steps, T, out, seed=None, store_positions=False):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--structure", default="Al9Co2Ni2-coords.txt")
-    ap.add_argument("--supercell", type=int, default=4)
+    ap.add_argument("--supercell", type=str, default="4",
+                    help="cube size ('4' -> 4x4x4) or three comma-separated "
+                         "dims ('8,4,4'). An elongated box lowers the floor "
+                         "along its long axis: E_min is set by the LONGEST "
+                         "dimension, so 8x4x4 reaches ~1.7 meV with fewer "
+                         "atoms (3328) than a 6x6x6 (5616, OOM on 23 GB).")
     ap.add_argument("--steps", type=int, default=100000, help="production steps (x2 fs)")
     ap.add_argument("--temperature", type=float, default=300.0)
     ap.add_argument("--device", default="cuda")
@@ -276,10 +282,17 @@ def main():
         benchmark(base, args.device)
         return
 
-    out = args.out or f"md_{args.supercell}x{args.supercell}x{args.supercell}"
+    # parse '4' -> (4,4,4) or '8,4,4' -> (8,4,4)
+    parts = [int(x) for x in args.supercell.split(",")]
+    dims = tuple(parts * 3) if len(parts) == 1 else tuple(parts)
+    if len(dims) != 3:
+        raise SystemExit(f"--supercell needs 1 or 3 numbers, got {args.supercell!r}")
+    tag = "x".join(str(d) for d in dims)
+
+    out = args.out or f"md_{tag}"
     calc = mace_mp(model="medium-mpa-0", device=args.device, default_dtype=args.dtype)
     log(f"MD dtype: {args.dtype}")
-    run_md(calc, base, args.supercell, args.steps, args.temperature, out,
+    run_md(calc, base, dims, args.steps, args.temperature, out,
            seed=args.seed, store_positions=args.store_positions)
 
 
