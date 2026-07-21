@@ -116,3 +116,254 @@ NVE production: 200 ps (~0.021 meV resolution), 50 blocks...
   block 50/50 | 711 min | ~0 min left | 50000 samples
 FINISHED. velocities (50000, 1664, 3)
 Energy drift: 0.0274 meV/atom (laptop 2x2x2 run gave 0.039)
+Loaded 26 atoms: {'Al': 18, 'Ni': 3, 'Co': 5}, volume 360.8 A^3
+Relaxed (float64): max residual force 0.00083 eV/A (laptop gave 0.00083)
+MD dtype: float32
+=== MD: 2x2x2, 208 atoms, 624 modes, 300.0 K ===
+    {'Al': 144, 'Ni': 24, 'Co': 40}
+    seed 1
+NVT equilibration (10 ps)...
+  done in 318s, instantaneous T = 304 K
+NVE burn-in (2 ps, not recorded)...
+NVE production: 1 ps (~4.136 meV resolution), 50 blocks, storing positions...
+  block 1/50 | 0 min | ~1 min left | 5 samples
+  block 2/50 | 0 min | ~1 min left | 10 samples
+  block 3/50 | 0 min | ~0 min left | 15 samples
+  block 4/50 | 0 min | ~0 min left | 20 samples
+  block 5/50 | 0 min | ~0 min left | 25 samples
+  block 6/50 | 0 min | ~0 min left | 30 samples
+  block 7/50 | 0 min | ~0 min left | 35 samples
+  block 8/50 | 0 min | ~0 min left | 40 samples
+  block 9/50 | 0 min | ~0 min left | 45 samples
+  block 10/50 | 0 min | ~0 min left | 50 samples
+  block 11/50 | 0 min | ~0 min left | 55 samples
+  block 12/50 | 0 min | ~0 min left | 60 samples
+  block 13/50 | 0 min | ~0 min left | 65 samples
+  block 14/50 | 0 min | ~0 min left | 70 samples
+  block 15/50 | 0 min | ~0 min left | 75 samples
+  block 16/50 | 0 min | ~0 min left | 80 samples
+  block 17/50 | 0 min | ~0 min left | 85 samples
+  block 18/50 | 0 min | ~0 min left | 90 samples
+  block 19/50 | 0 min | ~0 min left | 95 samples
+  block 20/50 | 0 min | ~0 min left | 100 samples
+  block 21/50 | 0 min | ~0 min left | 105 samples
+  block 22/50 | 0 min | ~0 min left | 110 samples
+  block 23/50 | 0 min | ~0 min left | 115 samples
+  block 24/50 | 0 min | ~0 min left | 120 samples
+  block 25/50 | 0 min | ~0 min left | 125 samples
+  block 26/50 | 0 min | ~0 min left | 130 samples
+  block 27/50 | 0 min | ~0 min left | 135 samples
+  block 28/50 | 0 min | ~0 min left | 140 samples
+  block 29/50 | 0 min | ~0 min left | 145 samples
+  block 30/50 | 0 min | ~0 min left | 150 samples
+  block 31/50 | 0 min | ~0 min left | 155 samples
+  block 32/50 | 0 min | ~0 min left | 160 samples
+  block 33/50 | 0 min | ~0 min left | 165 samples
+  block 34/50 | 0 min | ~0 min left | 170 samples
+  block 35/50 | 0 min | ~0 min left | 175 samples
+  block 36/50 | 0 min | ~0 min left | 180 samples
+  block 37/50 | 0 min | ~0 min left | 185 samples
+  block 38/50 | 0 min | ~0 min left | 190 samples
+  block 39/50 | 0 min | ~0 min left | 195 samples
+  block 40/50 | 0 min | ~0 min left | 200 samples
+  block 41/50 | 0 min | ~0 min left | 205 samples
+  block 42/50 | 0 min | ~0 min left | 210 samples
+  block 43/50 | 0 min | ~0 min left | 215 samples
+  block 44/50 | 0 min | ~0 min left | 220 samples
+  block 45/50 | 0 min | ~0 min left | 225 samples
+  block 46/50 | 0 min | ~0 min left | 230 samples
+  block 47/50 | 1 min | ~0 min left | 235 samples
+  block 48/50 | 1 min | ~0 min left | 240 samples
+  block 49/50 | 1 min | ~0 min left | 245 samples
+  block 50/50 | 1 min | ~0 min left | 250 samples
+FINISHED. velocities (250, 208, 3)
+Energy drift: 0.0275 meV/atom (laptop 2x2x2 run gave 0.039)
+positions saved: (250, 208, 3)
+Loaded 26 atoms: {'Al': 18, 'Ni': 3, 'Co': 5}, volume 360.8 A^3
+Relaxed (float64): max residual force 0.00083 eV/A (laptop gave 0.00083)
+MD dtype: float32
+=== MD: 2x2x2, 208 atoms, 624 modes, 300.0 K ===
+    {'Al': 144, 'Ni': 24, 'Co': 40}
+    seed 11
+NVT equilibration (10 ps)...
+Loaded 26 atoms: {'Al': 18, 'Ni': 3, 'Co': 5}, volume 360.8 A^3
+Loaded 26 atoms: {'Al': 18, 'Ni': 3, 'Co': 5}, volume 360.8 A^3
+Relaxed (float64): max residual force 0.00083 eV/A (laptop gave 0.00083)
+Relaxed (float64): max residual force 0.00083 eV/A (laptop gave 0.00083)
+MD dtype: float64
+=== MD: 2x2x2, 208 atoms, 624 modes, 300.0 K ===
+    {'Al': 144, 'Ni': 24, 'Co': 40}
+    seed 11
+NVT equilibration (10 ps)...
+MD dtype: float32
+=== MD: 3x3x3, 702 atoms, 2106 modes, 300.0 K ===
+    {'Al': 486, 'Ni': 81, 'Co': 135}
+    seed 12
+NVT equilibration (10 ps)...
+  done in 318s, instantaneous T = 288 K
+NVE burn-in (2 ps, not recorded)...
+NVE production: 200 ps (~0.021 meV resolution), 50 blocks, storing positions...
+  block 1/50 | 2 min | ~104 min left | 1000 samples
+  block 2/50 | 4 min | ~101 min left | 2000 samples
+  block 3/50 | 6 min | ~99 min left | 3000 samples
+  block 4/50 | 8 min | ~97 min left | 4000 samples
+  block 5/50 | 11 min | ~95 min left | 5000 samples
+  done in 910s, instantaneous T = 298 K
+NVE burn-in (2 ps, not recorded)...
+  block 6/50 | 13 min | ~93 min left | 6000 samples
+NVE production: 200 ps (~0.021 meV resolution), 50 blocks, storing positions...
+  block 7/50 | 15 min | ~91 min left | 7000 samples
+  block 8/50 | 17 min | ~89 min left | 8000 samples
+  block 9/50 | 19 min | ~87 min left | 9000 samples
+  block 1/50 | 6 min | ~297 min left | 1000 samples
+  block 10/50 | 21 min | ~85 min left | 10000 samples
+  block 11/50 | 23 min | ~82 min left | 11000 samples
+  block 12/50 | 25 min | ~80 min left | 12000 samples
+  block 2/50 | 12 min | ~291 min left | 2000 samples
+  block 13/50 | 27 min | ~78 min left | 13000 samples
+  block 14/50 | 30 min | ~76 min left | 14000 samples
+  block 15/50 | 32 min | ~74 min left | 15000 samples
+  done in 2135s, instantaneous T = 288 K
+NVE burn-in (2 ps, not recorded)...
+  block 3/50 | 18 min | ~285 min left | 3000 samples
+  block 16/50 | 34 min | ~72 min left | 16000 samples
+  block 17/50 | 36 min | ~70 min left | 17000 samples
+  block 18/50 | 38 min | ~68 min left | 18000 samples
+  block 4/50 | 24 min | ~279 min left | 4000 samples
+NVE production: 200 ps (~0.021 meV resolution), 50 blocks...
+  block 19/50 | 40 min | ~65 min left | 19000 samples
+  block 20/50 | 42 min | ~63 min left | 20000 samples
+  block 21/50 | 44 min | ~61 min left | 21000 samples
+  block 5/50 | 30 min | ~272 min left | 5000 samples
+  block 22/50 | 46 min | ~59 min left | 22000 samples
+  block 23/50 | 49 min | ~57 min left | 23000 samples
+  block 24/50 | 51 min | ~55 min left | 24000 samples
+  block 6/50 | 36 min | ~266 min left | 6000 samples
+  block 25/50 | 53 min | ~53 min left | 25000 samples
+  block 1/50 | 14 min | ~697 min left | 1000 samples
+  block 26/50 | 55 min | ~51 min left | 26000 samples
+  block 27/50 | 57 min | ~49 min left | 27000 samples
+  block 7/50 | 42 min | ~260 min left | 7000 samples
+  block 28/50 | 59 min | ~46 min left | 28000 samples
+  block 29/50 | 61 min | ~44 min left | 29000 samples
+  block 8/50 | 48 min | ~254 min left | 8000 samples
+  block 30/50 | 63 min | ~42 min left | 30000 samples
+  block 31/50 | 65 min | ~40 min left | 31000 samples
+  block 32/50 | 68 min | ~38 min left | 32000 samples
+  block 2/50 | 28 min | ~683 min left | 2000 samples
+  block 9/50 | 54 min | ~248 min left | 9000 samples
+  block 33/50 | 70 min | ~36 min left | 33000 samples
+  block 34/50 | 72 min | ~34 min left | 34000 samples
+  block 35/50 | 74 min | ~32 min left | 35000 samples
+  block 10/50 | 61 min | ~242 min left | 10000 samples
+  block 36/50 | 76 min | ~30 min left | 36000 samples
+  block 37/50 | 78 min | ~27 min left | 37000 samples
+  block 38/50 | 80 min | ~25 min left | 38000 samples
+  block 11/50 | 67 min | ~236 min left | 11000 samples
+  block 3/50 | 43 min | ~669 min left | 3000 samples
+  block 39/50 | 82 min | ~23 min left | 39000 samples
+  block 40/50 | 84 min | ~21 min left | 40000 samples
+  block 41/50 | 87 min | ~19 min left | 41000 samples
+  block 12/50 | 73 min | ~230 min left | 12000 samples
+  block 42/50 | 89 min | ~17 min left | 42000 samples
+  block 43/50 | 91 min | ~15 min left | 43000 samples
+  block 44/50 | 93 min | ~13 min left | 44000 samples
+  block 13/50 | 79 min | ~224 min left | 13000 samples
+  block 45/50 | 95 min | ~11 min left | 45000 samples
+  block 4/50 | 57 min | ~654 min left | 4000 samples
+  block 46/50 | 97 min | ~8 min left | 46000 samples
+  block 47/50 | 99 min | ~6 min left | 47000 samples
+  block 14/50 | 85 min | ~218 min left | 14000 samples
+  block 48/50 | 101 min | ~4 min left | 48000 samples
+  block 49/50 | 103 min | ~2 min left | 49000 samples
+  block 15/50 | 91 min | ~212 min left | 15000 samples
+  block 50/50 | 106 min | ~0 min left | 50000 samples
+FINISHED. velocities (50000, 208, 3)
+Energy drift: 0.0436 meV/atom (laptop 2x2x2 run gave 0.039)
+positions saved: (50000, 208, 3)
+  block 5/50 | 71 min | ~640 min left | 5000 samples
+  block 16/50 | 97 min | ~206 min left | 16000 samples
+  block 17/50 | 103 min | ~200 min left | 17000 samples
+  block 18/50 | 109 min | ~194 min left | 18000 samples
+  block 6/50 | 85 min | ~626 min left | 6000 samples
+  block 19/50 | 115 min | ~188 min left | 19000 samples
+  block 20/50 | 121 min | ~182 min left | 20000 samples
+  block 7/50 | 100 min | ~612 min left | 7000 samples
+  block 21/50 | 127 min | ~176 min left | 21000 samples
+  block 22/50 | 133 min | ~170 min left | 22000 samples
+  block 8/50 | 114 min | ~598 min left | 8000 samples
+  block 23/50 | 139 min | ~164 min left | 23000 samples
+  block 24/50 | 145 min | ~157 min left | 24000 samples
+  block 25/50 | 151 min | ~151 min left | 25000 samples
+  block 9/50 | 128 min | ~583 min left | 9000 samples
+  block 26/50 | 157 min | ~145 min left | 26000 samples
+  block 27/50 | 164 min | ~139 min left | 27000 samples
+  block 10/50 | 142 min | ~569 min left | 10000 samples
+  block 28/50 | 170 min | ~133 min left | 28000 samples
+  block 29/50 | 176 min | ~127 min left | 29000 samples
+  block 11/50 | 157 min | ~555 min left | 11000 samples
+  block 30/50 | 182 min | ~121 min left | 30000 samples
+  block 31/50 | 188 min | ~115 min left | 31000 samples
+  block 32/50 | 194 min | ~109 min left | 32000 samples
+  block 12/50 | 171 min | ~541 min left | 12000 samples
+  block 33/50 | 200 min | ~103 min left | 33000 samples
+  block 34/50 | 206 min | ~97 min left | 34000 samples
+  block 13/50 | 185 min | ~526 min left | 13000 samples
+  block 35/50 | 212 min | ~91 min left | 35000 samples
+  block 36/50 | 218 min | ~85 min left | 36000 samples
+  block 14/50 | 199 min | ~512 min left | 14000 samples
+  block 37/50 | 224 min | ~79 min left | 37000 samples
+  block 38/50 | 230 min | ~73 min left | 38000 samples
+  block 39/50 | 236 min | ~67 min left | 39000 samples
+  block 15/50 | 213 min | ~498 min left | 15000 samples
+  block 40/50 | 242 min | ~61 min left | 40000 samples
+  block 41/50 | 248 min | ~55 min left | 41000 samples
+  block 16/50 | 228 min | ~484 min left | 16000 samples
+  block 42/50 | 254 min | ~48 min left | 42000 samples
+  block 43/50 | 261 min | ~42 min left | 43000 samples
+  block 17/50 | 242 min | ~470 min left | 17000 samples
+  block 44/50 | 267 min | ~36 min left | 44000 samples
+  block 45/50 | 273 min | ~30 min left | 45000 samples
+  block 46/50 | 279 min | ~24 min left | 46000 samples
+  block 18/50 | 256 min | ~455 min left | 18000 samples
+  block 47/50 | 285 min | ~18 min left | 47000 samples
+  block 48/50 | 291 min | ~12 min left | 48000 samples
+  block 19/50 | 270 min | ~441 min left | 19000 samples
+  block 49/50 | 297 min | ~6 min left | 49000 samples
+  block 50/50 | 303 min | ~0 min left | 50000 samples
+FINISHED. velocities (50000, 702, 3)
+Energy drift: 0.0280 meV/atom (laptop 2x2x2 run gave 0.039)
+positions saved: (50000, 702, 3)
+  block 20/50 | 285 min | ~427 min left | 20000 samples
+  block 21/50 | 299 min | ~413 min left | 21000 samples
+  block 22/50 | 313 min | ~398 min left | 22000 samples
+  block 23/50 | 327 min | ~384 min left | 23000 samples
+  block 24/50 | 341 min | ~370 min left | 24000 samples
+  block 25/50 | 356 min | ~356 min left | 25000 samples
+  block 26/50 | 370 min | ~341 min left | 26000 samples
+  block 27/50 | 384 min | ~327 min left | 27000 samples
+  block 28/50 | 398 min | ~313 min left | 28000 samples
+  block 29/50 | 413 min | ~299 min left | 29000 samples
+  block 30/50 | 427 min | ~285 min left | 30000 samples
+  block 31/50 | 441 min | ~270 min left | 31000 samples
+  block 32/50 | 455 min | ~256 min left | 32000 samples
+  block 33/50 | 470 min | ~242 min left | 33000 samples
+  block 34/50 | 484 min | ~228 min left | 34000 samples
+  block 35/50 | 498 min | ~213 min left | 35000 samples
+  block 36/50 | 512 min | ~199 min left | 36000 samples
+  block 37/50 | 526 min | ~185 min left | 37000 samples
+  block 38/50 | 541 min | ~171 min left | 38000 samples
+  block 39/50 | 555 min | ~157 min left | 39000 samples
+  block 40/50 | 569 min | ~142 min left | 40000 samples
+  block 41/50 | 583 min | ~128 min left | 41000 samples
+  block 42/50 | 598 min | ~114 min left | 42000 samples
+  block 43/50 | 612 min | ~100 min left | 43000 samples
+  block 44/50 | 626 min | ~85 min left | 44000 samples
+  block 45/50 | 640 min | ~71 min left | 45000 samples
+  block 46/50 | 655 min | ~57 min left | 46000 samples
+  block 47/50 | 669 min | ~43 min left | 47000 samples
+  block 48/50 | 683 min | ~28 min left | 48000 samples
+  block 49/50 | 697 min | ~14 min left | 49000 samples
+  block 50/50 | 711 min | ~0 min left | 50000 samples
+FINISHED. velocities (50000, 208, 3)
+Energy drift: 0.0432 meV/atom (laptop 2x2x2 run gave 0.039)
