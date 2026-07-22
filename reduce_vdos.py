@@ -97,7 +97,9 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--velocities", required=True)
     ap.add_argument("--structure", default="Al9Co2Ni2-coords.txt")
-    ap.add_argument("--supercell", type=int, required=True)
+    ap.add_argument("--supercell", type=str, required=True,
+                    help="cube size ('4' -> 4x4x4) or three comma-separated "
+                         "dims ('8,4,4') - must match the MD run")
     ap.add_argument("--sample-fs", type=float, default=4.0)
     ap.add_argument("--chunks", type=int, default=8,
                     help="split the trajectory into blocks for an error bar, and "
@@ -109,7 +111,11 @@ def main():
 
     vel = np.load(args.velocities, mmap_mode="r")      # do not pull 2 GB into RAM at once
     base = parse_structure(args.structure)
-    sc = make_supercell(base, np.diag([args.supercell] * 3))
+    parts = [int(x) for x in args.supercell.split(",")]
+    dims = tuple(parts * 3) if len(parts) == 1 else tuple(parts)
+    if len(dims) != 3:
+        raise SystemExit(f"--supercell needs 1 or 3 numbers, got {args.supercell!r}")
+    sc = make_supercell(base, np.diag(dims))
     syms = np.array(sc.get_chemical_symbols())
     masses = np.array([atomic_masses[atomic_numbers[s]] for s in syms])
 
