@@ -1,0 +1,462 @@
+"""
+Cell-constrained melt-quench with MACE: discovering AlCoNi approximants
+=======================================================================
+
+What this does, and how it differs from md_run.py
+-------------------------------------------------
+md_run.py measures the vibrations of a structure we already have. This script
+does the opposite: it *discovers* a structure, given only a unit cell, a
+composition and an atom count.
+
+The method is "cell-constrained melt-quench", from
+
+    M. Mihalkovic, M. Widom and C. L. Henley, "Cell-constrained melt-quench
+    simulation of d-AlCoNi: Ni-rich versus Co-rich structures",
+    Phil. Mag. 91 (2011) 2557-2566.  doi:10.1080/14786435.2010.515264
+
+Their recipe: fix the cell, composition and atomic density to known values,
+melt, then cool under MD while interleaving Monte Carlo swaps of atomic
+species. The cell constraint is what makes it work - it limits the accessible
+ensemble enough to shepherd the system toward the global minimum rather than
+into a glass.
+
+They used GPT pair potentials; we use MACE. Two consequences:
+
+  - Every attempted MC swap costs a full MACE forward pass, where a pair
+    potential could evaluate the energy change locally. So the swap count per
+    loop is the main cost knob (--swaps), and --benchmark measures the real
+    per-evaluation cost before committing to a schedule.
+
+  - The paper notes the GPT potentials had "unrealistically deep Al-TM
+    nearest-neighbour wells" which exaggerated the stability of the spurious B2
+    phase, and that this - not compute time - was what limited how large a cell
+    they could use. Whether MACE inherits that bias is an open question, and one
+    of the reasons this is worth doing at all.
+
+The validation gate
+-------------------
+Section 3 of the paper validates the method by reproducing known structures
+from scratch: Al3Ni in 10 loops, m-Al13Co4 (51 atoms) in 119 loops, Al9Co2,
+and the ternary X(AlCoNi) phase at Al:Co:Ni = 18:5:3 in 71 loops.
+
+That last one is our 26-atom cell. So the first thing to do is reproduce it:
+
+    python melt_quench.py --reference Al9Co2Ni2-coords.txt --loops-per-temp 5
+
+Success criterion: the quenched structure lands at the same energy per atom as
+the relaxed reference (printed side by side at the end). A higher energy means
+the anneal got stuck in a metastable state - run longer, or raise --swaps.
+
+Protocol notes, and why each choice
+-----------------------------------
+  Timestep 0.2 fs, not the 2 fs used for the room-temperature VDOS runs. At
+  2500 K atoms move an order of magnitude faster and 2 fs would not integrate
+  stably. This is the paper's value.
+
+  Langevin thermostat throughout, deliberately. This is annealing, so we *want*
+  a thermostat holding each stage at temperature - the exact opposite of the
+  VDOS runs, where NVE was essential because a thermostat modifies the
+  equations of motion and would contaminate the spectrum.
+
+  The cell never changes. That is the "cell constraint": positions relax and
+  species swap, but the lattice is pinned at the target values. Even the
+  quenches relax positions only.
+
+  MC species swaps, not just MD. Solid-state diffusion is far too slow to
+  sample chemical orderings in reachable simulation time, so the chemistry has
+  to be moved by Monte Carlo rather than by atoms physically migrating.
+
+  8 A stacking, not 4 A, for any new cell. The paper is blunt: "There is no
+  hope to realistically model any decagonal without (at least local) 8 A period
+  due to puckering of Al atoms out of their layers" - when they forced a 4 A
+  cell they never obtained a decagonal at all.
+
+  Random start with a minimum separation. Uniformly random placement will
+  occasionally put two atoms ~0.5 A apart, which gives an enormous energy and
+  can produce NaN forces on the very first MD step. We reject such placements.
+
+Deviations from the paper, and why
+---------------------------------
+  NO REPLICA EXCHANGE. The paper runs 20 simulations at once, one per
+  temperature, and exchanges whole configurations between temperatures by
+  Metropolis. They identify this as the trick that makes the method work: their
+  expectation was that a plain quench "should get caught in a glassy or highly
+  defective metastable state rather than the true energy minimum", and it was
+  "sufficient to apply the trick of replica exchange" to avoid that. This script
+  instead does staged annealing - one trajectory cooling through the ladder -
+  because it is far less code and ~20x cheaper. That is a real simplification,
+  not an equivalent: if a validation run lands above the reference energy, this
+  is the first thing to suspect, and larger cells will probably need the full
+  replica-exchange treatment.
+
+  500 swap attempts per loop instead of 7800, because each attempt is a full
+  MACE forward pass rather than a local pair-potential update. See --swaps.
+
+  MACE instead of GPT pair potentials, which is the point of the exercise.
+
+  Atomic density is NOT swept. The paper treats density as a key parameter and
+  finds the same composition gives a different structure type at low vs high
+  density (Ni-type vs Co-type). With --reference the density comes from the
+  known cell, so it is fixed correctly; when designing new cells it has to be
+  varied deliberately. This script prints the density but does not explore it.
+
+  Diagnostic: the paper reports swap acceptance of 0.03-0.05. If the acc column
+  in the log reads far from that, something is off with the temperatures or the
+  energetics and it is worth stopping to look.
+
+Reference cells from the paper (Section 3-4), for later runs
+-----------------------------------------------------------
+  tilings use a_q = 2.44 A in-plane, c = 4.08 A minimum stacking period
+  "2B+H" cell:  a = b = 19.78 A, gamma = 108 deg, c = 8.06 A
+  "boat" cell:  a = b = 12.30 A, gamma = 108 deg, c = 8.20 A  (2B+H shrunk by
+                tau; chosen because it matches the spurious B2 phase poorly)
+  densities 0.066-0.070 atoms/A^3, i.e. 77-80 atoms in the boat cell
+  compositions: Al56Co6Ni16 (Ni-rich), Al58Co14Ni9 (Co-rich)
+
+Usage
+-----
+    python melt_quench.py --benchmark --reference Al9Co2Ni2-coords.txt
+    python melt_quench.py --reference Al9Co2Ni2-coords.txt        # validation gate
+    python melt_quench.py --cell 12.3,12.3,8.20 --angles 90,90,108 \
+                          --counts Al:56,Co:6,Ni:16 --out boat_nirich
+"""
+
+import argparse
+import time
+from collections import Counter
+
+import numpy as np
+from ase import Atoms, units
+from ase.geometry import cellpar_to_cell, find_mic
+from ase.io import write
+from ase.md.langevin import Langevin
+from ase.optimize import BFGS
+
+TYPE_TO_ELEMENT = {13: "Al", 27: "Co", 28: "Ni"}
+
+
+def log(msg, path="melt_quench_progress.txt"):
+    print(msg, flush=True)
+    with open(path, "a") as f:
+        f.write(msg + "\n")
+
+
+def parse_structure(path):
+    """Same parser as md_run.py: cell vectors on one line, then x y z type per
+    atom, with type 0 rows dropped as partial-occupancy placeholders. Duplicated
+    here rather than imported so this script stands alone and can be tested
+    without a MACE install."""
+    lines = open(path).read().splitlines()
+    tokens = open(path).read().split()
+    cell = np.array([float(x) for x in tokens[:9]]).reshape(3, 3)
+    symbols, scaled = [], []
+    for ln in lines:
+        p = ln.split()
+        if len(p) >= 6 and p[3].isdigit() and p[4].isdigit():
+            t = int(p[3])
+            if t == 0:
+                continue
+            if t in TYPE_TO_ELEMENT:
+                symbols.append(TYPE_TO_ELEMENT[t])
+                scaled.append([float(p[0]), float(p[1]), float(p[2])])
+    return Atoms(symbols=symbols, scaled_positions=np.array(scaled),
+                 cell=cell, pbc=True)
+
+
+def _refresh_masses(atoms):
+    """ASE will cache a 'masses' array, and that array does NOT follow a species
+    swap - so MD after a swap would silently use the wrong masses. Drop it and
+    let ASE re-derive masses from atomic numbers."""
+    if "masses" in atoms.arrays:
+        del atoms.arrays["masses"]
+
+
+def random_config(cell, counts, rng, min_dist=2.0, max_tries=300):
+    """Scatter the given composition at random positions in a fixed cell,
+    rejecting any position closer than min_dist to an already-placed atom
+    (minimum-image). If a slot cannot be filled, min_dist is relaxed slightly
+    rather than looping forever."""
+    symbols = []
+    for sym, n in counts.items():
+        symbols += [sym] * n
+    symbols = [str(s) for s in rng.permutation(symbols)]
+
+    cell = np.asarray(cell, dtype=float)
+    pos = np.zeros((len(symbols), 3))
+    placed, tries = 0, 0
+    while placed < len(symbols):
+        cand = rng.random(3) @ cell
+        if placed == 0:
+            ok = True
+        else:
+            _, dlen = find_mic(cand - pos[:placed], cell, pbc=True)
+            ok = float(dlen.min()) > min_dist
+        if ok:
+            pos[placed] = cand
+            placed += 1
+            tries = 0
+        else:
+            tries += 1
+            if tries > max_tries:
+                min_dist *= 0.95
+                tries = 0
+    return Atoms(symbols=symbols, positions=pos, cell=cell, pbc=True)
+
+
+def md_burst(atoms, T, n_steps, timestep_fs, friction=0.02):
+    """MD at fixed temperature. Friction is higher than the VDOS runs' 0.01/fs
+    because at melt temperatures we want the thermostat to hold temperature
+    firmly, not to perturb the dynamics as little as possible."""
+    Langevin(atoms, timestep_fs * units.fs, temperature_K=T,
+             friction=friction / units.fs).run(n_steps)
+
+
+def try_swaps(atoms, T, n_attempts, rng, e_current):
+    """Metropolis Monte Carlo on chemical identity. Returns the current energy
+    and the number of accepted swaps. One MACE energy evaluation per attempt -
+    this is the expensive part of the method."""
+    kT = units.kB * T
+    syms = np.array(atoms.get_chemical_symbols())
+    n_acc = 0
+    for _ in range(n_attempts):
+        i = int(rng.integers(len(syms)))
+        others = np.flatnonzero(syms != syms[i])
+        if others.size == 0:
+            break                                   # single-species cell
+        j = int(others[rng.integers(others.size)])
+
+        syms[i], syms[j] = syms[j], syms[i]
+        atoms.set_chemical_symbols(list(syms))
+        _refresh_masses(atoms)
+        e_trial = atoms.get_potential_energy()
+
+        dE = e_trial - e_current
+        if dE <= 0.0 or rng.random() < np.exp(-dE / kT):
+            e_current = e_trial
+            n_acc += 1
+        else:
+            syms[i], syms[j] = syms[j], syms[i]      # revert
+            atoms.set_chemical_symbols(list(syms))
+            _refresh_masses(atoms)
+    return e_current, n_acc
+
+
+def quench(atoms, fmax):
+    """Relax positions at fixed cell to read off the underlying zero-temperature
+    energy. The paper does this periodically to monitor progress. The cell is
+    NOT relaxed - that would break the constraint the method relies on."""
+    snap = atoms.copy()
+    snap.calc = atoms.calc
+    BFGS(snap, logfile=None).run(fmax=fmax, steps=300)
+    return snap, snap.get_potential_energy()
+
+
+def melt_quench(atoms, args, rng):
+    n = len(atoms)
+    log(f"=== melt-quench: {n} atoms, {dict(Counter(atoms.get_chemical_symbols()))} ===")
+    log(f"    cell {np.round(atoms.cell.cellpar(), 3)}, "
+        f"density {n / atoms.get_volume():.4f} atoms/A^3")
+    log(f"    {args.n_temps} stages {args.t_hi}->{args.t_lo} K, "
+        f"{args.loops_per_temp} loops each ({args.n_temps * args.loops_per_temp} total), "
+        f"{args.md_steps} MD steps + {args.swaps} swap attempts per loop")
+
+    t_start = time.time()
+    log(f"melting at {args.t_hi} K ({args.melt_steps} steps)...")
+    md_burst(atoms, args.t_hi, args.melt_steps, args.timestep)
+
+    temps = np.linspace(args.t_hi, args.t_lo, args.n_temps)
+    best_e, best = np.inf, None
+    trace, loop = [], 0
+
+    for T in temps:
+        n_acc_stage = 0
+        for _ in range(args.loops_per_temp):
+            loop += 1
+            md_burst(atoms, T, args.md_steps, args.timestep)
+            e_current = atoms.get_potential_energy()
+            e_current, n_acc = try_swaps(atoms, T, args.swaps, rng, e_current)
+            n_acc_stage += n_acc
+
+        snap, e_q = quench(atoms, args.fmax_monitor)
+        if e_q < best_e:
+            best_e, best = e_q, snap.copy()
+        acc_rate = n_acc_stage / max(1, args.swaps * args.loops_per_temp)
+        trace.append((T, e_q / n, acc_rate))
+        el = (time.time() - t_start) / 60
+        log(f"  T={T:7.0f} K | loop {loop:4d} | quenched {e_q / n:+.5f} eV/atom "
+            f"| best {best_e / n:+.5f} | acc {acc_rate:.3f} | {el:.0f} min")
+
+    log("final tight relax of the best structure...")
+    best.calc = atoms.calc
+    BFGS(best, logfile=None).run(fmax=args.fmax_final, steps=500)
+    e_final = best.get_potential_energy()
+    log(f"FINISHED. best energy {e_final / n:+.6f} eV/atom "
+        f"({(time.time() - t_start) / 60:.0f} min)")
+
+    write(f"{args.out}_best.vasp", best, direct=True, sort=True)
+    write(f"{args.out}_best.xyz", best)
+    np.save(f"{args.out}_trace.npy", np.array(trace))
+    log(f"wrote {args.out}_best.vasp, {args.out}_best.xyz, {args.out}_trace.npy")
+    return best, e_final
+
+
+def benchmark(atoms, args):
+    """Measure the real per-evaluation cost before committing to a schedule.
+
+    Two traps this avoids, both learned the hard way in md_run.py's benchmark:
+      - ASE caches results, so repeating an identical call times nothing. We
+        perturb positions (MD-like) or swap species (MC-like) between calls.
+      - CUDA calls are asynchronous, so without synchronize() we would time the
+        queueing rather than the work.
+    """
+    try:
+        import torch
+        cuda = torch.cuda.is_available() and args.device == "cuda"
+    except ImportError:
+        torch, cuda = None, False
+
+    atoms.get_potential_energy()                     # warm-up, not timed
+    if cuda:
+        torch.cuda.synchronize()
+
+    reps = 20
+    t0 = time.time()
+    for _ in range(reps):
+        atoms.rattle(1e-4)                           # invalidate the cache
+        atoms.get_potential_energy()
+    if cuda:
+        torch.cuda.synchronize()
+    t_md = (time.time() - t0) / reps
+
+    syms = np.array(atoms.get_chemical_symbols())
+    t0 = time.time()
+    for k in range(reps):
+        i, j = k % len(syms), (k + len(syms) // 2) % len(syms)
+        syms[i], syms[j] = syms[j], syms[i]
+        atoms.set_chemical_symbols(list(syms))
+        _refresh_masses(atoms)
+        atoms.get_potential_energy()
+    if cuda:
+        torch.cuda.synchronize()
+    t_mc = (time.time() - t0) / reps
+
+    loops = args.n_temps * args.loops_per_temp
+    n_evals = loops * (args.md_steps + args.swaps)
+    est_h = (loops * (args.md_steps * t_md + args.swaps * t_mc)) / 3600
+
+    log("=== BENCHMARK ===")
+    log(f"{len(atoms)} atoms, device {args.device}, dtype {args.dtype}")
+    log(f"  energy after position change (MD-like): {t_md * 1000:8.2f} ms")
+    log(f"  energy after species swap    (MC-like): {t_mc * 1000:8.2f} ms")
+    log(f"  default schedule: {loops} loops x ({args.md_steps} MD + {args.swaps} swaps) "
+        f"= {n_evals:,} evaluations")
+    log(f"  estimated wall time: {est_h:.2f} h")
+    log("  (the paper used 7800 swaps/loop with pair potentials, where a swap's")
+    log("   energy change is local. Scale --swaps to what the estimate allows.)")
+
+
+def parse_counts(spec):
+    """'Al:18,Co:5,Ni:3' -> {'Al': 18, 'Co': 5, 'Ni': 3}"""
+    counts = {}
+    for part in spec.split(","):
+        sym, n = part.split(":")
+        counts[sym.strip()] = int(n)
+    return counts
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--reference", default=None,
+                    help="known structure to take the cell and composition from, "
+                         "and to compare the result against. This is how the "
+                         "validation run is set up.")
+    ap.add_argument("--cell", default=None, help="a,b,c in Angstrom")
+    ap.add_argument("--angles", default="90,90,90", help="alpha,beta,gamma in degrees")
+    ap.add_argument("--counts", default=None, help="e.g. Al:56,Co:6,Ni:16")
+
+    ap.add_argument("--t-hi", type=float, default=2500.0, help="melt temperature (K)")
+    ap.add_argument("--t-lo", type=float, default=1000.0, help="final anneal temperature (K)")
+    ap.add_argument("--n-temps", type=int, default=20,
+                    help="annealing stages between t-hi and t-lo (paper used 20)")
+    ap.add_argument("--loops-per-temp", type=int, default=5,
+                    help="MD+MC loops per stage; 20 stages x 5 = 100 loops, "
+                         "matching the paper's ~100 to first low-energy states")
+    ap.add_argument("--md-steps", type=int, default=1000, help="MD steps per loop (paper: 1000)")
+    ap.add_argument("--swaps", type=int, default=500,
+                    help="MC swap attempts per loop. The paper used 7800, cheap "
+                         "with pair potentials; each attempt is a full MACE "
+                         "forward pass here, so this is reduced. Scale roughly "
+                         "with atom count, and check --benchmark first.")
+    ap.add_argument("--timestep", type=float, default=0.2,
+                    help="fs; 0.2 as in the paper, not the 2 fs used at 300 K")
+    ap.add_argument("--melt-steps", type=int, default=2000,
+                    help="initial MD steps at t-hi to randomise the melt")
+    ap.add_argument("--fmax-monitor", type=float, default=0.02,
+                    help="eV/A for the periodic monitoring quenches (loose, for speed)")
+    ap.add_argument("--fmax-final", type=float, default=0.001,
+                    help="eV/A for the final relax of the best structure")
+
+    ap.add_argument("--seed", type=int, default=1)
+    ap.add_argument("--device", default="cuda")
+    ap.add_argument("--dtype", default="float32",
+                    help="float32 for the anneal; the final relax is where "
+                         "precision matters most")
+    ap.add_argument("--benchmark", action="store_true")
+    ap.add_argument("--out", default="mq")
+    args = ap.parse_args()
+
+    rng = np.random.default_rng(args.seed)
+
+    # ---- work out the cell and composition ----
+    ref = None
+    if args.reference:
+        ref = parse_structure(args.reference)
+        cell = np.array(ref.cell)
+        counts = dict(Counter(ref.get_chemical_symbols()))
+        log(f"reference {args.reference}: {len(ref)} atoms, {counts}, "
+            f"volume {ref.get_volume():.1f} A^3")
+        if args.counts:
+            counts = parse_counts(args.counts)
+            log(f"  overriding composition with {counts}")
+    else:
+        if not (args.cell and args.counts):
+            raise SystemExit("give either --reference, or both --cell and --counts")
+        a, b, c = [float(x) for x in args.cell.split(",")]
+        al, be, ga = [float(x) for x in args.angles.split(",")]
+        cell = cellpar_to_cell([a, b, c, al, be, ga])
+        counts = parse_counts(args.counts)
+
+    atoms = random_config(cell, counts, rng)
+    log(f"random start: {len(atoms)} atoms in a fixed cell, "
+        f"min separation {atoms.get_all_distances(mic=True)[np.triu_indices(len(atoms), 1)].min():.2f} A")
+
+    # ---- attach MACE ----
+    from mace.calculators import mace_mp
+    calc = mace_mp(model="medium-mpa-0", device=args.device, default_dtype=args.dtype)
+    atoms.calc = calc
+
+    if args.benchmark:
+        benchmark(atoms, args)
+        return
+
+    best, e_final = melt_quench(atoms, args, rng)
+
+    # ---- the validation comparison ----
+    if ref is not None:
+        ref.calc = calc
+        BFGS(ref, logfile=None).run(fmax=args.fmax_final, steps=500)
+        e_ref = ref.get_potential_energy() / len(ref)
+        e_got = e_final / len(best)
+        log("=== validation against the reference structure ===")
+        log(f"  reference (relaxed): {e_ref:+.6f} eV/atom")
+        log(f"  melt-quench found:   {e_got:+.6f} eV/atom")
+        log(f"  difference:          {(e_got - e_ref) * 1000:+.2f} meV/atom")
+        if e_got - e_ref < 0.001:
+            log("  -> matches or beats the reference: the anneal found it.")
+        else:
+            log("  -> higher than the reference: the anneal is stuck. Run more "
+                "loops, or raise --swaps.")
+
+
+if __name__ == "__main__":
+    main()
