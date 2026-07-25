@@ -251,6 +251,136 @@ def quench(atoms, fmax):
     return snap, snap.get_potential_energy()
 
 
+def fixed_site_mc(ref, args, rng):
+    """Diagnostic: keep the reference ATOMIC POSITIONS, randomise the species,
+    and let only the Monte Carlo swaps run. No MD, no position changes.
+
+    This is what Mihalkovic and Widom did for the W-phase in Phil. Mag. 86
+    (2005): fixed-site Monte Carlo on a site list taken from diffraction. Here
+    it decomposes the validation gap into its two causes. If this recovers the
+    reference energy easily, the whole gap is the positional search and the
+    chemistry machinery is fine. If it stalls well above, the swap schedule
+    needs work too, and no amount of better annealing will fix that.
+    """
+    atoms = ref.copy()
+    atoms.calc = ref.calc
+    syms = [str(s) for s in rng.permutation(atoms.get_chemical_symbols())]
+    atoms.set_chemical_symbols(syms)
+    _refresh_masses(atoms)
+
+    n = len(atoms)
+    e = atoms.get_potential_energy()
+    log(f"=== fixed-site MC: {n} atoms on the reference site list ===")
+    log(f"    species randomised, start {e / n:+.6f} eV/atom")
+    log(f"    {args.n_temps} stages {args.t_hi}->{args.t_lo} K, "
+        f"{args.swaps} swap attempts each, positions frozen")
+
+    t0 = time.time()
+    best_e, best = e, atoms.copy()
+    for T in np.linspace(args.t_hi, args.t_lo, args.n_temps):
+        e, n_acc = try_swaps(atoms, T, args.swaps, rng, e)
+        if e < best_e:
+            best_e, best = e, atoms.copy()
+        log(f"  T={T:7.0f} K | {e / n:+.6f} eV/atom | best {best_e / n:+.6f} "
+            f"| acc {n_acc / max(1, args.swaps):.3f} | {(time.time() - t0) / 60:.0f} min")
+
+    log(f"best chemistry on frozen sites: {best_e / n:+.6f} eV/atom")
+    best.calc = ref.calc
+    BFGS(best, logfile=None).run(fmax=args.fmax_final, steps=500)
+    e_relaxed = best.get_potential_energy()
+    log(f"after relaxing positions too:   {e_relaxed / n:+.6f} eV/atom")
+    write(f"{args.out}_fixedsite.vasp", best, direct=True, sort=True)
+    return best, e_relaxed
+
+
+def replica_exchange(atoms, args, rng):
+    """Replica exchange (parallel tempering), the piece the paper identifies as
+    essential and that staged annealing lacks.
+
+    Why it fixes what we saw: five independent staged anneals landed in five
+    different basins 25-70 meV/atom above the reference, because once a single
+    trajectory cools it has no way back out (swap acceptance had fallen to 0.01
+    by the last stage - chemically frozen). Here several replicas run at once
+    across a temperature ladder, and configurations are exchanged between
+    adjacent temperatures by Metropolis. A cold replica stuck in a bad basin can
+    hand its configuration up to a hotter replica that can escape, and inherit a
+    better one in return.
+
+    The exchange criterion for replicas i, j with inverse temperatures b_i, b_j:
+        Delta = (b_i - b_j)(E_i - E_j),   accept if Delta >= 0 or rand < exp(Delta)
+    which is always accepted when the hotter replica has found the lower energy -
+    exactly the rescue we need.
+
+    Temperatures are spaced geometrically, which keeps the exchange acceptance
+    roughly uniform along the ladder rather than bunching at one end.
+    """
+    n = len(atoms)
+    temps = np.geomspace(args.t_lo, args.t_hi, args.n_replicas)
+    betas = 1.0 / (units.kB * temps)
+
+    log(f"=== replica exchange: {n} atoms, {args.n_replicas} replicas ===")
+    log(f"    ladder (K): {np.round(temps, 0)}")
+    log(f"    {args.n_cycles} cycles x ({args.md_steps} MD + {args.swaps} swaps) "
+        f"per replica = {args.n_cycles * args.n_replicas * (args.md_steps + args.swaps):,} "
+        f"evaluations")
+
+    # every replica starts from the same melted configuration
+    log(f"melting at {args.t_hi} K ({args.melt_steps} steps)...")
+    md_burst(atoms, args.t_hi, args.melt_steps, args.timestep)
+    reps = []
+    for _ in range(args.n_replicas):
+        r = atoms.copy()
+        r.calc = atoms.calc
+        reps.append(r)
+    energies = np.array([r.get_potential_energy() for r in reps])
+
+    t0 = time.time()
+    best_e, best = np.inf, None
+    trace, n_exch_total, n_exch_acc = [], 0, 0
+
+    for cycle in range(args.n_cycles):
+        # --- each replica evolves at its own temperature ---
+        for k, (r, T) in enumerate(zip(reps, temps)):
+            md_burst(r, T, args.md_steps, args.timestep)
+            energies[k] = r.get_potential_energy()
+            energies[k], _ = try_swaps(r, T, args.swaps, rng, energies[k])
+
+        # --- exchange attempts between adjacent pairs, alternating parity so
+        #     every pair gets tried over successive cycles ---
+        for i in range(cycle % 2, args.n_replicas - 1, 2):
+            j = i + 1
+            delta = (betas[i] - betas[j]) * (energies[i] - energies[j])
+            n_exch_total += 1
+            if delta >= 0.0 or rng.random() < np.exp(delta):
+                reps[i], reps[j] = reps[j], reps[i]
+                energies[i], energies[j] = energies[j], energies[i]
+                n_exch_acc += 1
+
+        # --- quench the coldest replica to see the underlying 0 K state ---
+        if (cycle + 1) % args.quench_every == 0 or cycle == args.n_cycles - 1:
+            snap, e_q = quench(reps[0], args.fmax_monitor)
+            if e_q < best_e:
+                best_e, best = e_q, snap.copy()
+            exch_rate = n_exch_acc / max(1, n_exch_total)
+            trace.append((cycle + 1, e_q / n, exch_rate))
+            log(f"  cycle {cycle + 1:4d} | coldest quenched {e_q / n:+.6f} eV/atom "
+                f"| best {best_e / n:+.6f} | exch {exch_rate:.3f} "
+                f"| {(time.time() - t0) / 60:.0f} min")
+
+    log("final tight relax of the best structure...")
+    best.calc = atoms.calc
+    BFGS(best, logfile=None).run(fmax=args.fmax_final, steps=500)
+    e_final = best.get_potential_energy()
+    log(f"FINISHED. best energy {e_final / n:+.6f} eV/atom "
+        f"({(time.time() - t0) / 60:.0f} min, exchange acceptance "
+        f"{n_exch_acc / max(1, n_exch_total):.3f})")
+
+    write(f"{args.out}_best.vasp", best, direct=True, sort=True)
+    write(f"{args.out}_best.xyz", best)
+    np.save(f"{args.out}_trace.npy", np.array(trace))
+    return best, e_final
+
+
 def melt_quench(atoms, args, rng):
     n = len(atoms)
     log(f"=== melt-quench: {n} atoms, {dict(Counter(atoms.get_chemical_symbols()))} ===")
@@ -397,6 +527,22 @@ def main():
                     help="eV/A for the final relax of the best structure")
 
     ap.add_argument("--seed", type=int, default=1)
+    ap.add_argument("--fixed-sites", action="store_true",
+                    help="diagnostic: keep the reference positions, randomise "
+                         "species, run swaps only. Decomposes the validation gap "
+                         "into positional vs chemical. Requires --reference.")
+    ap.add_argument("--replica-exchange", action="store_true",
+                    help="parallel tempering instead of staged annealing. This is "
+                         "the paper's method and the fix for the trapping that "
+                         "five independent staged anneals demonstrated.")
+    ap.add_argument("--n-replicas", type=int, default=8,
+                    help="replicas on the temperature ladder (paper used 20; 8 "
+                         "keeps a full run inside one 24 h job)")
+    ap.add_argument("--n-cycles", type=int, default=50,
+                    help="exchange cycles; each is one MD+MC block per replica "
+                         "followed by adjacent-pair exchange attempts")
+    ap.add_argument("--quench-every", type=int, default=5,
+                    help="quench the coldest replica every N cycles to monitor")
     ap.add_argument("--device", default="cuda")
     ap.add_argument("--dtype", default="float32",
                     help="float32 for the anneal; the final relax is where "
@@ -439,7 +585,15 @@ def main():
         benchmark(atoms, args)
         return
 
-    best, e_final = melt_quench(atoms, args, rng)
+    if args.fixed_sites:
+        if ref is None:
+            raise SystemExit("--fixed-sites needs --reference (it uses its site list)")
+        ref.calc = calc
+        best, e_final = fixed_site_mc(ref, args, rng)
+    elif args.replica_exchange:
+        best, e_final = replica_exchange(atoms, args, rng)
+    else:
+        best, e_final = melt_quench(atoms, args, rng)
 
     # ---- the validation comparison ----
     if ref is not None:
