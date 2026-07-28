@@ -1,0 +1,181 @@
+"""
+Matching a W-phase supercell to the 8x4x4 X-phase box
+=====================================================
+
+The experiment this sets up
+---------------------------
+Albert's description: a cell whose box is equivalent to the 8x4x4, "except that
+it's not periodic within that, it's only periodic at the next lattice", compared
+against the qualitatively similar but much smaller-period approximant.
+
+We have exactly that pair already:
+
+    X-phase   26 atoms   4 A stacking   (what the 8x4x4 is built from)
+    W-phase  265 atoms   8 A stacking   (a 10x larger quasiperiodic motif)
+
+So a W-phase supercell with the same longest axis as the 8x4x4 gives the same
+low-frequency floor and the same protocol, differing only in how quasiperiodic
+the interior is. That is the controlled comparison.
+
+Why the longest axis is the thing to match
+------------------------------------------
+The measured floor law from the size series, re-expressed in physical length so
+it transfers between structures with different lattice parameters:
+
+    onset = C / L_long,   C = 176 meV.A
+
+fitted on the n = 3, 4 cubes and the 8x4x4 (n = 2 sits low at 151, so it is
+excluded). It predicts 1.82 meV for the 8x4x4 against 1.83 measured, so it is
+good to about 0.5%. L_long is what sets the floor because the longest wavelength
+a periodic box supports runs along its longest dimension.
+
+What this script does NOT assume
+--------------------------------
+It reads the actual cell parameters from the files rather than taking them from
+the paper. The paper quotes 39.67 x 8.15 x 23.39 A for the W-phase, but that is
+the C-centred conventional cell with 534 sites; the 265-atom file is presumably
+the primitive cell, which would have different parameters. Guessing here would
+put every downstream number out.
+
+Honest confound to report
+-------------------------
+X-phase and W-phase differ in composition as well as in motif size, so this is
+not a perfectly controlled experiment: two variables move together. The script
+prints both compositions so the size of that confound is visible rather than
+hidden. It is still the comparison Albert asked for, and the alternative
+(generating a new approximant at the X-phase composition) is the thing that has
+not worked yet.
+
+Usage
+-----
+    python match_supercell.py
+"""
+
+import numpy as np
+from collections import Counter
+from ase import Atoms
+from ase.io import read
+
+C_FLOOR = 176.0          # meV.A, calibrated on the measured size series
+MEM_PER_ATOM = 15.2 / 3328     # GB/atom, measured: 8x4x4 used 15.2 GB at 3328 atoms
+MEM_LIMIT = 23.0               # GB on Avon's Quadro RTX 6000
+
+TYPE_TO_ELEMENT = {13: "Al", 27: "Co", 28: "Ni"}
+
+
+def parse_coords_txt(path):
+    """The custom format md_run.py uses: cell vectors on one line, then
+    x y z type per atom, type 0 rows dropped as partial occupancy."""
+    lines = open(path).read().splitlines()
+    tokens = open(path).read().split()
+    cell = np.array([float(x) for x in tokens[:9]]).reshape(3, 3)
+    symbols, scaled = [], []
+    for ln in lines:
+        p = ln.split()
+        if len(p) >= 6 and p[3].isdigit() and p[4].isdigit():
+            t = int(p[3])
+            if t == 0:
+                continue
+            if t in TYPE_TO_ELEMENT:
+                symbols.append(TYPE_TO_ELEMENT[t])
+                scaled.append([float(p[0]), float(p[1]), float(p[2])])
+    return Atoms(symbols=symbols, scaled_positions=np.array(scaled),
+                 cell=cell, pbc=True)
+
+
+def describe(name, at):
+    cp = at.cell.cellpar()
+    comp = dict(Counter(at.get_chemical_symbols()))
+    total = sum(comp.values())
+    pct = {k: 100.0 * v / total for k, v in comp.items()}
+    print(f"{name}")
+    print(f"  {len(at)} atoms   volume {at.get_volume():8.1f} A^3   "
+          f"density {len(at)/at.get_volume():.4f} atoms/A^3")
+    print(f"  a,b,c = {cp[0]:7.3f} {cp[1]:7.3f} {cp[2]:7.3f} A")
+    print(f"  angles= {cp[3]:7.2f} {cp[4]:7.2f} {cp[5]:7.2f} deg")
+    print(f"  composition {comp}  ("
+          + ", ".join(f"{k} {pct[k]:.0f}%" for k in sorted(pct)) + ")")
+    return cp
+
+
+def main():
+    print("=" * 68)
+    print("THE TWO APPROXIMANTS AS THEY ACTUALLY ARE ON DISK")
+    print("=" * 68)
+    x = parse_coords_txt("Al9Co2Ni2-coords.txt")
+    cp_x = describe("X-phase (26-atom, 4 A stacking)", x)
+
+    # try the relaxed W-phase first, fall back to the unrelaxed
+    w = None
+    for path in ("W-AlCoNi-265-relaxed.vasp", "W-AlCoNi-265.vasp"):
+        try:
+            w = read(path)
+            print()
+            cp_w = describe(f"W-phase from {path} (8 A stacking)", w)
+            break
+        except Exception as e:
+            print(f"\n(could not read {path}: {type(e).__name__}: {e})")
+    if w is None:
+        raise SystemExit("no W-phase file readable - check the filenames with ls *.vasp")
+
+    # ---- the target: the 8x4x4's box ----
+    box_x = cp_x[:3] * np.array([8, 4, 4])
+    L_target = box_x.max()
+    n_x = len(x) * 8 * 4 * 4
+    print()
+    print("=" * 68)
+    print("THE TARGET: the existing 8x4x4 X-phase run")
+    print("=" * 68)
+    print(f"  box {box_x[0]:.1f} x {box_x[1]:.1f} x {box_x[2]:.1f} A, "
+          f"{n_x} atoms")
+    print(f"  longest axis {L_target:.1f} A -> predicted onset "
+          f"{C_FLOOR/L_target:.2f} meV (measured 1.83)")
+
+    # ---- search W-phase supercells ----
+    print()
+    print("=" * 68)
+    print("W-PHASE SUPERCELLS, RANKED BY HOW WELL THE LONGEST AXIS MATCHES")
+    print("=" * 68)
+    print(f"{'nx,ny,nz':>10} {'box (A)':>28} {'L_long':>8} {'atoms':>7} "
+          f"{'onset':>7} {'mem':>7}  note")
+    rows = []
+    for nx in range(1, 7):
+        for ny in range(1, 13):
+            for nz in range(1, 7):
+                box = cp_w[:3] * np.array([nx, ny, nz])
+                L = box.max()
+                n_at = len(w) * nx * ny * nz
+                mem = n_at * MEM_PER_ATOM
+                if n_at > 6000:
+                    continue
+                rows.append((abs(L - L_target), (nx, ny, nz), box, L, n_at, mem))
+    rows.sort()
+    for err, (nx, ny, nz), box, L, n_at, mem in rows[:12]:
+        fits = "fits" if mem < MEM_LIMIT * 0.85 else "TOO BIG for 23 GB"
+        print(f"{nx},{ny},{nz:<6} {box[0]:8.1f} x{box[1]:7.1f} x{box[2]:7.1f} "
+              f"{L:8.1f} {n_at:7d} {C_FLOOR/L:6.2f} {mem:6.1f}G  "
+              f"{fits}, L off by {err:.1f} A ({100*err/L_target:.0f}%)")
+
+    # ---- also: which X-phase supercell would match a chosen W supercell ----
+    print()
+    print("=" * 68)
+    print("ALTERNATIVE: matching the X-phase TO a W-phase supercell instead")
+    print("=" * 68)
+    print("(useful if no W supercell lands close to 97 A - we can instead pick a")
+    print(" good W cell and rebuild the X-phase side to match its longest axis)")
+    print(f"{'W cell':>10} {'L_long':>8} | {'X cell':>10} {'L_long':>8} "
+          f"{'atoms':>7} {'mismatch':>9}")
+    for nx in range(1, 5):
+        L_w = (cp_w[:3] * np.array([nx, 2, 2])).max()
+        n_needed = L_w / cp_x[0]
+        for n_try in (int(np.floor(n_needed)), int(np.ceil(n_needed))):
+            if n_try < 1:
+                continue
+            L_x = n_try * cp_x[0]
+            n_at = len(x) * n_try * 4 * 4
+            print(f"{nx},2,2{'':<4} {L_w:8.1f} | {n_try},4,4{'':<3} {L_x:8.1f} "
+                  f"{n_at:7d} {100*abs(L_x-L_w)/L_w:8.1f}%")
+
+
+if __name__ == "__main__":
+    main()
