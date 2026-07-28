@@ -74,6 +74,7 @@ from collections import Counter
 
 import numpy as np
 from ase import Atoms
+from ase.io import read
 from ase.build import make_supercell
 from ase.filters import FrechetCellFilter
 from ase.md.langevin import Langevin
@@ -93,8 +94,25 @@ def log(msg, path="md_progress.txt"):
 
 
 def parse_structure(path):
-    """Al9Co2Ni2-coords.txt: cell vectors on one line, then x y z type per atom.
-    Type 0 entries are partial-occupancy placeholders and are dropped."""
+    """Read a structure. Two paths, deliberately:
+
+    Anything ASE can read (.vasp, .cif, .xyz) goes through ase.io.read. This is
+    how the 265-atom W-phase gets in, and the 26-atom sanity check below cannot
+    apply to it.
+
+    The custom coords.txt format (cell vectors on one line, then x y z type per
+    atom, type 0 rows dropped as partial-occupancy placeholders) keeps the sanity
+    check, because for that file we know exactly what it should contain and a
+    silent misparse would waste hours of GPU time.
+    """
+    if not path.lower().endswith(".txt"):
+        atoms = read(path)
+        atoms.pbc = True
+        log(f"read {path} via ASE: {len(atoms)} atoms, "
+            f"volume {atoms.get_volume():.1f} A^3, "
+            f"cellpar {np.round(atoms.cell.cellpar(), 3)}")
+        return atoms
+
     lines = open(path).read().splitlines()
     tokens = open(path).read().split()
     cell = np.array([float(x) for x in tokens[:9]]).reshape(3, 3)
@@ -169,11 +187,14 @@ def benchmark(base, device):
                     f"{type(e).__name__}: {e}")
 
 
-def run_md(calc, base, dims, n_steps, T, out, seed=None, store_positions=False):
-    sc = make_supercell(base, np.diag(dims))
+def run_md(calc, base, P, n_steps, T, out, tag, seed=None, store_positions=False):
+    sc = make_supercell(base, P)
     sc.calc = calc
-    tag = "x".join(str(d) for d in dims)
     log(f"=== MD: {tag}, {len(sc)} atoms, {3*len(sc)} modes, {T} K ===")
+    log(f"    supercell matrix rows {np.asarray(P).tolist()}, "
+        f"det {int(round(abs(np.linalg.det(P))))}")
+    log(f"    box lengths {np.round(sc.cell.cellpar()[:3], 2)}, "
+        f"angles {np.round(sc.cell.cellpar()[3:], 2)}")
     log(f"    {dict(Counter(sc.get_chemical_symbols()))}")
 
     timestep = 2.0 * units.fs
@@ -282,17 +303,38 @@ def main():
         benchmark(base, args.device)
         return
 
-    # parse '4' -> (4,4,4) or '8,4,4' -> (8,4,4)
+    # --supercell accepts:
+    #   '4'                     -> diag(4,4,4)
+    #   '8,4,4'                 -> diag(8,4,4)
+    #   '3,3,0,-2,2,0,0,0,1'    -> the full 3x3 matrix, row by row
+    # The matrix form is needed for the W-phase, whose file is the primitive
+    # cell of a C-centred setting (gamma = 23.27 deg). P = [[1,1,0],[-1,1,0],
+    # [0,0,1]] recovers the conventional 39.35 x 8.10 x 23.23 A axes, and
+    # combining that with a 3x2x1 tiling gives [[3,3,0],[-2,2,0],[0,0,1]].
     parts = [int(x) for x in args.supercell.split(",")]
-    dims = tuple(parts * 3) if len(parts) == 1 else tuple(parts)
-    if len(dims) != 3:
-        raise SystemExit(f"--supercell needs 1 or 3 numbers, got {args.supercell!r}")
-    tag = "x".join(str(d) for d in dims)
+    if len(parts) == 1:
+        P = np.diag(parts * 3)
+        tag = f"{parts[0]}x{parts[0]}x{parts[0]}"
+    elif len(parts) == 3:
+        P = np.diag(parts)
+        tag = "x".join(str(p) for p in parts)
+    elif len(parts) == 9:
+        P = np.array(parts).reshape(3, 3)
+        tag = "mat" + "_".join(str(p) for p in parts)
+    else:
+        raise SystemExit(f"--supercell needs 1, 3 or 9 numbers, got {args.supercell!r}")
+
+    det = np.linalg.det(P)
+    if abs(det) < 0.5:
+        raise SystemExit(f"supercell matrix is singular (det {det:.3f})")
+    if det < 0:
+        log(f"WARNING: det(P) = {det:.0f} is negative, which flips handedness. "
+            f"Swap two rows if that matters.")
 
     out = args.out or f"md_{tag}"
     calc = mace_mp(model="medium-mpa-0", device=args.device, default_dtype=args.dtype)
     log(f"MD dtype: {args.dtype}")
-    run_md(calc, base, dims, args.steps, args.temperature, out,
+    run_md(calc, base, P, args.steps, args.temperature, out, tag,
            seed=args.seed, store_positions=args.store_positions)
 
 
