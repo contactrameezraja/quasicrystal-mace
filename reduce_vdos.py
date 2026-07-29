@@ -30,6 +30,7 @@ import argparse
 
 import numpy as np
 from ase import Atoms
+from ase.io import read
 from ase.build import make_supercell
 from ase.data import atomic_masses, atomic_numbers
 
@@ -39,6 +40,13 @@ _trapz = getattr(np, "trapezoid", None) or np.trapz
 
 
 def parse_structure(path):
+    # Non-txt files (.vasp, .cif, .xyz) go through ASE - this is how the
+    # 265-atom W-phase gets in. Mirrors md_run.py exactly, so the reduction
+    # rebuilds the same atoms the MD ran on.
+    if not path.lower().endswith(".txt"):
+        atoms = read(path)
+        atoms.pbc = True
+        return atoms
     lines = open(path).read().splitlines()
     tok = open(path).read().split()
     cell = np.array([float(x) for x in tok[:9]]).reshape(3, 3)
@@ -111,11 +119,20 @@ def main():
 
     vel = np.load(args.velocities, mmap_mode="r")      # do not pull 2 GB into RAM at once
     base = parse_structure(args.structure)
+    # --supercell mirrors md_run.py: '4' -> diag(4,4,4), '8,4,4' -> diag,
+    # '3,3,0,-2,2,0,0,0,1' -> full 3x3 matrix (needed for the W-phase, whose
+    # file is an oblique primitive cell). MUST match what the MD used, and the
+    # atom-count check below catches a mismatch.
     parts = [int(x) for x in args.supercell.split(",")]
-    dims = tuple(parts * 3) if len(parts) == 1 else tuple(parts)
-    if len(dims) != 3:
-        raise SystemExit(f"--supercell needs 1 or 3 numbers, got {args.supercell!r}")
-    sc = make_supercell(base, np.diag(dims))
+    if len(parts) == 1:
+        P = np.diag(parts * 3)
+    elif len(parts) == 3:
+        P = np.diag(parts)
+    elif len(parts) == 9:
+        P = np.array(parts).reshape(3, 3)
+    else:
+        raise SystemExit(f"--supercell needs 1, 3 or 9 numbers, got {args.supercell!r}")
+    sc = make_supercell(base, P)
     syms = np.array(sc.get_chemical_symbols())
     masses = np.array([atomic_masses[atomic_numbers[s]] for s in syms])
 
