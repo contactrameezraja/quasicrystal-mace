@@ -1,0 +1,252 @@
+reference Al9Co2Ni2-coords.txt: 26 atoms, {'Al': 18, 'Ni': 3, 'Co': 5}, volume 360.8 A^3
+random start: 26 atoms in a fixed cell, min separation 2.00 A
+=== BENCHMARK ===
+26 atoms, device cuda, dtype float32
+  energy after position change (MD-like):   120.13 ms
+  energy after species swap    (MC-like):    14.88 ms
+  default schedule: 100 loops x (1000 MD + 500 swaps) = 150,000 evaluations
+  estimated wall time: 3.54 h
+  (the paper used 7800 swaps/loop with pair potentials, where a swap's
+   energy change is local. Scale --swaps to what the estimate allows.)
+reference Al9Co2Ni2-coords.txt: 26 atoms, {'Al': 18, 'Ni': 3, 'Co': 5}, volume 360.8 A^3
+random start: 26 atoms in a fixed cell, min separation 2.00 A
+=== melt-quench: 26 atoms, {'Al': 18, 'Ni': 3, 'Co': 5} ===
+    cell [ 12.128   4.051   7.636  90.    105.9    90.   ], density 0.0721 atoms/A^3
+    3 stages 2500.0->1000.0 K, 1 loops each (3 total), 200 MD steps + 100 swap attempts per loop
+melting at 2500.0 K (2000 steps)...
+  T=   2500 K | loop    1 | quenched -4.95206 eV/atom | best -4.95206 | acc 0.080 | 1 min
+  T=   1750 K | loop    2 | quenched -4.95608 eV/atom | best -4.95608 | acc 0.020 | 2 min
+  T=   1000 K | loop    3 | quenched -4.96262 eV/atom | best -4.96262 | acc 0.030 | 2 min
+final tight relax of the best structure...
+FINISHED. best energy -4.962639 eV/atom (2 min)
+wrote probe_best.vasp, probe_best.xyz, probe_trace.npy
+=== validation against the reference structure ===
+  reference (relaxed): -5.104818 eV/atom
+  melt-quench found:   -4.962639 eV/atom
+  difference:          +142.18 meV/atom
+  -> higher than the reference: the anneal is stuck. Run more loops, or raise --swaps.
+reference Al9Co2Ni2-coords.txt: 26 atoms, {'Al': 18, 'Ni': 3, 'Co': 5}, volume 360.8 A^3
+random start: 26 atoms in a fixed cell, min separation 2.00 A
+=== melt-quench: 26 atoms, {'Al': 18, 'Ni': 3, 'Co': 5} ===
+    cell [ 12.128   4.051   7.636  90.    105.9    90.   ], density 0.0721 atoms/A^3
+    20 stages 2500.0->1000.0 K, 5 loops each (100 total), 1000 MD steps + 4000 swap attempts per loop
+melting at 2500.0 K (5000 steps)...
+  T=   2500 K | loop    5 | quenched -5.01596 eV/atom | best -5.01596 | acc 0.056 | 15 min
+  T=   2421 K | loop   10 | quenched -4.97321 eV/atom | best -5.01596 | acc 0.040 | 27 min
+  T=   2342 K | loop   15 | quenched -4.97632 eV/atom | best -5.01596 | acc 0.049 | 40 min
+  T=   2263 K | loop   20 | quenched -5.01089 eV/atom | best -5.01596 | acc 0.035 | 52 min
+  T=   2184 K | loop   25 | quenched -5.03617 eV/atom | best -5.03617 | acc 0.047 | 65 min
+  T=   2105 K | loop   30 | quenched -5.04929 eV/atom | best -5.04929 | acc 0.032 | 77 min
+  T=   2026 K | loop   35 | quenched -5.02329 eV/atom | best -5.04929 | acc 0.027 | 89 min
+  T=   1947 K | loop   40 | quenched -5.07279 eV/atom | best -5.07279 | acc 0.033 | 102 min
+  T=   1868 K | loop   45 | quenched -5.06678 eV/atom | best -5.07279 | acc 0.023 | 114 min
+  T=   1789 K | loop   50 | quenched -5.03385 eV/atom | best -5.07279 | acc 0.024 | 127 min
+  T=   1711 K | loop   55 | quenched -5.02399 eV/atom | best -5.07279 | acc 0.021 | 139 min
+  T=   1632 K | loop   60 | quenched -5.07136 eV/atom | best -5.07279 | acc 0.025 | 151 min
+  T=   1553 K | loop   65 | quenched -5.07135 eV/atom | best -5.07279 | acc 0.018 | 163 min
+  T=   1474 K | loop   70 | quenched -5.07915 eV/atom | best -5.07915 | acc 0.019 | 175 min
+  T=   1395 K | loop   75 | quenched -5.06673 eV/atom | best -5.07915 | acc 0.016 | 187 min
+  T=   1316 K | loop   80 | quenched -5.07915 eV/atom | best -5.07915 | acc 0.021 | 200 min
+  T=   1237 K | loop   85 | quenched -5.07279 eV/atom | best -5.07915 | acc 0.019 | 212 min
+  T=   1158 K | loop   90 | quenched -5.07303 eV/atom | best -5.07915 | acc 0.026 | 224 min
+  T=   1079 K | loop   95 | quenched -5.07479 eV/atom | best -5.07915 | acc 0.019 | 236 min
+  T=   1000 K | loop  100 | quenched -5.07552 eV/atom | best -5.07915 | acc 0.010 | 248 min
+final tight relax of the best structure...
+FINISHED. best energy -5.079157 eV/atom (248 min)
+wrote mq_xphase_best.vasp, mq_xphase_best.xyz, mq_xphase_trace.npy
+=== validation against the reference structure ===
+  reference (relaxed): -5.104818 eV/atom
+  melt-quench found:   -5.079157 eV/atom
+  difference:          +25.66 meV/atom
+  -> higher than the reference: the anneal is stuck. Run more loops, or raise --swaps.
+reference Al9Co2Ni2-coords.txt: 26 atoms, {'Al': 18, 'Ni': 3, 'Co': 5}, volume 360.8 A^3
+random start: 26 atoms in a fixed cell, min separation 1.84 A
+reference Al9Co2Ni2-coords.txt: 26 atoms, {'Al': 18, 'Ni': 3, 'Co': 5}, volume 360.8 A^3
+random start: 26 atoms in a fixed cell, min separation 2.00 A
+=== melt-quench: 26 atoms, {'Al': 18, 'Co': 5, 'Ni': 3} ===
+    cell [ 12.128   4.051   7.636  90.    105.9    90.   ], density 0.0721 atoms/A^3
+    20 stages 2500.0->1000.0 K, 5 loops each (100 total), 1000 MD steps + 4000 swap attempts per loop
+melting at 2500.0 K (5000 steps)...
+=== melt-quench: 26 atoms, {'Ni': 3, 'Co': 5, 'Al': 18} ===
+    cell [ 12.128   4.051   7.636  90.    105.9    90.   ], density 0.0721 atoms/A^3
+    20 stages 2500.0->1000.0 K, 5 loops each (100 total), 1000 MD steps + 4000 swap attempts per loop
+melting at 2500.0 K (5000 steps)...
+reference Al9Co2Ni2-coords.txt: 26 atoms, {'Al': 18, 'Ni': 3, 'Co': 5}, volume 360.8 A^3
+random start: 26 atoms in a fixed cell, min separation 2.01 A
+reference Al9Co2Ni2-coords.txt: 26 atoms, {'Al': 18, 'Ni': 3, 'Co': 5}, volume 360.8 A^3
+random start: 26 atoms in a fixed cell, min separation 1.91 A
+=== melt-quench: 26 atoms, {'Al': 18, 'Co': 5, 'Ni': 3} ===
+    cell [ 12.128   4.051   7.636  90.    105.9    90.   ], density 0.0721 atoms/A^3
+    20 stages 2500.0->1000.0 K, 5 loops each (100 total), 1000 MD steps + 4000 swap attempts per loop
+melting at 2500.0 K (5000 steps)...
+=== melt-quench: 26 atoms, {'Ni': 3, 'Al': 18, 'Co': 5} ===
+    cell [ 12.128   4.051   7.636  90.    105.9    90.   ], density 0.0721 atoms/A^3
+    20 stages 2500.0->1000.0 K, 5 loops each (100 total), 1000 MD steps + 4000 swap attempts per loop
+melting at 2500.0 K (5000 steps)...
+  T=   2500 K | loop    5 | quenched -5.00217 eV/atom | best -5.00217 | acc 0.062 | 14 min
+  T=   2500 K | loop    5 | quenched -4.97141 eV/atom | best -4.97141 | acc 0.059 | 15 min
+  T=   2500 K | loop    5 | quenched -4.95968 eV/atom | best -4.95968 | acc 0.057 | 15 min
+  T=   2500 K | loop    5 | quenched -5.02654 eV/atom | best -5.02654 | acc 0.039 | 15 min
+  T=   2421 K | loop   10 | quenched -5.03892 eV/atom | best -5.03892 | acc 0.046 | 26 min
+  T=   2421 K | loop   10 | quenched -4.94304 eV/atom | best -4.97141 | acc 0.053 | 27 min
+  T=   2421 K | loop   10 | quenched -5.01673 eV/atom | best -5.02654 | acc 0.056 | 27 min
+  T=   2421 K | loop   10 | quenched -4.95520 eV/atom | best -4.95968 | acc 0.051 | 28 min
+  T=   2342 K | loop   15 | quenched -5.02889 eV/atom | best -5.03892 | acc 0.040 | 38 min
+  T=   2342 K | loop   15 | quenched -4.95230 eV/atom | best -4.97141 | acc 0.057 | 40 min
+  T=   2342 K | loop   15 | quenched -5.01113 eV/atom | best -5.02654 | acc 0.035 | 39 min
+  T=   2342 K | loop   15 | quenched -4.99476 eV/atom | best -4.99476 | acc 0.037 | 40 min
+  T=   2263 K | loop   20 | quenched -5.01938 eV/atom | best -5.03892 | acc 0.035 | 50 min
+  T=   2263 K | loop   20 | quenched -4.95681 eV/atom | best -4.97141 | acc 0.052 | 52 min
+  T=   2263 K | loop   20 | quenched -4.98523 eV/atom | best -5.02654 | acc 0.034 | 52 min
+  T=   2263 K | loop   20 | quenched -4.98080 eV/atom | best -4.99476 | acc 0.042 | 52 min
+  T=   2184 K | loop   25 | quenched -5.01444 eV/atom | best -5.03892 | acc 0.040 | 61 min
+  T=   2184 K | loop   25 | quenched -5.00258 eV/atom | best -5.00258 | acc 0.044 | 64 min
+  T=   2184 K | loop   25 | quenched -4.99803 eV/atom | best -5.02654 | acc 0.040 | 64 min
+  T=   2184 K | loop   25 | quenched -4.98612 eV/atom | best -4.99476 | acc 0.034 | 64 min
+  T=   2105 K | loop   30 | quenched -5.00505 eV/atom | best -5.03892 | acc 0.032 | 73 min
+  T=   2105 K | loop   30 | quenched -5.03986 eV/atom | best -5.03986 | acc 0.034 | 76 min
+  T=   2105 K | loop   30 | quenched -5.02320 eV/atom | best -5.02320 | acc 0.035 | 77 min
+  T=   2105 K | loop   30 | quenched -5.02392 eV/atom | best -5.02392 | acc 0.034 | 77 min
+  T=   2026 K | loop   35 | quenched -5.02655 eV/atom | best -5.03892 | acc 0.033 | 85 min
+  T=   2026 K | loop   35 | quenched -5.00006 eV/atom | best -5.03986 | acc 0.032 | 88 min
+  T=   2026 K | loop   35 | quenched -5.03825 eV/atom | best -5.03825 | acc 0.034 | 89 min
+  T=   2026 K | loop   35 | quenched -5.03507 eV/atom | best -5.03507 | acc 0.028 | 89 min
+  T=   1947 K | loop   40 | quenched -5.00627 eV/atom | best -5.03892 | acc 0.031 | 96 min
+  T=   1947 K | loop   40 | quenched -5.03994 eV/atom | best -5.03994 | acc 0.033 | 100 min
+  T=   1947 K | loop   40 | quenched -5.02343 eV/atom | best -5.03825 | acc 0.028 | 101 min
+  T=   1947 K | loop   40 | quenched -4.98886 eV/atom | best -5.03507 | acc 0.029 | 102 min
+  T=   1868 K | loop   45 | quenched -5.02105 eV/atom | best -5.03892 | acc 0.031 | 108 min
+  T=   1868 K | loop   45 | quenched -4.98790 eV/atom | best -5.03994 | acc 0.031 | 112 min
+  T=   1868 K | loop   45 | quenched -5.05984 eV/atom | best -5.05984 | acc 0.027 | 113 min
+  T=   1868 K | loop   45 | quenched -5.02058 eV/atom | best -5.03507 | acc 0.022 | 114 min
+  T=   1789 K | loop   50 | quenched -5.01715 eV/atom | best -5.03892 | acc 0.026 | 120 min
+  T=   1789 K | loop   50 | quenched -5.03383 eV/atom | best -5.03994 | acc 0.033 | 124 min
+  T=   1789 K | loop   50 | quenched -5.06472 eV/atom | best -5.06472 | acc 0.025 | 125 min
+  T=   1789 K | loop   50 | quenched -5.01896 eV/atom | best -5.03507 | acc 0.027 | 126 min
+  T=   1711 K | loop   55 | quenched -5.00795 eV/atom | best -5.03892 | acc 0.025 | 132 min
+  T=   1711 K | loop   55 | quenched -4.99758 eV/atom | best -5.03994 | acc 0.033 | 137 min
+  T=   1711 K | loop   55 | quenched -5.05090 eV/atom | best -5.06472 | acc 0.026 | 137 min
+  T=   1711 K | loop   55 | quenched -5.02942 eV/atom | best -5.03507 | acc 0.020 | 139 min
+  T=   1632 K | loop   60 | quenched -5.03021 eV/atom | best -5.03892 | acc 0.019 | 143 min
+  T=   1632 K | loop   60 | quenched -5.00139 eV/atom | best -5.03994 | acc 0.025 | 149 min
+  T=   1632 K | loop   60 | quenched -5.05843 eV/atom | best -5.06472 | acc 0.028 | 149 min
+  T=   1632 K | loop   60 | quenched -5.02868 eV/atom | best -5.03507 | acc 0.022 | 151 min
+  T=   1553 K | loop   65 | quenched -5.02860 eV/atom | best -5.03892 | acc 0.024 | 155 min
+  T=   1553 K | loop   65 | quenched -5.06284 eV/atom | best -5.06472 | acc 0.021 | 161 min
+  T=   1553 K | loop   65 | quenched -4.99810 eV/atom | best -5.03994 | acc 0.024 | 161 min
+  T=   1553 K | loop   65 | quenched -5.02117 eV/atom | best -5.03507 | acc 0.025 | 163 min
+  T=   1474 K | loop   70 | quenched -5.02226 eV/atom | best -5.03892 | acc 0.023 | 167 min
+  T=   1474 K | loop   70 | quenched -5.05633 eV/atom | best -5.06472 | acc 0.020 | 173 min
+  T=   1474 K | loop   70 | quenched -5.03771 eV/atom | best -5.03994 | acc 0.019 | 173 min
+  T=   1474 K | loop   70 | quenched -5.01195 eV/atom | best -5.03507 | acc 0.029 | 176 min
+  T=   1395 K | loop   75 | quenched -5.02750 eV/atom | best -5.03892 | acc 0.020 | 178 min
+  T=   1395 K | loop   75 | quenched -5.03895 eV/atom | best -5.06472 | acc 0.021 | 185 min
+  T=   1395 K | loop   75 | quenched -5.02404 eV/atom | best -5.03994 | acc 0.015 | 185 min
+  T=   1395 K | loop   75 | quenched -5.02438 eV/atom | best -5.03507 | acc 0.023 | 188 min
+  T=   1316 K | loop   80 | quenched -5.03139 eV/atom | best -5.03892 | acc 0.017 | 190 min
+  T=   1316 K | loop   80 | quenched -5.05346 eV/atom | best -5.06472 | acc 0.021 | 197 min
+  T=   1316 K | loop   80 | quenched -5.02964 eV/atom | best -5.03994 | acc 0.017 | 197 min
+  T=   1316 K | loop   80 | quenched -5.01921 eV/atom | best -5.03507 | acc 0.026 | 200 min
+  T=   1237 K | loop   85 | quenched -5.02740 eV/atom | best -5.03892 | acc 0.023 | 202 min
+  T=   1237 K | loop   85 | quenched -5.06603 eV/atom | best -5.06603 | acc 0.020 | 209 min
+  T=   1237 K | loop   85 | quenched -5.01914 eV/atom | best -5.03994 | acc 0.011 | 209 min
+  T=   1237 K | loop   85 | quenched -5.01908 eV/atom | best -5.03507 | acc 0.022 | 213 min
+  T=   1158 K | loop   90 | quenched -5.02739 eV/atom | best -5.03892 | acc 0.018 | 214 min
+  T=   1158 K | loop   90 | quenched -5.05110 eV/atom | best -5.06603 | acc 0.016 | 221 min
+  T=   1158 K | loop   90 | quenched -5.05218 eV/atom | best -5.05218 | acc 0.012 | 221 min
+  T=   1158 K | loop   90 | quenched -5.02138 eV/atom | best -5.03507 | acc 0.018 | 225 min
+  T=   1079 K | loop   95 | quenched -5.03102 eV/atom | best -5.03892 | acc 0.016 | 225 min
+  T=   1079 K | loop   95 | quenched -5.05844 eV/atom | best -5.06603 | acc 0.016 | 233 min
+  T=   1079 K | loop   95 | quenched -5.04307 eV/atom | best -5.05218 | acc 0.015 | 233 min
+  T=   1000 K | loop  100 | quenched -5.01107 eV/atom | best -5.03892 | acc 0.015 | 237 min
+final tight relax of the best structure...
+FINISHED. best energy -5.038925 eV/atom (237 min)
+wrote mq_s4_best.vasp, mq_s4_best.xyz, mq_s4_trace.npy
+=== validation against the reference structure ===
+  reference (relaxed): -5.104818 eV/atom
+  melt-quench found:   -5.038925 eV/atom
+  difference:          +65.89 meV/atom
+  -> higher than the reference: the anneal is stuck. Run more loops, or raise --swaps.
+  T=   1079 K | loop   95 | quenched -5.00192 eV/atom | best -5.03507 | acc 0.021 | 238 min
+  T=   1000 K | loop  100 | quenched -5.06240 eV/atom | best -5.06603 | acc 0.015 | 245 min
+final tight relax of the best structure...
+FINISHED. best energy -5.066047 eV/atom (245 min)
+wrote mq_s2_best.vasp, mq_s2_best.xyz, mq_s2_trace.npy
+=== validation against the reference structure ===
+  reference (relaxed): -5.104819 eV/atom
+  melt-quench found:   -5.066047 eV/atom
+  difference:          +38.77 meV/atom
+  -> higher than the reference: the anneal is stuck. Run more loops, or raise --swaps.
+  T=   1000 K | loop  100 | quenched -5.05318 eV/atom | best -5.05318 | acc 0.011 | 245 min
+final tight relax of the best structure...
+FINISHED. best energy -5.053200 eV/atom (245 min)
+wrote mq_s5_best.vasp, mq_s5_best.xyz, mq_s5_trace.npy
+=== validation against the reference structure ===
+  reference (relaxed): -5.104818 eV/atom
+  melt-quench found:   -5.053200 eV/atom
+  difference:          +51.62 meV/atom
+  -> higher than the reference: the anneal is stuck. Run more loops, or raise --swaps.
+  T=   1000 K | loop  100 | quenched -5.01907 eV/atom | best -5.03507 | acc 0.018 | 250 min
+final tight relax of the best structure...
+FINISHED. best energy -5.035110 eV/atom (250 min)
+wrote mq_s3_best.vasp, mq_s3_best.xyz, mq_s3_trace.npy
+=== validation against the reference structure ===
+  reference (relaxed): -5.104818 eV/atom
+  melt-quench found:   -5.035110 eV/atom
+  difference:          +69.71 meV/atom
+  -> higher than the reference: the anneal is stuck. Run more loops, or raise --swaps.
+reference Al9Co2Ni2-coords.txt: 26 atoms, {'Al': 18, 'Ni': 3, 'Co': 5}, volume 360.8 A^3
+reference Al9Co2Ni2-coords.txt: 26 atoms, {'Al': 18, 'Ni': 3, 'Co': 5}, volume 360.8 A^3
+random start: 26 atoms in a fixed cell, min separation 2.00 A
+random start: 26 atoms in a fixed cell, min separation 2.00 A
+=== replica exchange: 26 atoms, 8 replicas ===
+    ladder (K): [1000. 1140. 1299. 1481. 1688. 1924. 2193. 2500.]
+    50 cycles x (1000 MD + 2000 swaps) per replica = 1,200,000 evaluations
+melting at 2500.0 K (2000 steps)...
+=== fixed-site MC: 26 atoms on the reference site list ===
+    species randomised, start -4.487405 eV/atom
+    20 stages 2500.0->1000.0 K, 2000 swap attempts each, positions frozen
+  T=   2500 K | -5.101387 eV/atom | best -5.101387 | acc 0.041 | 1 min
+  T=   2421 K | -5.076900 eV/atom | best -5.101387 | acc 0.027 | 2 min
+  T=   2342 K | -5.093813 eV/atom | best -5.101387 | acc 0.023 | 3 min
+  T=   2263 K | -5.101387 eV/atom | best -5.101387 | acc 0.026 | 4 min
+  T=   2184 K | -5.093005 eV/atom | best -5.101387 | acc 0.021 | 5 min
+  T=   2105 K | -5.093005 eV/atom | best -5.101387 | acc 0.034 | 6 min
+  T=   2026 K | -5.088671 eV/atom | best -5.101387 | acc 0.028 | 7 min
+  T=   1947 K | -5.104282 eV/atom | best -5.104282 | acc 0.019 | 8 min
+  T=   1868 K | -5.088636 eV/atom | best -5.104282 | acc 0.033 | 9 min
+  T=   1789 K | -5.094412 eV/atom | best -5.104282 | acc 0.032 | 10 min
+  T=   1711 K | -5.104282 eV/atom | best -5.104282 | acc 0.029 | 10 min
+  T=   1632 K | -5.091844 eV/atom | best -5.104282 | acc 0.026 | 11 min
+  T=   1553 K | -5.091147 eV/atom | best -5.104282 | acc 0.022 | 12 min
+  T=   1474 K | -5.089884 eV/atom | best -5.104282 | acc 0.019 | 13 min
+  T=   1395 K | -5.104282 eV/atom | best -5.104282 | acc 0.011 | 14 min
+  T=   1316 K | -5.104282 eV/atom | best -5.104282 | acc 0.028 | 15 min
+  T=   1237 K | -5.101387 eV/atom | best -5.104282 | acc 0.021 | 16 min
+  T=   1158 K | -5.094411 eV/atom | best -5.104282 | acc 0.015 | 17 min
+  T=   1079 K | -5.101423 eV/atom | best -5.104282 | acc 0.017 | 18 min
+  T=   1000 K | -5.101423 eV/atom | best -5.104282 | acc 0.007 | 19 min
+best chemistry on frozen sites: -5.104282 eV/atom
+after relaxing positions too:   -5.104818 eV/atom
+=== validation against the reference structure ===
+  reference (relaxed): -5.104818 eV/atom
+  melt-quench found:   -5.104818 eV/atom
+  difference:          +0.00 meV/atom
+  -> matches or beats the reference: the anneal found it.
+  cycle    5 | coldest quenched -5.003767 eV/atom | best -5.003767 | exch 0.444 | 58 min
+  cycle   10 | coldest quenched -4.975445 eV/atom | best -5.003767 | exch 0.514 | 116 min
+  cycle   15 | coldest quenched -4.975753 eV/atom | best -5.003767 | exch 0.566 | 174 min
+  cycle   20 | coldest quenched -5.048491 eV/atom | best -5.048491 | exch 0.600 | 232 min
+  cycle   25 | coldest quenched -5.045733 eV/atom | best -5.048491 | exch 0.568 | 290 min
+  cycle   30 | coldest quenched -5.034238 eV/atom | best -5.048491 | exch 0.543 | 347 min
+  cycle   35 | coldest quenched -5.048712 eV/atom | best -5.048712 | exch 0.545 | 405 min
+  cycle   40 | coldest quenched -5.040763 eV/atom | best -5.048712 | exch 0.543 | 463 min
+  cycle   45 | coldest quenched -5.035035 eV/atom | best -5.048712 | exch 0.544 | 521 min
+  cycle   50 | coldest quenched -5.046096 eV/atom | best -5.048712 | exch 0.531 | 579 min
+final tight relax of the best structure...
+FINISHED. best energy -5.048721 eV/atom (579 min, exchange acceptance 0.531)
+=== validation against the reference structure ===
+  reference (relaxed): -5.104818 eV/atom
+  melt-quench found:   -5.048721 eV/atom
+  difference:          +56.10 meV/atom
+  -> higher than the reference: the anneal is stuck. Run more loops, or raise --swaps.
