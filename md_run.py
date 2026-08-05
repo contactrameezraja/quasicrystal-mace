@@ -1,6 +1,6 @@
 """
 MACE molecular dynamics: VDOS of decagonal Al-Ni-Co approximants
-================================================================
+===============================================================
 
 Why this needs a cluster
 ------------------------
@@ -18,11 +18,11 @@ A 4x4x4 (1664-atom) run projected to ~55 days on a MacBook Air.
 
 The plan
 --------
-  1. --benchmark        time force evaluations across sizes and dtypes
-  2. --supercell 2      reproduce the laptop result on the GPU (a check that
-                        the cluster gives the same answer)
-  3. --supercell 3      moderate
-  4. --supercell 4      the target
+  1. --benchmark       time force evaluations across sizes and dtypes
+  2. --supercell 2     reproduce the laptop result on the GPU (a check that
+                       the cluster gives the same answer)
+  3. --supercell 3     moderate
+  4. --supercell 4     the target
 
 Each run gives a VDOS. Comparing them across sizes answers whether the spectrum
 has converged with system size, which is a result in itself rather than just a
@@ -30,21 +30,20 @@ stepping stone to the big run.
 
 Protocol, and why
 -----------------
-  Tight relaxation, fmax = 0.001 eV/A.  Ten times tighter than the O1 stability
-  check. Residual force contaminates the dynamics.
+Tight relaxation, fmax = 0.001 eV/A.  Ten times tighter than the 01 stability
+check. Residual force contaminates the dynamics.
 
-  NVT equilibration, Langevin, 300 K, 2 fs.  300 K is not arbitrary: it is the
-  temperature Mihalkovic used for MD annealing of this system, close to the
-  296 K of the experimental neutron GVDOS, and well below the ~2/3 T_melt
-  threshold where Gahler & Hocker found Al starts to diffuse. Above that atoms
-  migrate rather than vibrate and the VDOS interpretation breaks.
+NVT equilibration, Langevin, 300 K, 2 fs.  300 K is not arbitrary: it is the
+temperature Mihalkovic used for MD annealing of this system, close to the
+296 K of the experimental neutron GVDOS, and well below the ~2/3 T_melt
+threshold where Gahler & Hocker found Al starts to diffuse. Above that atoms
+migrate rather than vibrate and the VDOS interpretation breaks.
 
-  NVE burn-in, thermostat off, discarded.  Removing the thermostat leaves a
-  brief transient.
-
-  NVE production, storing full velocities.  The thermostat must be off: it
-  modifies the equations of motion, so the transform would include its action
-  rather than just the phonons.
+NVE burn-in, thermostat off, discarded.  Removing the thermostat leaves a
+brief transient.
+NVE production, storing full velocities.  The thermostat must be off: it
+modifies the equations of motion, so the transform would include its action
+rather than just the phonons.
 
 Sampling every 4 fs puts the Nyquist limit far above the ~53 meV cutoff.
 The VACF -> VDOS analysis is done off the cluster.
@@ -52,8 +51,8 @@ The VACF -> VDOS analysis is done off the cluster.
 Usage
 -----
     python md_run.py --benchmark
-    python md_run.py --supercell 2 --steps 15000    # 30 ps, matches the laptop run
-    python md_run.py --supercell 4 --steps 100000   # 200 ps
+    python md_run.py --supercell 2 --steps 15000   # 30 ps, matches the laptop run
+    python md_run.py --supercell 4 --steps 100000  # 200 ps
 
     # option 2: independent runs from different seeds, to average later
     python md_run.py --supercell 4 --steps 100000 --seed 1 --out md_4x4x4_s1
@@ -66,6 +65,9 @@ Usage
 
     # precision control
     python md_run.py --supercell 2 --steps 100000 --dtype float64 --out md_2x2x2_f64
+
+    # O5 model-uncertainty run: same pipeline, MatterSim forces
+    python md_run.py --supercell 2 --steps 100000 --seed 11 --model mattersim
 """
 
 import argparse
@@ -85,6 +87,20 @@ from ase import units
 from mace.calculators import mace_mp
 
 TYPE_TO_ELEMENT = {13: "Al", 27: "Co", 28: "Ni"}
+
+
+def make_calc(model, device, dtype):
+    """Return the requested force model. dtype applies to MACE only;
+    MatterSim manages precision internally. The MatterSim model is pinned
+    to v1-1M to match the O1 comparison. If the load_path errors, delete
+    the load_path argument (it then loads its default) and record which
+    model the log says it loaded."""
+    if model == "mace":
+        return mace_mp(model="medium-mpa-0", device=device, default_dtype=dtype)
+    if model == "mattersim":
+        from mattersim.forcefield import MatterSimCalculator   # lazy: only needed if used
+        return MatterSimCalculator(load_path="MatterSim-v1.0.0-1M.pth", device=device)
+    raise SystemExit(f"unknown --model {model!r}")
 
 
 def log(msg, path="md_progress.txt"):
@@ -129,13 +145,14 @@ def parse_structure(path):
     atoms = Atoms(symbols=symbols, scaled_positions=np.array(scaled),
                   cell=cell, pbc=True)
 
-    # Sanity check against the values verified against the CMU database in O1.
+    # Sanity check against the values verified against the CMU database in 01.
     # If this fails the file has been read wrongly - stop rather than run for
     # hours on a garbage structure.
     if len(atoms) != 26 or abs(atoms.get_volume() - 360.8) / 360.8 > 0.02:
         raise SystemExit(
             f"Parsed {len(atoms)} atoms, volume {atoms.get_volume():.1f} A^3. "
-            f"Expected 26 atoms at 360.8 A^3 (Al18Co5Ni3). Check the file.")
+            f"Expected 26 atoms at 360.8 A^3 (Al18Co5Ni3). Check the file."
+        )
     return atoms
 
 
@@ -170,15 +187,15 @@ def benchmark(base, device):
             sc = make_supercell(base, np.diag([n, n, n]))
             sc.calc = calc
             try:
-                sc.get_forces()                    # warm-up, not timed
+                sc.get_forces()                  # warm-up, not timed
                 if device == "cuda":
                     torch.cuda.synchronize()
                 t0 = time.time()
                 for _ in range(5):
-                    sc.rattle(0.0001)              # invalidate ASE's force cache
+                    sc.rattle(0.0001)            # invalidate ASE's force cache
                     sc.get_forces()
                 if device == "cuda":
-                    torch.cuda.synchronize()       # wait for the GPU to finish
+                    torch.cuda.synchronize()     # wait for the GPU to finish
                 dt = (time.time() - t0) / 5
                 log(f"{dtype:>8} {n}x{n}x{n:<3} {len(sc):7d} {dt:10.4f} "
                     f"{dt * 100000 / 3600:11.2f}")
@@ -206,7 +223,7 @@ def run_md(calc, base, P, n_steps, T, out, tag, seed=None, store_positions=False
         np.random.seed(seed)
         log(f"    seed {seed}")
     MaxwellBoltzmannDistribution(sc, temperature_K=T)
-    Stationary(sc)                                 # zero net momentum before equilibration
+    Stationary(sc)                               # zero net momentum before equilibration
 
     log("NVT equilibration (10 ps)...")
     t0 = time.time()
@@ -227,7 +244,7 @@ def run_md(calc, base, P, n_steps, T, out, tag, seed=None, store_positions=False
 
     velocities, energies = [], []
     positions = [] if store_positions else None
-    sample_every = 2                               # every 4 fs
+    sample_every = 2                                    # every 4 fs
 
     def record():
         velocities.append(sc.get_velocities().copy())
@@ -238,7 +255,7 @@ def run_md(calc, base, P, n_steps, T, out, tag, seed=None, store_positions=False
     dyn.attach(record, interval=sample_every)
 
     n_blocks = 50
-    res = 4.1357 / (n_steps * 2e-3)                # rough resolution, meV
+    res = 4.1357 / (n_steps * 2e-3)                     # rough resolution, meV
     log(f"NVE production: {n_steps*2/1000:.0f} ps "
         f"(~{res:.3f} meV resolution), {n_blocks} blocks"
         f"{', storing positions' if store_positions else ''}...")
@@ -251,7 +268,7 @@ def run_md(calc, base, P, n_steps, T, out, tag, seed=None, store_positions=False
             np.save(f"{out}_positions.npy", np.array(positions))
         el = time.time() - t0
         log(f"  block {b+1}/{n_blocks} | {el/60:.0f} min | "
-            f"~{el/(b+1)*(n_blocks-1-b)/60:.0f} min left | {len(velocities)} samples")
+            f"{el/(b+1)*(n_blocks-1-b)/60:.0f} min left | {len(velocities)} samples")
 
     e = np.array(energies)
     log(f"FINISHED. velocities {np.array(velocities).shape}")
@@ -276,6 +293,8 @@ def main():
     ap.add_argument("--dtype", default="float32",
                     help="float32 for MD; float64 is more accurate but heavily "
                          "rate-limited on workstation GPUs")
+    ap.add_argument("--model", default="mace", choices=["mace", "mattersim"],
+                    help="force model; mattersim closes the O5 model-uncertainty gap")
     ap.add_argument("--benchmark", action="store_true")
     ap.add_argument("--seed", type=int, default=None,
                     help="random seed for the initial velocities; use different "
@@ -291,8 +310,10 @@ def main():
         f"volume {base.get_volume():.1f} A^3")
 
     # Relax in float64 regardless. One-off cost, and the dynamics need a
-    # well-converged starting point.
-    calc64 = mace_mp(model="medium-mpa-0", device=args.device, default_dtype="float64")
+    # well-converged starting point. Relax with the SAME model as production:
+    # the O5 test wants each model's whole pipeline at its own minimum.
+    calc64 = make_calc(args.model, args.device, "float64")
+    log(f"model: {args.model}")
     base.calc = calc64
     BFGS(FrechetCellFilter(base), logfile=None).run(fmax=0.001)
     fmax = np.sqrt((base.get_forces() ** 2).sum(axis=1)).max()
@@ -304,9 +325,9 @@ def main():
         return
 
     # --supercell accepts:
-    #   '4'                     -> diag(4,4,4)
-    #   '8,4,4'                 -> diag(8,4,4)
-    #   '3,3,0,-2,2,0,0,0,1'    -> the full 3x3 matrix, row by row
+    #   '4'                   -> diag(4,4,4)
+    #   '8,4,4'               -> diag(8,4,4)
+    #   '3,3,0,-2,2,0,0,0,1'  -> the full 3x3 matrix, row by row
     # The matrix form is needed for the W-phase, whose file is the primitive
     # cell of a C-centred setting (gamma = 23.27 deg). P = [[1,1,0],[-1,1,0],
     # [0,0,1]] recovers the conventional 39.35 x 8.10 x 23.23 A axes, and
@@ -331,8 +352,9 @@ def main():
         log(f"WARNING: det(P) = {det:.0f} is negative, which flips handedness. "
             f"Swap two rows if that matters.")
 
-    out = args.out or f"md_{tag}"
-    calc = mace_mp(model="medium-mpa-0", device=args.device, default_dtype=args.dtype)
+    suffix = "" if args.model == "mace" else f"_{args.model}"
+    out = args.out or f"md_{tag}{suffix}"
+    calc = make_calc(args.model, args.device, args.dtype)
     log(f"MD dtype: {args.dtype}")
     run_md(calc, base, P, args.steps, args.temperature, out, tag,
            seed=args.seed, store_positions=args.store_positions)
