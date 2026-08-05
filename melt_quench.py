@@ -47,6 +47,28 @@ Success criterion: the quenched structure lands at the same energy per atom as
 the relaxed reference (printed side by side at the end). A higher energy means
 the anneal got stuck in a metastable state - run longer, or raise --swaps.
 
+The supercell species-swap experiment (as-tiled start)
+------------------------------------------------------
+The fixed-site diagnostic validated the chemistry machinery: from randomised
+species on the reference site list it recovers the reference ordering exactly.
+The supercell experiment asks the opposite question. A supercell built from a
+periodic approximant repeats the SAME chemical ordering in every copy of the
+cell - an artificial periodicity the tiling imposes, not one the chemistry
+chose. Starting fixed-site MC from that as-tiled ordering (--start-from
+as-tiled, i.e. do NOT randomise) lets the chemistry decide whether to break
+the tile periodicity. If swaps are accepted and the energy drops, the true
+ordering of the larger cell differs from tiled copies of the small one.
+
+The ratio experiment (target counts)
+------------------------------------
+Instead of grand-canonical MC with chemical-potential reservoirs, composition
+is changed MANUALLY: --target-counts reassigns the minimum number of sites
+(chosen at random from the majority species) to hit the requested counts, then
+the MC runs canonically at the new composition. Combined with --start-from
+as-tiled this perturbs the tiled ordering as little as possible, so the swaps
+explore the consequence of the composition change rather than recovering from
+a fully scrambled start.
+
 Protocol notes, and why each choice
 -----------------------------------
   Timestep 0.2 fs, not the 2 fs used for the room-temperature VDOS runs. At
@@ -119,6 +141,17 @@ Usage
     python melt_quench.py --reference Al9Co2Ni2-coords.txt        # validation gate
     python melt_quench.py --cell 12.3,12.3,8.20 --angles 90,90,108 \
                           --counts Al:56,Co:6,Ni:16 --out boat_nirich
+
+    # supercell species-swap MC: W-phase 3x2x1 conventional, as-tiled start
+    python melt_quench.py --reference wphase.vasp \
+        --supercell 3,3,0,-2,2,0,0,0,1 \
+        --fixed-sites --start-from as-tiled --out w_astiled_mc
+
+    # ratio experiment: same, with the composition nudged manually
+    python melt_quench.py --reference wphase.vasp \
+        --supercell 3,3,0,-2,2,0,0,0,1 \
+        --fixed-sites --start-from as-tiled \
+        --target-counts Al:2244,Co:696,Ni:240 --out w_ratio_coplus
 """
 
 import argparse
@@ -161,6 +194,80 @@ def parse_structure(path):
                 scaled.append([float(p[0]), float(p[1]), float(p[2])])
     return Atoms(symbols=symbols, scaled_positions=np.array(scaled),
                  cell=cell, pbc=True)
+
+
+def load_structure(path):
+    """Dispatch on file type: the legacy coords.txt format goes through
+    parse_structure; anything ASE can read (.vasp/POSCAR, .cif, .xyz) goes
+    through ase.io.read. Mirrors the reader added to md_run.py for the W-vs-X
+    comparison, so both scripts accept the same inputs."""
+    lower = path.lower()
+    if lower.endswith((".vasp", ".poscar", ".cif", ".xyz")) or "poscar" in lower:
+        from ase.io import read
+        atoms = read(path)
+        atoms.pbc = True
+        return atoms
+    return parse_structure(path)
+
+
+def apply_supercell(atoms, spec):
+    """Build a supercell from 3 diagonal repeats ('3,2,1') or a full 9-number
+    transformation matrix row-by-row ('3,3,0,-2,2,0,0,0,1') - the latter is how
+    the W-phase primitive cell becomes its 3x2x1 conventional box. Same
+    convention as md_run.py's --supercell."""
+    nums = [int(x) for x in spec.replace(",", " ").split()]
+    if len(nums) == 3:
+        P = np.diag(nums)
+    elif len(nums) == 9:
+        P = np.array(nums).reshape(3, 3)
+    else:
+        raise SystemExit("--supercell needs 3 or 9 integers")
+    from ase.build import make_supercell
+    sc = make_supercell(atoms, P)
+    log(f"supercell matrix rows {P.tolist()}, det {int(round(np.linalg.det(P)))}: "
+        f"{len(atoms)} -> {len(sc)} atoms, "
+        f"box {np.round(sc.cell.cellpar(), 2)}")
+    return sc
+
+
+def retarget_counts(atoms, target, rng):
+    """Reassign the MINIMUM number of sites needed to hit the target counts.
+    Surplus species donate randomly-chosen sites; deficit species receive them
+    in shuffled order. Everything else keeps its identity, so an as-tiled start
+    is perturbed as little as the composition change allows. This is the manual
+    alternative to grand-canonical MC: composition is set by hand, the MC then
+    runs canonically at that composition."""
+    syms = np.array(atoms.get_chemical_symbols())
+    n = len(syms)
+    total = sum(target.values())
+    if total != n:
+        raise SystemExit(f"--target-counts sums to {total}, but the cell has "
+                         f"{n} sites - counts must match exactly (fixed cell, "
+                         f"fixed density)")
+    current = Counter(syms)
+    species = sorted(set(current) | set(target))
+    surplus = {s: current.get(s, 0) - target.get(s, 0) for s in species}
+
+    give = []
+    for s in species:
+        if surplus[s] > 0:
+            idx = np.flatnonzero(syms == s)
+            chosen = rng.choice(idx, size=surplus[s], replace=False)
+            give.extend(int(i) for i in chosen)
+    need = []
+    for s in species:
+        if surplus[s] < 0:
+            need += [s] * (-surplus[s])
+    need = [str(s) for s in rng.permutation(need)]
+
+    for i, s in zip(give, need):
+        syms[i] = s
+    atoms.set_chemical_symbols(list(syms))
+    _refresh_masses(atoms)
+    log(f"retarget: {({str(k): int(v) for k, v in current.items()})} -> "
+        f"{({str(k): int(v) for k, v in Counter(syms).items()})} "
+        f"({len(give)} of {n} sites reassigned)")
+    return len(give)
 
 
 def _refresh_masses(atoms):
@@ -252,26 +359,42 @@ def quench(atoms, fmax):
 
 
 def fixed_site_mc(ref, args, rng):
-    """Diagnostic: keep the reference ATOMIC POSITIONS, randomise the species,
-    and let only the Monte Carlo swaps run. No MD, no position changes.
+    """Keep the ATOMIC POSITIONS fixed and let only the Monte Carlo swaps run.
+    No MD, no position changes.
 
-    This is what Mihalkovic and Widom did for the W-phase in Phil. Mag. 86
-    (2005): fixed-site Monte Carlo on a site list taken from diffraction. Here
-    it decomposes the validation gap into its two causes. If this recovers the
-    reference energy easily, the whole gap is the positional search and the
-    chemistry machinery is fine. If it stalls well above, the swap schedule
-    needs work too, and no amount of better annealing will fix that.
+    Two uses, selected by --start-from:
+
+    random (the original diagnostic): randomise the species first. This is what
+    Mihalkovic and Widom did for the W-phase in Phil. Mag. 86 (2005):
+    fixed-site Monte Carlo on a site list taken from diffraction. It decomposes
+    the validation gap into its two causes. If this recovers the reference
+    energy easily, the whole gap is the positional search and the chemistry
+    machinery is fine. If it stalls well above, the swap schedule needs work
+    too, and no amount of better annealing will fix that.
+
+    as-tiled (the supercell experiment): keep the species exactly as read from
+    the input, so a supercell starts from tiled copies of the small cell's
+    ordering. The MC then decides whether chemistry wants to break that
+    artificial tile periodicity. Accepted swaps that lower the energy are the
+    signal; a dead run at acceptance ~0 with no energy drop says the tiled
+    ordering is already locally optimal.
     """
     atoms = ref.copy()
     atoms.calc = ref.calc
-    syms = [str(s) for s in rng.permutation(atoms.get_chemical_symbols())]
-    atoms.set_chemical_symbols(syms)
-    _refresh_masses(atoms)
-
     n = len(atoms)
+
+    log(f"=== fixed-site MC: {n} atoms on the input site list ===")
+    if args.start_from == "as-tiled":
+        log(f"    species kept AS-TILED from the input file "
+            f"({dict(Counter(atoms.get_chemical_symbols()))})")
+    else:
+        syms = [str(s) for s in rng.permutation(atoms.get_chemical_symbols())]
+        atoms.set_chemical_symbols(syms)
+        _refresh_masses(atoms)
+        log("    species randomised")
+
     e = atoms.get_potential_energy()
-    log(f"=== fixed-site MC: {n} atoms on the reference site list ===")
-    log(f"    species randomised, start {e / n:+.6f} eV/atom")
+    log(f"    start {e / n:+.6f} eV/atom")
     log(f"    {args.n_temps} stages {args.t_hi}->{args.t_lo} K, "
         f"{args.swaps} swap attempts each, positions frozen")
 
@@ -483,6 +606,10 @@ def benchmark(atoms, args):
     log(f"  estimated wall time: {est_h:.2f} h")
     log("  (the paper used 7800 swaps/loop with pair potentials, where a swap's")
     log("   energy change is local. Scale --swaps to what the estimate allows.)")
+    if args.fixed_sites:
+        est_fs_h = (args.n_temps * args.swaps * t_mc) / 3600
+        log(f"  fixed-site schedule: {args.n_temps} stages x {args.swaps} swaps "
+            f"= {args.n_temps * args.swaps:,} evaluations, ~{est_fs_h:.2f} h")
 
 
 def parse_counts(spec):
@@ -498,11 +625,31 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--reference", default=None,
                     help="known structure to take the cell and composition from, "
-                         "and to compare the result against. This is how the "
-                         "validation run is set up.")
+                         "and to compare the result against. Accepts the legacy "
+                         "coords.txt format or anything ASE reads (.vasp/POSCAR, "
+                         ".cif, .xyz).")
+    ap.add_argument("--supercell", default=None,
+                    help="build a supercell of the reference before anything "
+                         "else: 3 diagonal repeats ('3,2,1') or a 9-number "
+                         "transformation matrix row-by-row "
+                         "('3,3,0,-2,2,0,0,0,1' gives the W-phase 3x2x1 "
+                         "conventional box). Same convention as md_run.py.")
     ap.add_argument("--cell", default=None, help="a,b,c in Angstrom")
     ap.add_argument("--angles", default="90,90,90", help="alpha,beta,gamma in degrees")
     ap.add_argument("--counts", default=None, help="e.g. Al:56,Co:6,Ni:16")
+    ap.add_argument("--target-counts", default=None,
+                    help="reassign the minimum number of sites of the loaded "
+                         "(super)cell to hit these counts, e.g. "
+                         "Al:2244,Co:696,Ni:240. Must sum to the site total. "
+                         "This is the manual-composition route chosen instead "
+                         "of grand-canonical MC.")
+    ap.add_argument("--start-from", choices=["random", "as-tiled"], default="random",
+                    help="random (default): previous behaviour - random "
+                         "positions for anneals, randomised species for "
+                         "--fixed-sites. as-tiled: keep positions AND species "
+                         "exactly as loaded, so a supercell starts from tiled "
+                         "copies of the small cell's ordering. Requires "
+                         "--reference.")
 
     ap.add_argument("--t-hi", type=float, default=2500.0, help="melt temperature (K)")
     ap.add_argument("--t-lo", type=float, default=1000.0, help="final anneal temperature (K)")
@@ -528,9 +675,11 @@ def main():
 
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--fixed-sites", action="store_true",
-                    help="diagnostic: keep the reference positions, randomise "
-                         "species, run swaps only. Decomposes the validation gap "
-                         "into positional vs chemical. Requires --reference.")
+                    help="keep the loaded positions, run species swaps only. "
+                         "With --start-from random this is the validation-gap "
+                         "diagnostic; with --start-from as-tiled it is the "
+                         "supercell species-swap experiment. Requires "
+                         "--reference.")
     ap.add_argument("--replica-exchange", action="store_true",
                     help="parallel tempering instead of staged annealing. This is "
                          "the paper's method and the fix for the trapping that "
@@ -553,14 +702,26 @@ def main():
 
     rng = np.random.default_rng(args.seed)
 
+    if args.start_from == "as-tiled" and not args.reference:
+        raise SystemExit("--start-from as-tiled needs --reference (it keeps "
+                         "that file's positions and species)")
+
     # ---- work out the cell and composition ----
     ref = None
     if args.reference:
-        ref = parse_structure(args.reference)
+        ref = load_structure(args.reference)
+        log(f"loaded {args.reference}: {len(ref)} atoms, "
+            f"{dict(Counter(ref.get_chemical_symbols()))}, "
+            f"volume {ref.get_volume():.1f} A^3")
+        if args.supercell:
+            ref = apply_supercell(ref, args.supercell)
+        if args.target_counts:
+            retarget_counts(ref, parse_counts(args.target_counts), rng)
         cell = np.array(ref.cell)
         counts = dict(Counter(ref.get_chemical_symbols()))
-        log(f"reference {args.reference}: {len(ref)} atoms, {counts}, "
-            f"volume {ref.get_volume():.1f} A^3")
+        log(f"working cell: {len(ref)} atoms, {counts}, "
+            f"volume {ref.get_volume():.1f} A^3, "
+            f"density {len(ref) / ref.get_volume():.4f} atoms/A^3")
         if args.counts:
             counts = parse_counts(args.counts)
             log(f"  overriding composition with {counts}")
@@ -572,9 +733,16 @@ def main():
         cell = cellpar_to_cell([a, b, c, al, be, ga])
         counts = parse_counts(args.counts)
 
-    atoms = random_config(cell, counts, rng)
-    log(f"random start: {len(atoms)} atoms in a fixed cell, "
-        f"min separation {atoms.get_all_distances(mic=True)[np.triu_indices(len(atoms), 1)].min():.2f} A")
+    # ---- starting configuration for the annealing modes ----
+    # (--fixed-sites works from ref directly and ignores this object, but the
+    # benchmark uses it, so build it either way)
+    if ref is not None and args.start_from == "as-tiled":
+        atoms = ref.copy()
+        log("as-tiled start: positions and species taken from the input")
+    else:
+        atoms = random_config(cell, counts, rng)
+        log(f"random start: {len(atoms)} atoms in a fixed cell, "
+            f"min separation {atoms.get_all_distances(mic=True)[np.triu_indices(len(atoms), 1)].min():.2f} A")
 
     # ---- attach MACE ----
     from mace.calculators import mace_mp
@@ -596,20 +764,28 @@ def main():
         best, e_final = melt_quench(atoms, args, rng)
 
     # ---- the validation comparison ----
+    # With an as-tiled or retargeted start this compares the found chemistry
+    # against the relaxed STARTING ordering - i.e. it answers "did the MC beat
+    # the tiled arrangement", which is exactly the supercell experiment's
+    # question. Note the comparison relaxes ref in place, so it runs on the
+    # starting species, not the original file's, when --target-counts is used.
     if ref is not None:
         ref.calc = calc
         BFGS(ref, logfile=None).run(fmax=args.fmax_final, steps=500)
         e_ref = ref.get_potential_energy() / len(ref)
         e_got = e_final / len(best)
+        label = ("as-tiled/starting ordering (relaxed)"
+                 if args.start_from == "as-tiled" or args.target_counts
+                 else "reference (relaxed)")
         log("=== validation against the reference structure ===")
-        log(f"  reference (relaxed): {e_ref:+.6f} eV/atom")
-        log(f"  melt-quench found:   {e_got:+.6f} eV/atom")
+        log(f"  {label}: {e_ref:+.6f} eV/atom")
+        log(f"  search found:        {e_got:+.6f} eV/atom")
         log(f"  difference:          {(e_got - e_ref) * 1000:+.2f} meV/atom")
         if e_got - e_ref < 0.001:
-            log("  -> matches or beats the reference: the anneal found it.")
+            log("  -> matches or beats the starting ordering.")
         else:
-            log("  -> higher than the reference: the anneal is stuck. Run more "
-                "loops, or raise --swaps.")
+            log("  -> higher than the starting ordering: the search is stuck. "
+                "Run more loops, or raise --swaps.")
 
 
 if __name__ == "__main__":
