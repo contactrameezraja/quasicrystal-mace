@@ -88,7 +88,7 @@ from ase.filters import FrechetCellFilter
 from ase.md.langevin import Langevin
 from ase.md.velocitydistribution import MaxwellBoltzmannDistribution, Stationary
 from ase.md.verlet import VelocityVerlet
-from ase.optimize import BFGS
+from ase.optimize import BFGS, LBFGS, FIRE
 from ase import units
 from mace.calculators import mace_mp
 
@@ -308,6 +308,16 @@ def main():
                     help="relaxation convergence in eV/A. 0.001 is achievable in "
                          "float64; in float32 the force noise is itself of that "
                          "order, so use 0.01 there and say so in the methods.")
+    ap.add_argument("--optimizer", default="bfgs",
+                    choices=["bfgs", "lbfgs", "fire"],
+                    help="ASE optimiser for the initial relaxation. bfgs is the "
+                         "default and was used for every small-cell run, but it "
+                         "stores and eigendecomposes a full (3N)x(3N) Hessian "
+                         "every step: at 3120 atoms that is a 9360x9360 matrix, "
+                         "so the relaxation becomes bound by linear algebra "
+                         "rather than by force evaluation (measured 14x slower "
+                         "than lbfgs already at 500 atoms, and the gap grows as "
+                         "N^3 against N). Use lbfgs or fire above ~1000 atoms.")
     ap.add_argument("--fix-cell", action="store_true",
                     help="relax positions only, holding the cell fixed. Use when "
                          "the box must match another run exactly; the default "
@@ -339,11 +349,16 @@ def main():
     # production dynamics use anyway.
     calc_relax = make_calc(args.model, args.device, args.relax_dtype)
     log(f"model: {args.model} | relax dtype: {args.relax_dtype} | "
-        f"fmax {args.fmax} | cell {'fixed' if args.fix_cell else 'relaxed'}")
+        f"fmax {args.fmax} | cell {'fixed' if args.fix_cell else 'relaxed'} "
+        f"| optimizer {args.optimizer}")
     base.calc = calc_relax
     target = base if args.fix_cell else FrechetCellFilter(base)
     cell_before = base.cell.cellpar().copy()
-    BFGS(target, logfile=None).run(fmax=args.fmax)
+    opt_cls = {"bfgs": BFGS, "lbfgs": LBFGS, "fire": FIRE}[args.optimizer]
+    t_relax = time.time()
+    opt_cls(target, logfile=None).run(fmax=args.fmax)
+    log(f"  relaxation took {(time.time()-t_relax)/60:.1f} min "
+        f"with {args.optimizer}")
     fmax_final = np.sqrt((base.get_forces() ** 2).sum(axis=1)).max()
     log(f"Relaxed ({args.relax_dtype}): max residual force {fmax_final:.5f} eV/A "
         f"(the float64 26-atom relaxations gave 0.00083)")
