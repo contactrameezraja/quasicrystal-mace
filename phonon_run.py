@@ -333,15 +333,45 @@ def main():
         log(f"  (tau = 1.618; the 26-atom first ZB gap was 10.29 meV, "
             f"the 60-atom 8.36, and the 60-atom centre ratios 1.304/1.283)")
 
-    # ---------------- DOS ----------------
+    # ---------------- element decomposition, from the eigenvectors ----------
+    # Computed mode by mode rather than from phonopy's DOS routine, which needs
+    # a proper q-mesh and returns nothing usable from a single sampled point.
+    # For mass-weighted orthonormal eigenvectors the site weights sum to 1 per
+    # mode, so the fraction of weight above the split energy carried by an
+    # element is just its mean site weight over the modes above that energy.
+    # This is the same quantity reduce_vdos.py reports from the MD spectra.
+    syms = np.array(ph.primitive.symbols)
+    log(f"--- element decomposition from eigenvectors (above {args.split} meV) ---")
+    w_above = {el: 0.0 for el in sorted(set(syms))}
+    n_above = 0
+    for iq in range(freqs.shape[0]):
+        e = eigvecs[iq].reshape(n_at, 3, eigvecs[iq].shape[-1])
+        site = (np.abs(e) ** 2).sum(axis=1)                 # (n_atoms, n_modes)
+        site = site / site.sum(axis=0, keepdims=True)
+        sel = freqs[iq] > args.split
+        n_above += int(sel.sum())
+        for el in w_above:
+            m = syms == el
+            w_above[el] += site[m][:, sel].sum()
+    if n_above:
+        for el in sorted(w_above):
+            log(f"  {el}: {100*w_above[el]/n_above:.0f}% of weight above "
+                f"{args.split:.0f} meV ({int((syms == el).sum())} atoms, "
+                f"{100*(syms == el).sum()/n_at:.0f}% of atoms)")
+        log(f"  ({n_above} of {freqs.size} modes lie above {args.split:.0f} meV)")
+        log("  (MD gave Al 61 / Co 16 / Ni 15 for the X-phase at three sizes, "
+            "Al 54 / Co 19 / Ni 16 for the W-phase, Al 54 / Co 16 for Al13Co4)")
+    else:
+        log(f"  no modes above {args.split} meV (max {flat.max():.1f} meV)")
+
+    # ---------------- DOS (secondary; needs a real mesh to be meaningful) ----
     ph.run_total_dos()
     tdos = ph.get_total_dos_dict()
     e_dos = tdos["frequency_points"] * THZ_TO_MEV
     g_dos = tdos["total_dos"]
     ph.run_projected_dos()
     pdos = ph.get_projected_dos_dict()["projected_dos"]
-    syms = np.array(ph.primitive.symbols)
-    log("--- element decomposition (weight above 30 meV) ---")
+    log("--- DOS-based decomposition (secondary; needs a real mesh) ---")
     above = e_dos > args.split
     tot_above = np.trapezoid(g_dos[above], e_dos[above]) if hasattr(np, "trapezoid") \
         else np.trapz(g_dos[above], e_dos[above])
