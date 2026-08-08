@@ -250,3 +250,93 @@ FINISHED. best energy -5.048721 eV/atom (579 min, exchange acceptance 0.531)
   melt-quench found:   -5.048721 eV/atom
   difference:          +56.10 meV/atom
   -> higher than the reference: the anneal is stuck. Run more loops, or raise --swaps.
+loaded W-AlCoNi-265.vasp: 265 atoms, {'Co': 55, 'Ni': 20, 'Al': 190}, volume 3741.8 A^3
+supercell matrix rows [[3, 3, 0], [-2, 2, 0], [0, 0, 1]], det 12: 265 -> 3180 atoms, box [118.91  16.18  23.34  90.02  89.88  90.02]
+working cell: 3180 atoms, {'Co': 660, 'Ni': 240, 'Al': 2280}, volume 44901.4 A^3, density 0.0708 atoms/A^3
+random start: 3180 atoms in a fixed cell, min separation 1.81 A
+=== BENCHMARK ===
+3180 atoms, device cuda, dtype float32
+  energy after position change (MD-like):  1046.08 ms
+  energy after species swap    (MC-like):   363.22 ms
+  default schedule: 100 loops x (1000 MD + 500 swaps) = 150,000 evaluations
+  estimated wall time: 34.10 h
+  (the paper used 7800 swaps/loop with pair potentials, where a swap's
+   energy change is local. Scale --swaps to what the estimate allows.)
+loaded W-AlCoNi-265.vasp: 265 atoms, {'Co': 55, 'Ni': 20, 'Al': 190}, volume 3741.8 A^3
+supercell matrix rows [[3, 3, 0], [-2, 2, 0], [0, 0, 1]], det 12: 265 -> 3180 atoms, box [118.91  16.18  23.34  90.02  89.88  90.02]
+working cell: 3180 atoms, {'Co': 660, 'Ni': 240, 'Al': 2280}, volume 44901.4 A^3, density 0.0708 atoms/A^3
+as-tiled start: positions and species taken from the input
+=== fixed-site MC: 3180 atoms on the input site list ===
+    species kept AS-TILED from the input file ({'Co': 660, 'Ni': 240, 'Al': 2280})
+    start -5.041090 eV/atom
+    20 stages 2500.0->1000.0 K, 8000 swap attempts each, positions frozen
+loaded Al9Co2Ni2-coords.txt: 26 atoms, {'Al': 18, 'Ni': 3, 'Co': 5}, volume 360.8 A^3
+supercell matrix rows [[10, 0, 0], [0, 4, 0], [0, 0, 3]], det 120: 26 -> 3120 atoms, box [121.28  16.2   22.91  90.   105.9   90.  ]
+retarget: {'Al': 2160, 'Ni': 360, 'Co': 600} -> {'Al': 2237, 'Ni': 235, 'Co': 648} (125 of 3120 sites reassigned)
+working cell: 3120 atoms, {'Al': 2237, 'Ni': 235, 'Co': 648}, volume 43295.6 A^3, density 0.0721 atoms/A^3
+as-tiled start: positions and species taken from the input
+=== fixed-site MC: 3120 atoms on the input site list ===
+    species kept AS-TILED from the input file ({'Al': 2237, 'Ni': 235, 'Co': 648})
+    start -4.998184 eV/atom
+    20 stages 2500.0->1000.0 K, 8000 swap attempts each, positions frozen
+  T=   2500 K | -5.036360 eV/atom | best -5.041090 | acc 0.011 | 110 min
+  T=   2500 K | -4.992858 eV/atom | best -4.998184 | acc 0.035 | 105 min
+  T=   2421 K | -4.989947 eV/atom | best -4.998184 | acc 0.035 | 211 min
+  T=   2421 K | -5.033631 eV/atom | best -5.041090 | acc 0.015 | 221 min
+  T=   2342 K | -4.990806 eV/atom | best -4.998184 | acc 0.040 | 316 min
+  T=   2342 K | -5.032357 eV/atom | best -5.041090 | acc 0.014 | 331 min
+  T=   2263 K | -4.989219 eV/atom | best -4.998184 | acc 0.037 | 422 min
+  T=   2263 K | -5.031983 eV/atom | best -5.041090 | acc 0.018 | 441 min
+  T=   2184 K | -4.990088 eV/atom | best -4.998184 | acc 0.040 | 527 min
+  T=   2184 K | -5.031449 eV/atom | best -5.041090 | acc 0.017 | 552 min
+  T=   2105 K | -4.990497 eV/atom | best -4.998184 | acc 0.037 | 633 min
+  T=   2105 K | -5.031373 eV/atom | best -5.041090 | acc 0.018 | 662 min
+  T=   2026 K | -4.989832 eV/atom | best -4.998184 | acc 0.037 | 738 min
+  T=   2026 K | -5.031584 eV/atom | best -5.041090 | acc 0.017 | 772 min
+  T=   1947 K | -4.990506 eV/atom | best -4.998184 | acc 0.036 | 844 min
+  T=   1947 K | -5.032200 eV/atom | best -5.041090 | acc 0.014 | 883 min
+  T=   1868 K | -4.990272 eV/atom | best -4.998184 | acc 0.036 | 949 min
+  T=   1868 K | -5.032257 eV/atom | best -5.041090 | acc 0.017 | 993 min
+  T=   1789 K | -4.990112 eV/atom | best -4.998184 | acc 0.033 | 1054 min
+  T=   1789 K | -5.032743 eV/atom | best -5.041090 | acc 0.014 | 1103 min
+  T=   1711 K | -4.991556 eV/atom | best -4.998184 | acc 0.029 | 1160 min
+  T=   1711 K | -5.032589 eV/atom | best -5.041090 | acc 0.013 | 1214 min
+  T=   1632 K | -4.991597 eV/atom | best -4.998184 | acc 0.029 | 1265 min
+  T=   1632 K | -5.031678 eV/atom | best -5.041090 | acc 0.014 | 1324 min
+  T=   1553 K | -4.991710 eV/atom | best -4.998184 | acc 0.028 | 1371 min
+  T=   1553 K | -5.032365 eV/atom | best -5.041090 | acc 0.013 | 1434 min
+loaded W-AlCoNi-265.vasp: 265 atoms, {'Co': 55, 'Ni': 20, 'Al': 190}, volume 3741.8 A^3
+supercell matrix rows [[3, 3, 0], [-2, 2, 0], [0, 0, 1]], det 12: 265 -> 3180 atoms, box [118.91  16.18  23.34  90.02  89.88  90.02]
+working cell: 3180 atoms, {'Co': 660, 'Ni': 240, 'Al': 2280}, volume 44901.4 A^3, density 0.0708 atoms/A^3
+as-tiled start: positions and species taken from the input
+=== fixed-site MC: 3180 atoms on the input site list ===
+    species kept AS-TILED from the input file ({'Co': 660, 'Ni': 240, 'Al': 2280})
+    start -5.041090 eV/atom
+    10 stages 1300.0->600.0 K, 8000 swap attempts each, positions frozen
+  T=   1300 K | -5.039757 eV/atom | best -5.041090 | acc 0.004 | 110 min
+  T=   1222 K | -5.038376 eV/atom | best -5.041090 | acc 0.005 | 220 min
+  T=   1144 K | -5.037514 eV/atom | best -5.041090 | acc 0.008 | 330 min
+  T=   1067 K | -5.037216 eV/atom | best -5.041090 | acc 0.007 | 440 min
+  T=    989 K | -5.037040 eV/atom | best -5.041090 | acc 0.006 | 549 min
+  T=    911 K | -5.037529 eV/atom | best -5.041090 | acc 0.005 | 659 min
+  T=    833 K | -5.037246 eV/atom | best -5.041090 | acc 0.004 | 769 min
+  T=    756 K | -5.037685 eV/atom | best -5.041090 | acc 0.005 | 879 min
+  T=    678 K | -5.037869 eV/atom | best -5.041090 | acc 0.004 | 989 min
+  T=    600 K | -5.038341 eV/atom | best -5.041090 | acc 0.003 | 1099 min
+best chemistry on frozen sites: -5.041090 eV/atom
+after relaxing positions too:   -5.042059 eV/atom
+=== validation against the reference structure ===
+  as-tiled/starting ordering (relaxed): -5.042061 eV/atom
+  search found:        -5.042059 eV/atom
+  difference:          +0.00 meV/atom
+  -> matches or beats the starting ordering.
+loaded xbox_wcomp.vasp: 3120 atoms, {'Al': 2237, 'Ni': 235, 'Co': 648}, volume 43295.6 A^3
+working cell: 3120 atoms, {'Al': 2237, 'Ni': 235, 'Co': 648}, volume 43295.6 A^3, density 0.0721 atoms/A^3
+as-tiled start: positions and species taken from the input
+=== fixed-site MC: 3120 atoms on the input site list ===
+    species kept AS-TILED from the input file ({'Al': 2237, 'Ni': 235, 'Co': 648})
+    start -4.998160 eV/atom
+    10 stages 1300.0->600.0 K, 8000 swap attempts each, positions frozen
+  T=   1300 K | -4.995974 eV/atom | best -4.998160 | acc 0.019 | 104 min
+  T=   1222 K | -4.996020 eV/atom | best -4.998160 | acc 0.018 | 208 min
+  T=   1144 K | -4.995715 eV/atom | best -4.998160 | acc 0.018 | 312 min

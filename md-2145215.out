@@ -1,0 +1,36 @@
+CUDA: True Quadro RTX 6000
+cuequivariance or cuequivariance_torch is not available. Cuequivariance acceleration will be disabled.
+read al13co4.vasp via ASE: 102 atoms, volume 1447.7 A^3, cellpar [ 8.179 12.372 14.306 90.    90.    90.   ]
+Loaded 102 atoms: {'Al': 78, 'Co': 24}, volume 1447.7 A^3
+/home/physics/estzqn/.local/lib/python3.11/site-packages/mace/calculators/mace.py:226: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  torch.load(f=model_path, map_location=device)
+Using medium MPA-0 model as default MACE-MP model, to use previous (before 3.10) default model please specify 'medium' as model argument
+Using Materials Project MACE for MACECalculator with /home/physics/estzqn/.cache/mace/macempa0mediummodel
+Using float64 for MACECalculator, which is slower but more accurate. Recommended for geometry optimization.
+Traceback (most recent call last):
+  File "/gpfs/home/physics/estzqn/quasicrystal/md_run.py", line 364, in <module>
+    main()
+  File "/gpfs/home/physics/estzqn/quasicrystal/md_run.py", line 315, in main
+    calc64 = make_calc(args.model, args.device, "float64")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/gpfs/home/physics/estzqn/quasicrystal/md_run.py", line 99, in make_calc
+    return mace_mp(model="medium-mpa-0", device=device, default_dtype=dtype)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/physics/estzqn/.local/lib/python3.11/site-packages/mace/calculators/foundations_models.py", line 299, in mace_mp
+    mace_calc = MACECalculator(
+                ^^^^^^^^^^^^^^^
+  File "/home/physics/estzqn/.local/lib/python3.11/site-packages/mace/calculators/mace.py", line 225, in __init__
+    self.models = [
+                  ^
+  File "/home/physics/estzqn/.local/lib/python3.11/site-packages/mace/calculators/mace.py", line 226, in <listcomp>
+    torch.load(f=model_path, map_location=device)
+  File "/scrtp/avon/eb/software/PIP-PyTorch/2.4.0-foss-2023b-CUDA-12.4.0/lib/python3.11/site-packages/torch/serialization.py", line 1097, in load
+    return _load(
+           ^^^^^^
+  File "/scrtp/avon/eb/software/PIP-PyTorch/2.4.0-foss-2023b-CUDA-12.4.0/lib/python3.11/site-packages/torch/serialization.py", line 1525, in _load
+    result = unpickler.load()
+             ^^^^^^^^^^^^^^^^
+  File "/home/physics/estzqn/.local/lib/python3.11/site-packages/e3nn/util/codegen/_mixin.py", line 115, in __setstate__
+    for fname, (buffer_type, buffer) in codegen_state.items():
+               ^^^^^^^^^^^^^^^^^^^^^
+ValueError: too many values to unpack (expected 2)

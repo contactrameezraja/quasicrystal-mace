@@ -1,0 +1,82 @@
+CUDA: True Quadro RTX 6000
+/home/physics/estzqn/.local/lib/python3.11/site-packages/e3nn/o3/_wigner.py:10: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  _Jd, _W3j_flat, _W3j_indices = torch.load(os.path.join(os.path.dirname(__file__), 'constants.pt'))
+cuequivariance or cuequivariance_torch is not available. Cuequivariance acceleration will be disabled.
+Loaded 26 atoms: {'Al': 18, 'Ni': 3, 'Co': 5}, volume 360.8 A^3
+/home/physics/estzqn/.local/lib/python3.11/site-packages/mace/calculators/mace.py:226: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  torch.load(f=model_path, map_location=device)
+Using medium MPA-0 model as default MACE-MP model, to use previous (before 3.10) default model please specify 'medium' as model argument
+Using Materials Project MACE for MACECalculator with /home/physics/estzqn/.cache/mace/macempa0mediummodel
+Using float64 for MACECalculator, which is slower but more accurate. Recommended for geometry optimization.
+Relaxed (float64): max residual force 0.00083 eV/A (laptop gave 0.00083)
+/home/physics/estzqn/.local/lib/python3.11/site-packages/mace/calculators/mace.py:226: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  torch.load(f=model_path, map_location=device)
+WARNING:root:Default dtype float32 does not match model dtype float64, converting models to float32.
+Using medium MPA-0 model as default MACE-MP model, to use previous (before 3.10) default model please specify 'medium' as model argument
+Using Materials Project MACE for MACECalculator with /home/physics/estzqn/.cache/mace/macempa0mediummodel
+Using float32 for MACECalculator, which is faster but less accurate. Recommended for MD. Use float64 for geometry optimization.
+MD dtype: float32
+=== MD: 3x3x3, 702 atoms, 2106 modes, 300.0 K ===
+    {'Al': 486, 'Ni': 81, 'Co': 135}
+    seed 12
+/gpfs/home/physics/estzqn/quasicrystal/md_run.py:186: DeprecationWarning: Use thermalize_momenta
+  MaxwellBoltzmannDistribution(sc, temperature_K=T)
+NVT equilibration (10 ps)...
+/home/physics/estzqn/.local/lib/python3.11/site-packages/ase/md/langevin.py:102: FutureWarning: The implementation of `fixcm=True` in `Langevin` does not strictly sample the correct NVT distributions. The deviations are typically small for large systems but can be more pronounced for small systems. Use `fixcm=False` together with `ase.constraints.FixCom`. `fixcm` is deprecated since ASE 3.28.0 and will be removed in a future release.
+  warnings.warn(msg, FutureWarning)
+  done in 910s, instantaneous T = 298 K
+NVE burn-in (2 ps, not recorded)...
+NVE production: 200 ps (~0.021 meV resolution), 50 blocks, storing positions...
+  block 1/50 | 6 min | ~297 min left | 1000 samples
+  block 2/50 | 12 min | ~291 min left | 2000 samples
+  block 3/50 | 18 min | ~285 min left | 3000 samples
+  block 4/50 | 24 min | ~279 min left | 4000 samples
+  block 5/50 | 30 min | ~272 min left | 5000 samples
+  block 6/50 | 36 min | ~266 min left | 6000 samples
+  block 7/50 | 42 min | ~260 min left | 7000 samples
+  block 8/50 | 48 min | ~254 min left | 8000 samples
+  block 9/50 | 54 min | ~248 min left | 9000 samples
+  block 10/50 | 61 min | ~242 min left | 10000 samples
+  block 11/50 | 67 min | ~236 min left | 11000 samples
+  block 12/50 | 73 min | ~230 min left | 12000 samples
+  block 13/50 | 79 min | ~224 min left | 13000 samples
+  block 14/50 | 85 min | ~218 min left | 14000 samples
+  block 15/50 | 91 min | ~212 min left | 15000 samples
+  block 16/50 | 97 min | ~206 min left | 16000 samples
+  block 17/50 | 103 min | ~200 min left | 17000 samples
+  block 18/50 | 109 min | ~194 min left | 18000 samples
+  block 19/50 | 115 min | ~188 min left | 19000 samples
+  block 20/50 | 121 min | ~182 min left | 20000 samples
+  block 21/50 | 127 min | ~176 min left | 21000 samples
+  block 22/50 | 133 min | ~170 min left | 22000 samples
+  block 23/50 | 139 min | ~164 min left | 23000 samples
+  block 24/50 | 145 min | ~157 min left | 24000 samples
+  block 25/50 | 151 min | ~151 min left | 25000 samples
+  block 26/50 | 157 min | ~145 min left | 26000 samples
+  block 27/50 | 164 min | ~139 min left | 27000 samples
+  block 28/50 | 170 min | ~133 min left | 28000 samples
+  block 29/50 | 176 min | ~127 min left | 29000 samples
+  block 30/50 | 182 min | ~121 min left | 30000 samples
+  block 31/50 | 188 min | ~115 min left | 31000 samples
+  block 32/50 | 194 min | ~109 min left | 32000 samples
+  block 33/50 | 200 min | ~103 min left | 33000 samples
+  block 34/50 | 206 min | ~97 min left | 34000 samples
+  block 35/50 | 212 min | ~91 min left | 35000 samples
+  block 36/50 | 218 min | ~85 min left | 36000 samples
+  block 37/50 | 224 min | ~79 min left | 37000 samples
+  block 38/50 | 230 min | ~73 min left | 38000 samples
+  block 39/50 | 236 min | ~67 min left | 39000 samples
+  block 40/50 | 242 min | ~61 min left | 40000 samples
+  block 41/50 | 248 min | ~55 min left | 41000 samples
+  block 42/50 | 254 min | ~48 min left | 42000 samples
+  block 43/50 | 261 min | ~42 min left | 43000 samples
+  block 44/50 | 267 min | ~36 min left | 44000 samples
+  block 45/50 | 273 min | ~30 min left | 45000 samples
+  block 46/50 | 279 min | ~24 min left | 46000 samples
+  block 47/50 | 285 min | ~18 min left | 47000 samples
+  block 48/50 | 291 min | ~12 min left | 48000 samples
+  block 49/50 | 297 min | ~6 min left | 49000 samples
+  block 50/50 | 303 min | ~0 min left | 50000 samples
+FINISHED. velocities (50000, 702, 3)
+Energy drift: 0.0280 meV/atom (laptop 2x2x2 run gave 0.039)
+positions saved: (50000, 702, 3)

@@ -1,0 +1,84 @@
+CUDA: True Quadro RTX 6000
+=== harmonic run: ph_w265_band222 ===
+read W-AlCoNi-265.vasp: 265 atoms, volume 3741.8 A^3
+/home/physics/estzqn/.local/lib/python3.11/site-packages/e3nn/o3/_wigner.py:10: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  _Jd, _W3j_flat, _W3j_indices = torch.load(os.path.join(os.path.dirname(__file__), 'constants.pt'))
+/home/physics/estzqn/.local/lib/python3.11/site-packages/mace/calculators/mace.py:226: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  torch.load(f=model_path, map_location=device)
+cuequivariance or cuequivariance_torch is not available. Cuequivariance acceleration will be disabled.
+Using medium MPA-0 model as default MACE-MP model, to use previous (before 3.10) default model please specify 'medium' as model argument
+Using Materials Project MACE for MACECalculator with /home/physics/estzqn/.cache/mace/macempa0mediummodel
+Using float64 for MACECalculator, which is slower but more accurate. Recommended for geometry optimization.
+calculator: mace
+relaxing positions at fixed cell to fmax 0.001...
+  E = -5.042055 eV/atom, max residual force 0.00097 eV/A
+force constants: fc-supercell 2,2,2 (2120 atoms), displacement 0.01 A, 1590 displaced configurations
+Traceback (most recent call last):
+  File "/gpfs/home/physics/estzqn/quasicrystal/phonon_run.py", line 440, in <module>
+    main()
+  File "/gpfs/home/physics/estzqn/quasicrystal/phonon_run.py", line 245, in main
+    forces.append(a.get_forces())
+                  ^^^^^^^^^^^^^^
+  File "/home/physics/estzqn/.local/lib/python3.11/site-packages/ase/atoms.py", line 2015, in get_forces
+    forces = self._calc.get_forces(self)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/physics/estzqn/.local/lib/python3.11/site-packages/ase/calculators/abc.py", line 31, in get_forces
+    return self.get_property('forces', atoms)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/physics/estzqn/.local/lib/python3.11/site-packages/ase/calculators/calculator.py", line 517, in get_property
+    self.calculate(atoms, [name], system_changes)
+  File "/home/physics/estzqn/.local/lib/python3.11/site-packages/mace/calculators/mace.py", line 635, in calculate
+    out = model(
+          ^^^^^^
+  File "/scrtp/avon/eb/software/PIP-PyTorch/2.4.0-foss-2023b-CUDA-12.4.0/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scrtp/avon/eb/software/PIP-PyTorch/2.4.0-foss-2023b-CUDA-12.4.0/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/physics/estzqn/.local/lib/python3.11/site-packages/mace/modules/models.py", line 549, in forward
+    node_feats, sc = interaction(
+                     ^^^^^^^^^^^^
+  File "/scrtp/avon/eb/software/PIP-PyTorch/2.4.0-foss-2023b-CUDA-12.4.0/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scrtp/avon/eb/software/PIP-PyTorch/2.4.0-foss-2023b-CUDA-12.4.0/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/physics/estzqn/.local/lib/python3.11/site-packages/mace/modules/blocks.py", line 1034, in forward
+    mji = self.conv_tp(
+          ^^^^^^^^^^^^^
+  File "/scrtp/avon/eb/software/PIP-PyTorch/2.4.0-foss-2023b-CUDA-12.4.0/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scrtp/avon/eb/software/PIP-PyTorch/2.4.0-foss-2023b-CUDA-12.4.0/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/physics/estzqn/.local/lib/python3.11/site-packages/e3nn/o3/_tensor_product/_tensor_product.py", line 529, in forward
+    return self._compiled_main_left_right(x, y, real_weight)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scrtp/avon/eb/software/PIP-PyTorch/2.4.0-foss-2023b-CUDA-12.4.0/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/scrtp/avon/eb/software/PIP-PyTorch/2.4.0-foss-2023b-CUDA-12.4.0/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: The following operation failed in the TorchScript interpreter.
+Traceback of TorchScript, serialized code (most recent call last):
+  File "code/__torch__/torch/fx/graph_module/___torch_mangle_47.py", line 143, in forward
+    reshape_34 = torch.reshape(einsum_23, [getitem_4, 896])
+    _17 = [reshape_12, reshape_14, reshape_17, reshape_20, reshape_22, reshape_25, reshape_27, reshape_29, reshape_32, reshape_34]
+    cat = torch.cat(_17, 1)
+          ~~~~~~~~~ <--- HERE
+    return torch.reshape(cat, add_3)
+
+Traceback of TorchScript, original code (most recent call last):
+  File "<eval_with_key>.639", line 115, in forward
+    einsum_23 = torch.functional.einsum('dbca,dbc->dba', tensordot_3, reshape_33);  tensordot_3 = reshape_33 = None
+    reshape_34 = einsum_23.reshape(getitem_4, 896);  einsum_23 = getitem_4 = None
+    cat = torch.cat([reshape_12, reshape_14, reshape_17, reshape_20, reshape_22, reshape_25, reshape_27, reshape_29, reshape_32, reshape_34], dim = 1);  reshape_12 = reshape_14 = reshape_17 = reshape_20 = reshape_22 = reshape_25 = reshape_27 = reshape_29 = reshape_32 = reshape_34 = None
+          ~~~~~~~~~ <--- HERE
+    reshape_35 = cat.reshape(add_3);  cat = add_3 = None
+    return reshape_35
+RuntimeError: CUDA out of memory. Tried to allocate 4.72 GiB. GPU 0 has a total capacity of 22.16 GiB of which 1.35 GiB is free. Including non-PyTorch memory, this process has 20.81 GiB memory in use. Of the allocated memory 13.37 GiB is allocated by PyTorch, and 7.20 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)
+

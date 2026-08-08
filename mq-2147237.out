@@ -1,0 +1,35 @@
+CUDA: True Quadro RTX 6000
+loaded W-AlCoNi-265.vasp: 265 atoms, {'Co': 55, 'Ni': 20, 'Al': 190}, volume 3741.8 A^3
+supercell matrix rows [[3, 3, 0], [-2, 2, 0], [0, 0, 1]], det 12: 265 -> 3180 atoms, box [118.91  16.18  23.34  90.02  89.88  90.02]
+working cell: 3180 atoms, {'Co': 660, 'Ni': 240, 'Al': 2280}, volume 44901.4 A^3, density 0.0708 atoms/A^3
+as-tiled start: positions and species taken from the input
+/home/physics/estzqn/.local/lib/python3.11/site-packages/e3nn/o3/_wigner.py:10: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  _Jd, _W3j_flat, _W3j_indices = torch.load(os.path.join(os.path.dirname(__file__), 'constants.pt'))
+/home/physics/estzqn/.local/lib/python3.11/site-packages/mace/calculators/mace.py:226: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  torch.load(f=model_path, map_location=device)
+WARNING:root:Default dtype float32 does not match model dtype float64, converting models to float32.
+cuequivariance or cuequivariance_torch is not available. Cuequivariance acceleration will be disabled.
+Using medium MPA-0 model as default MACE-MP model, to use previous (before 3.10) default model please specify 'medium' as model argument
+Using Materials Project MACE for MACECalculator with /home/physics/estzqn/.cache/mace/macempa0mediummodel
+Using float32 for MACECalculator, which is faster but less accurate. Recommended for MD. Use float64 for geometry optimization.
+=== fixed-site MC: 3180 atoms on the input site list ===
+    species kept AS-TILED from the input file ({'Co': 660, 'Ni': 240, 'Al': 2280})
+    start -5.041090 eV/atom
+    10 stages 1300.0->600.0 K, 8000 swap attempts each, positions frozen
+  T=   1300 K | -5.039757 eV/atom | best -5.041090 | acc 0.004 | 110 min
+  T=   1222 K | -5.038376 eV/atom | best -5.041090 | acc 0.005 | 220 min
+  T=   1144 K | -5.037514 eV/atom | best -5.041090 | acc 0.008 | 330 min
+  T=   1067 K | -5.037216 eV/atom | best -5.041090 | acc 0.007 | 440 min
+  T=    989 K | -5.037040 eV/atom | best -5.041090 | acc 0.006 | 549 min
+  T=    911 K | -5.037529 eV/atom | best -5.041090 | acc 0.005 | 659 min
+  T=    833 K | -5.037246 eV/atom | best -5.041090 | acc 0.004 | 769 min
+  T=    756 K | -5.037685 eV/atom | best -5.041090 | acc 0.005 | 879 min
+  T=    678 K | -5.037869 eV/atom | best -5.041090 | acc 0.004 | 989 min
+  T=    600 K | -5.038341 eV/atom | best -5.041090 | acc 0.003 | 1099 min
+best chemistry on frozen sites: -5.041090 eV/atom
+after relaxing positions too:   -5.042059 eV/atom
+=== validation against the reference structure ===
+  as-tiled/starting ordering (relaxed): -5.042061 eV/atom
+  search found:        -5.042059 eV/atom
+  difference:          +0.00 meV/atom
+  -> matches or beats the starting ordering.

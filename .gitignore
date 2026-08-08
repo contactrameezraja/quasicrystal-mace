@@ -2,3 +2,8 @@ anaconda_projects/
 .ipynb_checkpoints/
 .DS_Store
 __pycache__/
+*_velocities.npy
+*_positions.npy
+*_phonopy.yaml
+*_velocities.npy
+*_positions.npy

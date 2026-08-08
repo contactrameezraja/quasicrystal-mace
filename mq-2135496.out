@@ -1,0 +1,46 @@
+CUDA: True Quadro RTX 6000
+reference Al9Co2Ni2-coords.txt: 26 atoms, {'Al': 18, 'Ni': 3, 'Co': 5}, volume 360.8 A^3
+random start: 26 atoms in a fixed cell, min separation 1.91 A
+/home/physics/estzqn/.local/lib/python3.11/site-packages/e3nn/o3/_wigner.py:10: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  _Jd, _W3j_flat, _W3j_indices = torch.load(os.path.join(os.path.dirname(__file__), 'constants.pt'))
+/home/physics/estzqn/.local/lib/python3.11/site-packages/mace/calculators/mace.py:226: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  torch.load(f=model_path, map_location=device)
+WARNING:root:Default dtype float32 does not match model dtype float64, converting models to float32.
+cuequivariance or cuequivariance_torch is not available. Cuequivariance acceleration will be disabled.
+Using medium MPA-0 model as default MACE-MP model, to use previous (before 3.10) default model please specify 'medium' as model argument
+Using Materials Project MACE for MACECalculator with /home/physics/estzqn/.cache/mace/macempa0mediummodel
+Using float32 for MACECalculator, which is faster but less accurate. Recommended for MD. Use float64 for geometry optimization.
+=== melt-quench: 26 atoms, {'Ni': 3, 'Al': 18, 'Co': 5} ===
+    cell [ 12.128   4.051   7.636  90.    105.9    90.   ], density 0.0721 atoms/A^3
+    20 stages 2500.0->1000.0 K, 5 loops each (100 total), 1000 MD steps + 4000 swap attempts per loop
+melting at 2500.0 K (5000 steps)...
+/home/physics/estzqn/.local/lib/python3.11/site-packages/ase/md/langevin.py:102: FutureWarning: The implementation of `fixcm=True` in `Langevin` does not strictly sample the correct NVT distributions. The deviations are typically small for large systems but can be more pronounced for small systems. Use `fixcm=False` together with `ase.constraints.FixCom`. `fixcm` is deprecated since ASE 3.28.0 and will be removed in a future release.
+  warnings.warn(msg, FutureWarning)
+  T=   2500 K | loop    5 | quenched -5.02654 eV/atom | best -5.02654 | acc 0.039 | 15 min
+  T=   2421 K | loop   10 | quenched -5.01673 eV/atom | best -5.02654 | acc 0.056 | 27 min
+  T=   2342 K | loop   15 | quenched -5.01113 eV/atom | best -5.02654 | acc 0.035 | 39 min
+  T=   2263 K | loop   20 | quenched -4.98523 eV/atom | best -5.02654 | acc 0.034 | 52 min
+  T=   2184 K | loop   25 | quenched -4.99803 eV/atom | best -5.02654 | acc 0.040 | 64 min
+  T=   2105 K | loop   30 | quenched -5.03986 eV/atom | best -5.03986 | acc 0.034 | 76 min
+  T=   2026 K | loop   35 | quenched -5.00006 eV/atom | best -5.03986 | acc 0.032 | 88 min
+  T=   1947 K | loop   40 | quenched -5.03994 eV/atom | best -5.03994 | acc 0.033 | 100 min
+  T=   1868 K | loop   45 | quenched -4.98790 eV/atom | best -5.03994 | acc 0.031 | 112 min
+  T=   1789 K | loop   50 | quenched -5.03383 eV/atom | best -5.03994 | acc 0.033 | 124 min
+  T=   1711 K | loop   55 | quenched -4.99758 eV/atom | best -5.03994 | acc 0.033 | 137 min
+  T=   1632 K | loop   60 | quenched -5.00139 eV/atom | best -5.03994 | acc 0.025 | 149 min
+  T=   1553 K | loop   65 | quenched -4.99810 eV/atom | best -5.03994 | acc 0.024 | 161 min
+  T=   1474 K | loop   70 | quenched -5.03771 eV/atom | best -5.03994 | acc 0.019 | 173 min
+  T=   1395 K | loop   75 | quenched -5.02404 eV/atom | best -5.03994 | acc 0.015 | 185 min
+  T=   1316 K | loop   80 | quenched -5.02964 eV/atom | best -5.03994 | acc 0.017 | 197 min
+  T=   1237 K | loop   85 | quenched -5.01914 eV/atom | best -5.03994 | acc 0.011 | 209 min
+  T=   1158 K | loop   90 | quenched -5.05218 eV/atom | best -5.05218 | acc 0.012 | 221 min
+  T=   1079 K | loop   95 | quenched -5.04307 eV/atom | best -5.05218 | acc 0.015 | 233 min
+  T=   1000 K | loop  100 | quenched -5.05318 eV/atom | best -5.05318 | acc 0.011 | 245 min
+final tight relax of the best structure...
+FINISHED. best energy -5.053200 eV/atom (245 min)
+wrote mq_s5_best.vasp, mq_s5_best.xyz, mq_s5_trace.npy
+=== validation against the reference structure ===
+  reference (relaxed): -5.104818 eV/atom
+  melt-quench found:   -5.053200 eV/atom
+  difference:          +51.62 meV/atom
+  -> higher than the reference: the anneal is stuck. Run more loops, or raise --swaps.

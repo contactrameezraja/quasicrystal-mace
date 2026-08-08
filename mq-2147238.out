@@ -1,0 +1,20 @@
+CUDA: True Quadro RTX 6000
+loaded xbox_wcomp.vasp: 3120 atoms, {'Al': 2237, 'Ni': 235, 'Co': 648}, volume 43295.6 A^3
+working cell: 3120 atoms, {'Al': 2237, 'Ni': 235, 'Co': 648}, volume 43295.6 A^3, density 0.0721 atoms/A^3
+as-tiled start: positions and species taken from the input
+/home/physics/estzqn/.local/lib/python3.11/site-packages/e3nn/o3/_wigner.py:10: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  _Jd, _W3j_flat, _W3j_indices = torch.load(os.path.join(os.path.dirname(__file__), 'constants.pt'))
+/home/physics/estzqn/.local/lib/python3.11/site-packages/mace/calculators/mace.py:226: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  torch.load(f=model_path, map_location=device)
+WARNING:root:Default dtype float32 does not match model dtype float64, converting models to float32.
+cuequivariance or cuequivariance_torch is not available. Cuequivariance acceleration will be disabled.
+Using medium MPA-0 model as default MACE-MP model, to use previous (before 3.10) default model please specify 'medium' as model argument
+Using Materials Project MACE for MACECalculator with /home/physics/estzqn/.cache/mace/macempa0mediummodel
+Using float32 for MACECalculator, which is faster but less accurate. Recommended for MD. Use float64 for geometry optimization.
+=== fixed-site MC: 3120 atoms on the input site list ===
+    species kept AS-TILED from the input file ({'Al': 2237, 'Ni': 235, 'Co': 648})
+    start -4.998160 eV/atom
+    10 stages 1300.0->600.0 K, 8000 swap attempts each, positions frozen
+  T=   1300 K | -4.995974 eV/atom | best -4.998160 | acc 0.019 | 104 min
+  T=   1222 K | -4.996020 eV/atom | best -4.998160 | acc 0.018 | 208 min
+  T=   1144 K | -4.995715 eV/atom | best -4.998160 | acc 0.018 | 312 min

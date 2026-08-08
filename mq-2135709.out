@@ -1,0 +1,42 @@
+CUDA: True Quadro RTX 6000
+reference Al9Co2Ni2-coords.txt: 26 atoms, {'Al': 18, 'Ni': 3, 'Co': 5}, volume 360.8 A^3
+random start: 26 atoms in a fixed cell, min separation 2.00 A
+/home/physics/estzqn/.local/lib/python3.11/site-packages/e3nn/o3/_wigner.py:10: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  _Jd, _W3j_flat, _W3j_indices = torch.load(os.path.join(os.path.dirname(__file__), 'constants.pt'))
+/home/physics/estzqn/.local/lib/python3.11/site-packages/mace/calculators/mace.py:226: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  torch.load(f=model_path, map_location=device)
+WARNING:root:Default dtype float32 does not match model dtype float64, converting models to float32.
+cuequivariance or cuequivariance_torch is not available. Cuequivariance acceleration will be disabled.
+Using medium MPA-0 model as default MACE-MP model, to use previous (before 3.10) default model please specify 'medium' as model argument
+Using Materials Project MACE for MACECalculator with /home/physics/estzqn/.cache/mace/macempa0mediummodel
+Using float32 for MACECalculator, which is faster but less accurate. Recommended for MD. Use float64 for geometry optimization.
+=== fixed-site MC: 26 atoms on the reference site list ===
+    species randomised, start -4.487405 eV/atom
+    20 stages 2500.0->1000.0 K, 2000 swap attempts each, positions frozen
+  T=   2500 K | -5.101387 eV/atom | best -5.101387 | acc 0.041 | 1 min
+  T=   2421 K | -5.076900 eV/atom | best -5.101387 | acc 0.027 | 2 min
+  T=   2342 K | -5.093813 eV/atom | best -5.101387 | acc 0.023 | 3 min
+  T=   2263 K | -5.101387 eV/atom | best -5.101387 | acc 0.026 | 4 min
+  T=   2184 K | -5.093005 eV/atom | best -5.101387 | acc 0.021 | 5 min
+  T=   2105 K | -5.093005 eV/atom | best -5.101387 | acc 0.034 | 6 min
+  T=   2026 K | -5.088671 eV/atom | best -5.101387 | acc 0.028 | 7 min
+  T=   1947 K | -5.104282 eV/atom | best -5.104282 | acc 0.019 | 8 min
+  T=   1868 K | -5.088636 eV/atom | best -5.104282 | acc 0.033 | 9 min
+  T=   1789 K | -5.094412 eV/atom | best -5.104282 | acc 0.032 | 10 min
+  T=   1711 K | -5.104282 eV/atom | best -5.104282 | acc 0.029 | 10 min
+  T=   1632 K | -5.091844 eV/atom | best -5.104282 | acc 0.026 | 11 min
+  T=   1553 K | -5.091147 eV/atom | best -5.104282 | acc 0.022 | 12 min
+  T=   1474 K | -5.089884 eV/atom | best -5.104282 | acc 0.019 | 13 min
+  T=   1395 K | -5.104282 eV/atom | best -5.104282 | acc 0.011 | 14 min
+  T=   1316 K | -5.104282 eV/atom | best -5.104282 | acc 0.028 | 15 min
+  T=   1237 K | -5.101387 eV/atom | best -5.104282 | acc 0.021 | 16 min
+  T=   1158 K | -5.094411 eV/atom | best -5.104282 | acc 0.015 | 17 min
+  T=   1079 K | -5.101423 eV/atom | best -5.104282 | acc 0.017 | 18 min
+  T=   1000 K | -5.101423 eV/atom | best -5.104282 | acc 0.007 | 19 min
+best chemistry on frozen sites: -5.104282 eV/atom
+after relaxing positions too:   -5.104818 eV/atom
+=== validation against the reference structure ===
+  reference (relaxed): -5.104818 eV/atom
+  melt-quench found:   -5.104818 eV/atom
+  difference:          +0.00 meV/atom
+  -> matches or beats the reference: the anneal found it.

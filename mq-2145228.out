@@ -1,0 +1,33 @@
+CUDA: True Quadro RTX 6000
+loaded Al9Co2Ni2-coords.txt: 26 atoms, {'Al': 18, 'Ni': 3, 'Co': 5}, volume 360.8 A^3
+supercell matrix rows [[10, 0, 0], [0, 4, 0], [0, 0, 3]], det 120: 26 -> 3120 atoms, box [121.28  16.2   22.91  90.   105.9   90.  ]
+retarget: {'Al': 2160, 'Ni': 360, 'Co': 600} -> {'Al': 2237, 'Ni': 235, 'Co': 648} (125 of 3120 sites reassigned)
+working cell: 3120 atoms, {'Al': 2237, 'Ni': 235, 'Co': 648}, volume 43295.6 A^3, density 0.0721 atoms/A^3
+as-tiled start: positions and species taken from the input
+/home/physics/estzqn/.local/lib/python3.11/site-packages/e3nn/o3/_wigner.py:10: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  _Jd, _W3j_flat, _W3j_indices = torch.load(os.path.join(os.path.dirname(__file__), 'constants.pt'))
+/home/physics/estzqn/.local/lib/python3.11/site-packages/mace/calculators/mace.py:226: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  torch.load(f=model_path, map_location=device)
+WARNING:root:Default dtype float32 does not match model dtype float64, converting models to float32.
+cuequivariance or cuequivariance_torch is not available. Cuequivariance acceleration will be disabled.
+Using medium MPA-0 model as default MACE-MP model, to use previous (before 3.10) default model please specify 'medium' as model argument
+Using Materials Project MACE for MACECalculator with /home/physics/estzqn/.cache/mace/macempa0mediummodel
+Using float32 for MACECalculator, which is faster but less accurate. Recommended for MD. Use float64 for geometry optimization.
+=== fixed-site MC: 3120 atoms on the input site list ===
+    species kept AS-TILED from the input file ({'Al': 2237, 'Ni': 235, 'Co': 648})
+    start -4.998184 eV/atom
+    20 stages 2500.0->1000.0 K, 8000 swap attempts each, positions frozen
+  T=   2500 K | -4.992858 eV/atom | best -4.998184 | acc 0.035 | 105 min
+  T=   2421 K | -4.989947 eV/atom | best -4.998184 | acc 0.035 | 211 min
+  T=   2342 K | -4.990806 eV/atom | best -4.998184 | acc 0.040 | 316 min
+  T=   2263 K | -4.989219 eV/atom | best -4.998184 | acc 0.037 | 422 min
+  T=   2184 K | -4.990088 eV/atom | best -4.998184 | acc 0.040 | 527 min
+  T=   2105 K | -4.990497 eV/atom | best -4.998184 | acc 0.037 | 633 min
+  T=   2026 K | -4.989832 eV/atom | best -4.998184 | acc 0.037 | 738 min
+  T=   1947 K | -4.990506 eV/atom | best -4.998184 | acc 0.036 | 844 min
+  T=   1868 K | -4.990272 eV/atom | best -4.998184 | acc 0.036 | 949 min
+  T=   1789 K | -4.990112 eV/atom | best -4.998184 | acc 0.033 | 1054 min
+  T=   1711 K | -4.991556 eV/atom | best -4.998184 | acc 0.029 | 1160 min
+  T=   1632 K | -4.991597 eV/atom | best -4.998184 | acc 0.029 | 1265 min
+  T=   1553 K | -4.991710 eV/atom | best -4.998184 | acc 0.028 | 1371 min
+slurmstepd: error: *** JOB 2145228 ON gpu007 CANCELLED AT 2026-08-06T18:23:16 DUE TO TIME LIMIT ***

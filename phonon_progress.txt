@@ -1,0 +1,447 @@
+=== harmonic run: ph_w265 ===
+read W-AlCoNi-265.vasp: 265 atoms, volume 3741.8 A^3
+calculator: mace
+relaxing positions at fixed cell to fmax 0.001...
+  E = -5.042055 eV/atom, max residual force 0.00097 eV/A
+force constants: fc-supercell 1,1,1 (265 atoms), displacement 0.01 A, 1590 displaced configurations
+  79/1590 | 0.7 min | 13.9 min left
+  158/1590 | 1.4 min | 13.1 min left
+  237/1590 | 2.2 min | 12.4 min left
+  316/1590 | 2.9 min | 11.7 min left
+  395/1590 | 3.6 min | 11.0 min left
+  474/1590 | 4.3 min | 10.2 min left
+  553/1590 | 5.1 min | 9.5 min left
+  632/1590 | 5.8 min | 8.8 min left
+  711/1590 | 6.5 min | 8.1 min left
+  790/1590 | 7.2 min | 7.3 min left
+  869/1590 | 8.0 min | 6.6 min left
+  948/1590 | 8.7 min | 5.9 min left
+  1027/1590 | 9.4 min | 5.2 min left
+  1106/1590 | 10.1 min | 4.4 min left
+  1185/1590 | 10.9 min | 3.7 min left
+  1264/1590 | 11.6 min | 3.0 min left
+  1343/1590 | 12.3 min | 2.3 min left
+  1422/1590 | 13.0 min | 1.5 min left
+  1501/1590 | 13.8 min | 0.8 min left
+  1580/1590 | 14.5 min | 0.1 min left
+  1590/1590 | 14.6 min | 0.0 min left
+force constants done
+mesh [1, 1, 1]: 1 q-points x 795 bands
+--- mode census ---
+  modes total          : 795
+  imaginary (< -0.01)  : 0
+  max frequency        : 54.339 meV
+  lowest 10 real modes : [4.128, 4.896, 5.233, 5.831, 6.259, 6.377, 6.587, 6.642, 6.725, 6.946]
+--- participation ratio (Mihalkovic Eq. 7 form) ---
+  P for a fully extended mode = 1.0, for a single-atom mode = 0.00377
+   4- 6 meV |     4 modes | mean P 0.1055 | min P 0.0171
+   6-10 meV |    23 modes | mean P 0.2478 | min P 0.0538
+  10-20 meV |   175 modes | mean P 0.3363 | min P 0.0604
+  20-30 meV |   269 modes | mean P 0.3754 | min P 0.1993
+  30-40 meV |   162 modes | mean P 0.2572 | min P 0.0504
+  40-60 meV |   159 modes | mean P 0.1391 | min P 0.0235
+  ten lowest modes, energy and P:
+      4.128 meV   P = 0.0171
+      4.896 meV   P = 0.1838
+      5.233 meV   P = 0.1954
+      5.831 meV   P = 0.0258
+      6.259 meV   P = 0.3036
+      6.377 meV   P = 0.2060
+      6.587 meV   P = 0.0766
+      6.642 meV   P = 0.0538
+      6.725 meV   P = 0.0789
+      6.946 meV   P = 0.1236
+--- gaps in the mode spectrum (width > 0.3 meV, below 20 meV) ---
+  NOTE: these are SPACINGS in the discrete mode list at the sampled
+  q-point(s), which is NOT the same observable as the zone-boundary
+  pseudo-gaps read off the 26- and 60-atom dispersions (10.29 and
+  8.36 meV, centre ratios 1.304/1.283). To compare with those, run
+  with --band and --fc-supercell 2,1,1 or larger, which costs a
+  supercell of that many times the atoms in force evaluations.
+    4.128 -   4.896 meV | centre   4.512 | width 0.768
+    4.896 -   5.233 meV | centre   5.065 | width 0.337
+    5.233 -   5.831 meV | centre   5.532 | width 0.598
+    5.831 -   6.259 meV | centre   6.045 | width 0.428
+    6.946 -   7.343 meV | centre   7.144 | width 0.397
+    7.912 -   8.240 meV | centre   8.076 | width 0.328
+    8.240 -   8.553 meV | centre   8.396 | width 0.313
+  successive gap-centre ratios: [1.122, 1.092, 1.093, 1.182, 1.13, 1.04]
+  (tau = 1.618; the 26-atom first ZB gap was 10.29 meV, the 60-atom 8.36, and the 60-atom centre ratios 1.304/1.283)
+--- element decomposition (weight above 30 meV) ---
+  no spectral weight above 30.0 meV, decomposition skipped (max frequency 54.3 meV)
+  Al: nan% of weight above 30 meV (190 atoms)
+  Co: nan% of weight above 30 meV (55 atoms)
+  Ni: nan% of weight above 30 meV (20 atoms)
+  (MD gave Al 61 / Co 16 / Ni 15 for the X-phase at three sizes, and Al 54 / Co 19 / Ni 16 for the W-phase)
+wrote ph_w265_modes.npz, ph_w265_dos.npz, ph_w265_phonopy.yaml
+total wall time 16.0 min
+=== harmonic run: ph_w265 ===
+read W-AlCoNi-265.vasp: 265 atoms, volume 3741.8 A^3
+calculator: mace
+relaxing positions at fixed cell to fmax 0.001...
+  E = -5.042055 eV/atom, max residual force 0.00097 eV/A
+force constants: fc-supercell 1,1,1 (265 atoms), displacement 0.01 A, 1590 displaced configurations
+  79/1590 | 0.7 min | 13.9 min left
+  158/1590 | 1.5 min | 13.2 min left
+  237/1590 | 2.2 min | 12.5 min left
+  316/1590 | 2.9 min | 11.7 min left
+  395/1590 | 3.6 min | 11.0 min left
+  474/1590 | 4.4 min | 10.3 min left
+  553/1590 | 5.1 min | 9.5 min left
+  632/1590 | 5.8 min | 8.8 min left
+  711/1590 | 6.5 min | 8.1 min left
+  790/1590 | 7.3 min | 7.4 min left
+  869/1590 | 8.0 min | 6.6 min left
+  948/1590 | 8.7 min | 5.9 min left
+  1027/1590 | 9.5 min | 5.2 min left
+  1106/1590 | 10.2 min | 4.5 min left
+  1185/1590 | 10.9 min | 3.7 min left
+  1264/1590 | 11.6 min | 3.0 min left
+  1343/1590 | 12.4 min | 2.3 min left
+  1422/1590 | 13.1 min | 1.5 min left
+  1501/1590 | 13.8 min | 0.8 min left
+  1580/1590 | 14.5 min | 0.1 min left
+  1590/1590 | 14.6 min | 0.0 min left
+force constants done
+mesh [1, 1, 1]: 1 q-points x 795 bands
+--- mode census ---
+  modes total          : 795
+  imaginary (< -0.01)  : 0
+  max frequency        : 54.339 meV
+  lowest 10 real modes : [4.128, 4.896, 5.233, 5.831, 6.259, 6.377, 6.587, 6.642, 6.725, 6.946]
+--- participation ratio (Mihalkovic Eq. 7 form) ---
+  P for a fully extended mode = 1.0, for a single-atom mode = 0.00377
+   4- 6 meV |     4 modes | mean P 0.1055 | min P 0.0171
+   6-10 meV |    23 modes | mean P 0.2478 | min P 0.0538
+  10-20 meV |   175 modes | mean P 0.3363 | min P 0.0604
+  20-30 meV |   269 modes | mean P 0.3754 | min P 0.1993
+  30-40 meV |   162 modes | mean P 0.2572 | min P 0.0504
+  40-60 meV |   159 modes | mean P 0.1391 | min P 0.0235
+  ten lowest modes, energy and P:
+      4.128 meV   P = 0.0171
+      4.896 meV   P = 0.1838
+      5.233 meV   P = 0.1954
+      5.831 meV   P = 0.0258
+      6.259 meV   P = 0.3036
+      6.377 meV   P = 0.2060
+      6.587 meV   P = 0.0766
+      6.642 meV   P = 0.0538
+      6.725 meV   P = 0.0789
+      6.946 meV   P = 0.1236
+--- gaps in the mode spectrum (width > 0.3 meV, below 20 meV) ---
+  NOTE: these are SPACINGS in the discrete mode list at the sampled
+  q-point(s), which is NOT the same observable as the zone-boundary
+  pseudo-gaps read off the 26- and 60-atom dispersions (10.29 and
+  8.36 meV, centre ratios 1.304/1.283). To compare with those, run
+  with --band and --fc-supercell 2,1,1 or larger, which costs a
+  supercell of that many times the atoms in force evaluations.
+    4.128 -   4.896 meV | centre   4.512 | width 0.768
+    4.896 -   5.233 meV | centre   5.065 | width 0.337
+    5.233 -   5.831 meV | centre   5.532 | width 0.598
+    5.831 -   6.259 meV | centre   6.045 | width 0.428
+    6.946 -   7.343 meV | centre   7.144 | width 0.397
+    7.912 -   8.240 meV | centre   8.076 | width 0.328
+    8.240 -   8.553 meV | centre   8.396 | width 0.313
+  successive gap-centre ratios: [1.122, 1.092, 1.093, 1.182, 1.13, 1.04]
+  (tau = 1.618; the 26-atom first ZB gap was 10.29 meV, the 60-atom 8.36, and the 60-atom centre ratios 1.304/1.283)
+--- element decomposition from eigenvectors (above 30.0 meV) ---
+  Al: 90% of weight above 30 meV (190 atoms, 72% of atoms)
+  Co: 7% of weight above 30 meV (55 atoms, 21% of atoms)
+  Ni: 2% of weight above 30 meV (20 atoms, 8% of atoms)
+  (321 of 795 modes lie above 30 meV)
+  (MD gave Al 61 / Co 16 / Ni 15 for the X-phase at three sizes, Al 54 / Co 19 / Ni 16 for the W-phase, Al 54 / Co 16 for Al13Co4)
+--- DOS-based decomposition (secondary; needs a real mesh) ---
+  no spectral weight above 30.0 meV, decomposition skipped (max frequency 54.3 meV)
+  Al: nan% of weight above 30 meV (190 atoms)
+  Co: nan% of weight above 30 meV (55 atoms)
+  Ni: nan% of weight above 30 meV (20 atoms)
+  (MD gave Al 61 / Co 16 / Ni 15 for the X-phase at three sizes, and Al 54 / Co 19 / Ni 16 for the W-phase)
+wrote ph_w265_modes.npz, ph_w265_dos.npz, ph_w265_phonopy.yaml
+total wall time 16.1 min
+=== harmonic run: ph_w265_band ===
+read W-AlCoNi-265.vasp: 265 atoms, volume 3741.8 A^3
+calculator: mace
+relaxing positions at fixed cell to fmax 0.001...
+  E = -5.042055 eV/atom, max residual force 0.00097 eV/A
+force constants: fc-supercell 2,1,1 (530 atoms), displacement 0.01 A, 1590 displaced configurations
+  79/1590 | 1.4 min | 27.1 min left
+  158/1590 | 2.8 min | 25.7 min left
+  237/1590 | 4.3 min | 24.3 min left
+  316/1590 | 5.7 min | 22.9 min left
+  395/1590 | 7.1 min | 21.5 min left
+  474/1590 | 8.5 min | 20.0 min left
+  553/1590 | 9.9 min | 18.6 min left
+  632/1590 | 11.3 min | 17.2 min left
+  711/1590 | 12.8 min | 15.8 min left
+  790/1590 | 14.2 min | 14.4 min left
+  869/1590 | 15.6 min | 12.9 min left
+  948/1590 | 17.0 min | 11.5 min left
+  1027/1590 | 18.4 min | 10.1 min left
+  1106/1590 | 19.9 min | 8.7 min left
+  1185/1590 | 21.3 min | 7.3 min left
+  1264/1590 | 22.7 min | 5.9 min left
+  1343/1590 | 24.1 min | 4.4 min left
+  1422/1590 | 25.5 min | 3.0 min left
+  1501/1590 | 26.9 min | 1.6 min left
+  1580/1590 | 28.4 min | 0.2 min left
+  1590/1590 | 28.5 min | 0.0 min left
+force constants done
+mesh [2, 1, 1]: 2 q-points x 795 bands
+--- mode census ---
+  modes total          : 1590
+  imaginary (< -0.01)  : 0
+  max frequency        : 54.308 meV
+  lowest 10 real modes : [4.412, 4.412, 4.879, 4.879, 4.999, 4.999, 5.718, 5.718, 5.959, 5.959]
+--- participation ratio (Mihalkovic Eq. 7 form) ---
+  P for a fully extended mode = 1.0, for a single-atom mode = 0.00377
+   4- 6 meV |    10 modes | mean P 0.2832 | min P 0.0255
+   6-10 meV |    42 modes | mean P 0.2899 | min P 0.0133
+  10-20 meV |   356 modes | mean P 0.4663 | min P 0.2349
+  20-30 meV |   542 modes | mean P 0.4900 | min P 0.2321
+  30-40 meV |   326 modes | mean P 0.3625 | min P 0.0699
+  40-60 meV |   314 modes | mean P 0.1915 | min P 0.0190
+  ten lowest modes, energy and P:
+      4.412 meV   P = 0.0255
+      4.412 meV   P = 0.0255
+      4.879 meV   P = 0.3460
+      4.879 meV   P = 0.3460
+      4.999 meV   P = 0.8177
+      4.999 meV   P = 0.8177
+      5.718 meV   P = 0.0403
+      5.718 meV   P = 0.0403
+      5.959 meV   P = 0.1864
+      5.959 meV   P = 0.1864
+--- gaps in the mode spectrum (width > 0.3 meV, below 20 meV) ---
+    4.412 -   4.879 meV | centre   4.646 | width 0.467
+    4.999 -   5.718 meV | centre   5.358 | width 0.719
+    6.397 -   6.996 meV | centre   6.696 | width 0.600
+    7.185 -   7.710 meV | centre   7.447 | width 0.525
+  successive gap-centre ratios: [1.153, 1.25, 1.112]
+  (tau = 1.618; the 26-atom first ZB gap was 10.29 meV, the 60-atom 8.36, and the 60-atom centre ratios 1.304/1.283)
+--- element decomposition from eigenvectors (above 30.0 meV) ---
+  Al: 90% of weight above 30 meV (190 atoms, 72% of atoms)
+  Co: 7% of weight above 30 meV (55 atoms, 21% of atoms)
+  Ni: 2% of weight above 30 meV (20 atoms, 8% of atoms)
+  (640 of 1590 modes lie above 30 meV)
+  (MD gave Al 61 / Co 16 / Ni 15 for the X-phase at three sizes, Al 54 / Co 19 / Ni 16 for the W-phase, Al 54 / Co 16 for Al13Co4)
+--- DOS-based decomposition (secondary; needs a real mesh) ---
+  no spectral weight above 30.0 meV, decomposition skipped (max frequency 54.3 meV)
+  Al: nan% of weight above 30 meV (190 atoms)
+  Co: nan% of weight above 30 meV (55 atoms)
+  Ni: nan% of weight above 30 meV (20 atoms)
+  (MD gave Al 61 / Co 16 / Ni 15 for the X-phase at three sizes, and Al 54 / Co 19 / Ni 16 for the W-phase)
+--- band path (gap centres at the zone boundary) ---
+  a*: 7 gaps below 20 meV
+        5.339 -   5.890 | centre   5.615 | width 0.551
+        5.890 -   6.299 | centre   6.094 | width 0.408
+        6.299 -   6.620 | centre   6.459 | width 0.321
+        6.620 -   6.939 | centre   6.779 | width 0.319
+        7.043 -   7.504 | centre   7.274 | width 0.461
+        7.603 -   8.229 | centre   7.916 | width 0.626
+  b*: 6 gaps below 20 meV
+        5.347 -   5.894 | centre   5.621 | width 0.547
+        5.894 -   6.299 | centre   6.097 | width 0.405
+        6.299 -   6.670 | centre   6.485 | width 0.371
+        7.092 -   7.527 | centre   7.309 | width 0.435
+        7.592 -   8.226 | centre   7.909 | width 0.634
+        8.226 -   8.546 | centre   8.386 | width 0.320
+  c* (stacking): 8 gaps below 20 meV
+        3.796 -   4.243 | centre   4.020 | width 0.448
+        4.243 -   5.144 | centre   4.693 | width 0.900
+        5.144 -   5.472 | centre   5.308 | width 0.328
+        5.534 -   6.313 | centre   5.923 | width 0.779
+        6.738 -   7.050 | centre   6.894 | width 0.312
+        7.050 -   7.507 | centre   7.279 | width 0.457
+wrote ph_w265_band_modes.npz, ph_w265_band_dos.npz, ph_w265_band_phonopy.yaml
+total wall time 30.1 min
+=== harmonic run: ph_x26_check ===
+read Al9Co2Ni2-coords.txt: 26 atoms, volume 360.8 A^3
+=== harmonic run: ph_w265_band222 ===
+read W-AlCoNi-265.vasp: 265 atoms, volume 3741.8 A^3
+calculator: mace
+calculator: mace
+relaxing positions at fixed cell to fmax 0.001...
+relaxing positions at fixed cell to fmax 0.001...
+  E = -5.104819 eV/atom, max residual force 0.00073 eV/A
+force constants: fc-supercell 2,2,2 (208 atoms), displacement 0.01 A, 104 displaced configurations
+  5/104 | 0.0 min | 0.9 min left
+  10/104 | 0.1 min | 0.8 min left
+  15/104 | 0.1 min | 0.7 min left
+  20/104 | 0.2 min | 0.6 min left
+  25/104 | 0.2 min | 0.6 min left
+  30/104 | 0.2 min | 0.6 min left
+  35/104 | 0.3 min | 0.5 min left
+  40/104 | 0.3 min | 0.5 min left
+  45/104 | 0.3 min | 0.4 min left
+  50/104 | 0.4 min | 0.4 min left
+  55/104 | 0.4 min | 0.4 min left
+  60/104 | 0.4 min | 0.3 min left
+  65/104 | 0.5 min | 0.3 min left
+  70/104 | 0.5 min | 0.2 min left
+  75/104 | 0.5 min | 0.2 min left
+  80/104 | 0.6 min | 0.2 min left
+  85/104 | 0.6 min | 0.1 min left
+  90/104 | 0.7 min | 0.1 min left
+  95/104 | 0.7 min | 0.1 min left
+  100/104 | 0.7 min | 0.0 min left
+  104/104 | 0.8 min | 0.0 min left
+force constants done
+mesh [2, 2, 2]: 8 q-points x 78 bands
+--- mode census ---
+  modes total          : 624
+  imaginary (< -0.01)  : 0
+  max frequency        : 50.319 meV
+  lowest 10 real modes : [10.202, 10.202, 10.202, 10.202, 10.431, 10.431, 10.431, 10.431, 10.986, 10.986]
+--- participation ratio (Mihalkovic Eq. 7 form) ---
+  P for a fully extended mode = 1.0, for a single-atom mode = 0.03846
+  10-20 meV |   144 modes | mean P 0.5735 | min P 0.2433
+  20-30 meV |   200 modes | mean P 0.5807 | min P 0.3335
+  30-40 meV |   144 modes | mean P 0.4783 | min P 0.2894
+  40-60 meV |   136 modes | mean P 0.3256 | min P 0.1257
+  ten lowest modes, energy and P:
+     10.202 meV   P = 0.3242
+     10.202 meV   P = 0.3242
+     10.202 meV   P = 0.3242
+     10.202 meV   P = 0.3242
+     10.431 meV   P = 0.2733
+     10.431 meV   P = 0.2733
+     10.431 meV   P = 0.2733
+     10.431 meV   P = 0.2733
+     10.986 meV   P = 0.5223
+     10.986 meV   P = 0.5223
+--- gaps in the mode spectrum (width > 0.3 meV, below 20 meV) ---
+   10.431 -  10.986 meV | centre  10.709 | width 0.555
+   11.437 -  12.055 meV | centre  11.746 | width 0.618
+   12.055 -  12.388 meV | centre  12.222 | width 0.333
+   12.619 -  13.454 meV | centre  13.037 | width 0.835
+   13.611 -  13.926 meV | centre  13.768 | width 0.315
+   14.387 -  14.857 meV | centre  14.622 | width 0.470
+   14.992 -  15.304 meV | centre  15.148 | width 0.311
+   16.131 -  16.720 meV | centre  16.425 | width 0.589
+   17.318 -  17.887 meV | centre  17.603 | width 0.569
+   17.931 -  18.289 meV | centre  18.110 | width 0.357
+   18.941 -  19.402 meV | centre  19.171 | width 0.462
+   19.402 -  19.762 meV | centre  19.582 | width 0.359
+  successive gap-centre ratios: [1.097, 1.041, 1.067, 1.056, 1.062, 1.036, 1.084, 1.072, 1.029, 1.059, 1.021]
+  (tau = 1.618; the 26-atom first ZB gap was 10.29 meV, the 60-atom 8.36, and the 60-atom centre ratios 1.304/1.283)
+--- element decomposition from eigenvectors (above 30.0 meV) ---
+  (a) share of the weight above the split, sums to 100%:
+      Al: 91%  (18 atoms, 69% of atoms)
+      Co: 5%  (5 atoms, 19% of atoms)
+      Ni: 3%  (3 atoms, 12% of atoms)
+  (b) fraction of each element's OWN spectrum above the split, which is what reduce_vdos.py prints:
+      Al: 59%
+      Co: 13%
+      Ni: 13%
+  (280 of 624 modes lie above 30 meV)
+  MD comparison, convention (b): Al 61 / Co 16 / Ni 15 for the X-phase at three sizes, Al 54 / Co 19 / Ni 16 for the W-phase, Al 54 / Co 16 for Al13Co4
+--- DOS-based decomposition (secondary; needs a real mesh) ---
+  Al: 91% of weight above 30 meV (18 atoms)
+  Co: 5% of weight above 30 meV (5 atoms)
+  Ni: 4% of weight above 30 meV (3 atoms)
+  (MD gave Al 61 / Co 16 / Ni 15 for the X-phase at three sizes, and Al 54 / Co 19 / Ni 16 for the W-phase)
+wrote ph_x26_check_modes.npz, ph_x26_check_dos.npz, ph_x26_check_phonopy.yaml
+total wall time 1.3 min
+  E = -5.042055 eV/atom, max residual force 0.00097 eV/A
+force constants: fc-supercell 2,2,2 (2120 atoms), displacement 0.01 A, 1590 displaced configurations
+=== harmonic run: ph_w265_band222 ===
+read W-AlCoNi-265.vasp: 265 atoms, volume 3741.8 A^3
+calculator: mace
+relaxing positions at fixed cell to fmax 0.001...
+  E = -5.042057 eV/atom, max residual force 0.00096 eV/A
+force constants: fc-supercell 2,2,2 (2120 atoms), displacement 0.01 A, 1590 displaced configurations
+  79/1590 | 0.8 min | 15.4 min left
+  158/1590 | 1.6 min | 14.6 min left
+  237/1590 | 2.4 min | 13.8 min left
+  316/1590 | 3.2 min | 13.0 min left
+  395/1590 | 4.0 min | 12.2 min left
+  474/1590 | 4.8 min | 11.4 min left
+  553/1590 | 5.6 min | 10.6 min left
+  632/1590 | 6.4 min | 9.8 min left
+  711/1590 | 7.2 min | 8.9 min left
+  790/1590 | 8.0 min | 8.1 min left
+  869/1590 | 8.8 min | 7.3 min left
+  948/1590 | 9.7 min | 6.5 min left
+  1027/1590 | 10.5 min | 5.7 min left
+  1106/1590 | 11.3 min | 4.9 min left
+  1185/1590 | 12.1 min | 4.1 min left
+  1264/1590 | 12.9 min | 3.3 min left
+  1343/1590 | 13.7 min | 2.5 min left
+  1422/1590 | 14.5 min | 1.7 min left
+  1501/1590 | 15.3 min | 0.9 min left
+  1580/1590 | 16.1 min | 0.1 min left
+  1590/1590 | 16.2 min | 0.0 min left
+force constants done
+mesh [2, 2, 2]: 8 q-points x 795 bands
+--- mode census ---
+  modes total          : 6360
+  imaginary (< -0.01)  : 0
+  max frequency        : 54.338 meV
+  lowest 10 real modes : [2.615, 2.615, 2.656, 2.656, 2.826, 2.826, 2.84, 2.84, 4.116, 4.116]
+--- participation ratio (Mihalkovic Eq. 7 form) ---
+  P for a fully extended mode = 1.0, for a single-atom mode = 0.00377
+   2- 4 meV |     8 modes | mean P 0.8561 | min P 0.8402
+   4- 6 meV |    34 modes | mean P 0.2583 | min P 0.0144
+   6-10 meV |   164 modes | mean P 0.2171 | min P 0.0226
+  10-20 meV |  1412 modes | mean P 0.4340 | min P 0.0882
+  20-30 meV |  2186 modes | mean P 0.4637 | min P 0.1592
+  30-40 meV |  1296 modes | mean P 0.3016 | min P 0.0427
+  40-60 meV |  1260 modes | mean P 0.1554 | min P 0.0200
+  ten lowest modes, energy and P:
+      2.615 meV   P = 0.8668
+      2.615 meV   P = 0.8668
+      2.656 meV   P = 0.8628
+      2.656 meV   P = 0.8628
+      2.826 meV   P = 0.8402
+      2.826 meV   P = 0.8402
+      2.840 meV   P = 0.8544
+      2.840 meV   P = 0.8544
+      4.116 meV   P = 0.0188
+      4.116 meV   P = 0.0188
+--- gaps in the mode spectrum (width > 0.3 meV, below 20 meV) ---
+    2.840 -   4.116 meV | centre   3.478 | width 1.275
+    4.116 -   4.753 meV | centre   4.434 | width 0.637
+    7.130 -   7.434 meV | centre   7.282 | width 0.304
+    7.692 -   8.086 meV | centre   7.889 | width 0.394
+  successive gap-centre ratios: [1.275, 1.642, 1.083]
+  (tau = 1.618; the 26-atom first ZB gap was 10.29 meV, the 60-atom 8.36, and the 60-atom centre ratios 1.304/1.283)
+--- element decomposition from eigenvectors (above 30.0 meV) ---
+  (a) share of the weight above the split, sums to 100%:
+      Al: 90%  (190 atoms, 72% of atoms)
+      Co: 7%  (55 atoms, 21% of atoms)
+      Ni: 2%  (20 atoms, 8% of atoms)
+  (b) fraction of each element's OWN spectrum above the split, which is what reduce_vdos.py prints:
+      Al: 51%
+      Co: 14%
+      Ni: 13%
+  (2556 of 6360 modes lie above 30 meV)
+  MD comparison, convention (b): Al 61 / Co 16 / Ni 15 for the X-phase at three sizes, Al 54 / Co 19 / Ni 16 for the W-phase, Al 54 / Co 16 for Al13Co4
+--- DOS-based decomposition (secondary; needs a real mesh) ---
+  Al: 91% of weight above 30 meV (190 atoms)
+  Co: 7% of weight above 30 meV (55 atoms)
+  Ni: 2% of weight above 30 meV (20 atoms)
+  (MD gave Al 61 / Co 16 / Ni 15 for the X-phase at three sizes, and Al 54 / Co 19 / Ni 16 for the W-phase)
+--- band path (gap centres at the zone boundary) ---
+  a*: 7 gaps below 20 meV
+        5.335 -   5.893 | centre   5.614 | width 0.558
+        5.893 -   6.295 | centre   6.094 | width 0.402
+        6.295 -   6.620 | centre   6.458 | width 0.325
+        6.620 -   6.941 | centre   6.780 | width 0.321
+        7.044 -   7.507 | centre   7.275 | width 0.462
+        7.603 -   8.229 | centre   7.916 | width 0.627
+  b*: 6 gaps below 20 meV
+        5.343 -   5.889 | centre   5.616 | width 0.545
+        5.889 -   6.300 | centre   6.094 | width 0.411
+        6.300 -   6.672 | centre   6.486 | width 0.372
+        7.087 -   7.527 | centre   7.307 | width 0.440
+        7.600 -   8.229 | centre   7.915 | width 0.629
+        8.229 -   8.544 | centre   8.387 | width 0.315
+  c* (stacking): 8 gaps below 20 meV
+        3.795 -   4.246 | centre   4.021 | width 0.451
+        4.246 -   5.147 | centre   4.697 | width 0.901
+        5.147 -   5.471 | centre   5.309 | width 0.324
+        5.533 -   6.315 | centre   5.924 | width 0.782
+        6.740 -   7.048 | centre   6.894 | width 0.308
+        7.048 -   7.508 | centre   7.278 | width 0.460
+wrote ph_w265_band222_modes.npz, ph_w265_band222_dos.npz, ph_w265_band222_phonopy.yaml
+total wall time 18.4 min

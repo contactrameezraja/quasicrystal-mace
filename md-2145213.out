@@ -1,0 +1,78 @@
+CUDA: True Quadro RTX 6000
+cuequivariance or cuequivariance_torch is not available. Cuequivariance acceleration will be disabled.
+Loaded 26 atoms: {'Al': 18, 'Ni': 3, 'Co': 5}, volume 360.8 A^3
+[32m2026-08-05 17:28:33.401[0m | [1mINFO    [0m | [36mmattersim.forcefield.potential[0m:[36mfrom_checkpoint[0m:[36m866[0m - [1mThe pre-trained model is not found locally, attempting to download it from the server.[0m
+[32m2026-08-05 17:28:33.402[0m | [1mINFO    [0m | [36mmattersim.utils.download_utils[0m:[36mdownload_file[0m:[36m20[0m - [1mDownloading file from https://raw.githubusercontent.com/microsoft/mattersim/main/pretrained_models/mattersim-v1.0.0-1M.pth to /home/physics/estzqn/.local/mattersim/pretrained_models/mattersim-v1.0.0-1M.pth[0m
+[32m2026-08-05 17:28:33.957[0m | [1mINFO    [0m | [36mmattersim.utils.download_utils[0m:[36mdownload_file[0m:[36m26[0m - [1mFile downloaded to /home/physics/estzqn/.local/mattersim/pretrained_models/mattersim-v1.0.0-1M.pth[0m
+[32m2026-08-05 17:28:33.961[0m | [1mINFO    [0m | [36mmattersim.forcefield.potential[0m:[36mfrom_checkpoint[0m:[36m873[0m - [1mLoading the pre-trained mattersim-v1.0.0-1M.pth model[0m
+/home/physics/estzqn/.local/lib/python3.11/site-packages/mattersim/forcefield/potential.py:892: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  checkpoint = torch.load(load_path, map_location=device)
+model: mattersim
+Relaxed (float64): max residual force 0.00084 eV/A (laptop gave 0.00083)
+[32m2026-08-05 17:28:42.310[0m | [1mINFO    [0m | [36mmattersim.forcefield.potential[0m:[36mfrom_checkpoint[0m:[36m873[0m - [1mLoading the pre-trained mattersim-v1.0.0-1M.pth model[0m
+MD dtype: float32
+=== MD: 2x2x2, 208 atoms, 624 modes, 300.0 K ===
+    supercell matrix rows [[2, 0, 0], [0, 2, 0], [0, 0, 2]], det 8
+    box lengths [24.08  8.15 15.34], angles [ 90.   105.36  90.  ]
+    {'Al': 144, 'Ni': 24, 'Co': 40}
+    seed 11
+/gpfs/home/physics/estzqn/quasicrystal/md_run.py:225: DeprecationWarning: Use thermalize_momenta
+  MaxwellBoltzmannDistribution(sc, temperature_K=T)
+NVT equilibration (10 ps)...
+/home/physics/estzqn/.local/lib/python3.11/site-packages/ase/md/langevin.py:102: FutureWarning: The implementation of `fixcm=True` in `Langevin` does not strictly sample the correct NVT distributions. The deviations are typically small for large systems but can be more pronounced for small systems. Use `fixcm=False` together with `ase.constraints.FixCom`. `fixcm` is deprecated since ASE 3.28.0 and will be removed in a future release.
+  warnings.warn(msg, FutureWarning)
+  done in 209s, instantaneous T = 286 K
+NVE burn-in (2 ps, not recorded)...
+NVE production: 200 ps (~0.021 meV resolution), 50 blocks...
+  block 1/50 | 1 min | 68 min left | 1000 samples
+  block 2/50 | 3 min | 67 min left | 2000 samples
+  block 3/50 | 4 min | 65 min left | 3000 samples
+  block 4/50 | 6 min | 64 min left | 4000 samples
+  block 5/50 | 7 min | 63 min left | 5000 samples
+  block 6/50 | 8 min | 61 min left | 6000 samples
+  block 7/50 | 10 min | 60 min left | 7000 samples
+  block 8/50 | 11 min | 58 min left | 8000 samples
+  block 9/50 | 13 min | 57 min left | 9000 samples
+  block 10/50 | 14 min | 56 min left | 10000 samples
+  block 11/50 | 15 min | 54 min left | 11000 samples
+  block 12/50 | 17 min | 53 min left | 12000 samples
+  block 13/50 | 18 min | 51 min left | 13000 samples
+  block 14/50 | 19 min | 50 min left | 14000 samples
+  block 15/50 | 21 min | 49 min left | 15000 samples
+  block 16/50 | 22 min | 47 min left | 16000 samples
+  block 17/50 | 24 min | 46 min left | 17000 samples
+  block 18/50 | 25 min | 45 min left | 18000 samples
+  block 19/50 | 26 min | 43 min left | 19000 samples
+  block 20/50 | 28 min | 42 min left | 20000 samples
+  block 21/50 | 29 min | 40 min left | 21000 samples
+  block 22/50 | 31 min | 39 min left | 22000 samples
+  block 23/50 | 32 min | 37 min left | 23000 samples
+  block 24/50 | 33 min | 36 min left | 24000 samples
+  block 25/50 | 35 min | 35 min left | 25000 samples
+  block 26/50 | 36 min | 33 min left | 26000 samples
+  block 27/50 | 37 min | 32 min left | 27000 samples
+  block 28/50 | 39 min | 31 min left | 28000 samples
+  block 29/50 | 40 min | 29 min left | 29000 samples
+  block 30/50 | 42 min | 28 min left | 30000 samples
+  block 31/50 | 43 min | 26 min left | 31000 samples
+  block 32/50 | 44 min | 25 min left | 32000 samples
+  block 33/50 | 46 min | 24 min left | 33000 samples
+  block 34/50 | 47 min | 22 min left | 34000 samples
+  block 35/50 | 48 min | 21 min left | 35000 samples
+  block 36/50 | 50 min | 19 min left | 36000 samples
+  block 37/50 | 51 min | 18 min left | 37000 samples
+  block 38/50 | 53 min | 17 min left | 38000 samples
+  block 39/50 | 54 min | 15 min left | 39000 samples
+  block 40/50 | 55 min | 14 min left | 40000 samples
+  block 41/50 | 57 min | 12 min left | 41000 samples
+  block 42/50 | 58 min | 11 min left | 42000 samples
+  block 43/50 | 60 min | 10 min left | 43000 samples
+  block 44/50 | 61 min | 8 min left | 44000 samples
+  block 45/50 | 62 min | 7 min left | 45000 samples
+  block 46/50 | 64 min | 6 min left | 46000 samples
+  block 47/50 | 65 min | 4 min left | 47000 samples
+  block 48/50 | 66 min | 3 min left | 48000 samples
+  block 49/50 | 68 min | 1 min left | 49000 samples
+  block 50/50 | 69 min | 0 min left | 50000 samples
+FINISHED. velocities (50000, 208, 3)
+Energy drift: 0.0428 meV/atom (laptop 2x2x2 run gave 0.039)

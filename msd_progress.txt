@@ -1,0 +1,78 @@
+=== MSD and g(r): md_2x2x2_s11_positions.npy ===
+50000 frames, 208 atoms, sampled every 4.0 fs (200 ps)
+largest single-frame displacement 0.057 A (half the shortest box vector is 4.05 A)
+--- MSD(t), multi-origin average ---
+   t (ps)   MSD (A^2)
+     0.00      0.0004
+     0.03      0.0157
+     0.12      0.0479
+     0.43      0.0331
+     1.57      0.0367
+     5.75      0.0381
+    21.06      0.0375
+    77.13      0.0381
+   100.00      0.0382
+plateau (mean over second half) : 0.0373 A^2
+slope over second half          : 0.00001 A^2/ps
+  -> implied D if diffusive     : 1.699e-10 cm^2/s
+  -> fractional rise per ps     : 0.0003
+  VERDICT: flat within 2% per ps - vibration about fixed sites
+--- g(r) ---
+averaged over 50 frames
+first peak of total g(r)        : 2.470 A (height 3.28) <- d_nn used below
+tallest peak of total g(r)      : 2.470 A (height 3.28)
+significant peaks (g > 1.50) at : [2.47, 4.71] A
+first minimum after it          : 3.210 A (g = 0.114; a filled-in minimum would mean hopping)
+  Al-Al    first peak 2.710 A, height 3.58
+  Al-Co    first peak 2.450 A, height 7.51
+  Al-Ni    first peak 2.450 A, height 7.71
+  Co-Co    first peak 4.030 A, height 4.32
+  Co-Ni    first peak 4.190 A, height 5.67
+  Ni-Ni    first peak 2.790 A, height 7.59
+--- Lindemann ratio per element (L = sqrt(<u^2>)/d_nn) ---
+d_nn taken as 2.470 A; the melting criterion is L ~ 0.1
+<u^2> is about each atom's time-averaged position; the MSD plateau above equals 2<u^2> (0.0373 vs 0.0383)
+  Al: sqrt(<u^2>) = 0.1471 A, L = 0.0595 (144 atoms)
+  Co: sqrt(<u^2>) = 0.1123 A, L = 0.0454 (40 atoms)
+  Ni: sqrt(<u^2>) = 0.1228 A, L = 0.0497 (24 atoms)
+  all: sqrt(<u^2>) = 0.1383 A, L = 0.0560
+wrote md_2x2x2_s11_msd_gr.npz
+=== MSD and g(r): md_3x3x3_s12_positions.npy ===
+50000 frames, 702 atoms, sampled every 4.0 fs (200 ps)
+largest single-frame displacement 0.059 A (half the shortest box vector is 6.08 A)
+--- MSD(t), multi-origin average ---
+   t (ps)   MSD (A^2)
+     0.00      0.0004
+     0.03      0.0152
+     0.12      0.0494
+     0.43      0.0374
+     1.57      0.0390
+     5.75      0.0386
+    21.06      0.0381
+    77.13      0.0378
+   100.00      0.0382
+plateau (mean over second half) : 0.0385 A^2
+slope over second half          : -0.00001 A^2/ps
+  -> implied D if diffusive     : -8.575e-11 cm^2/s
+  -> fractional rise per ps     : -0.0001
+  VERDICT: flat within 2% per ps - vibration about fixed sites
+--- g(r) ---
+averaged over 50 frames
+first peak of total g(r)        : 2.450 A (height 3.25) <- d_nn used below
+tallest peak of total g(r)      : 2.450 A (height 3.25)
+significant peaks (g > 1.50) at : [2.45, 2.63, 4.77] A
+first minimum after it          : 3.290 A (g = 0.113; a filled-in minimum would mean hopping)
+  Al-Al    first peak 2.710 A, height 3.60
+  Al-Co    first peak 2.450 A, height 7.46
+  Al-Ni    first peak 2.450 A, height 7.67
+  Co-Co    first peak 4.070 A, height 4.25
+  Co-Ni    first peak 4.190 A, height 5.24
+  Ni-Ni    first peak 2.790 A, height 6.24
+--- Lindemann ratio per element (L = sqrt(<u^2>)/d_nn) ---
+d_nn taken as 2.450 A; the melting criterion is L ~ 0.1
+<u^2> is about each atom's time-averaged position; the MSD plateau above equals 2<u^2> (0.0385 vs 0.0380)
+  Al: sqrt(<u^2>) = 0.1463 A, L = 0.0597 (486 atoms)
+  Co: sqrt(<u^2>) = 0.1128 A, L = 0.0461 (135 atoms)
+  Ni: sqrt(<u^2>) = 0.1229 A, L = 0.0501 (81 atoms)
+  all: sqrt(<u^2>) = 0.1379 A, L = 0.0563
+wrote md_3x3x3_s12_msd_gr.npz
