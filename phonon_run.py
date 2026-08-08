@@ -342,25 +342,43 @@ def main():
     # This is the same quantity reduce_vdos.py reports from the MD spectra.
     syms = np.array(ph.primitive.symbols)
     log(f"--- element decomposition from eigenvectors (above {args.split} meV) ---")
-    w_above = {el: 0.0 for el in sorted(set(syms))}
+    w_above = {el: 0.0 for el in sorted(set(syms))}   # weight above the split
+    w_own = {el: 0.0 for el in sorted(set(syms))}     # same, for convention (b)
+    w_tot = {el: 0.0 for el in sorted(set(syms))}     # this element's total
     n_above = 0
     for iq in range(freqs.shape[0]):
         e = eigvecs[iq].reshape(n_at, 3, eigvecs[iq].shape[-1])
         site = (np.abs(e) ** 2).sum(axis=1)                 # (n_atoms, n_modes)
         site = site / site.sum(axis=0, keepdims=True)
         sel = freqs[iq] > args.split
+        real = freqs[iq] > 0.05
         n_above += int(sel.sum())
         for el in w_above:
             m = syms == el
             w_above[el] += site[m][:, sel].sum()
+            w_own[el] += site[m][:, sel & real].sum()
+            w_tot[el] += site[m][:, real].sum()
     if n_above:
+        # TWO different quantities, printed together because confusing them is
+        # easy and costly. (a) SHARE: of the weight above the split energy, what
+        # fraction belongs to this element - these sum to 100% across elements.
+        # (b) PER-ELEMENT FRACTION: of this element's OWN spectrum, what fraction
+        # lies above the split - these do NOT sum to 100%, and this is the
+        # quantity reduce_vdos.py reports, because it normalises each element's
+        # partial spectrum to unit area before integrating.
+        log("  (a) share of the weight above the split, sums to 100%:")
         for el in sorted(w_above):
-            log(f"  {el}: {100*w_above[el]/n_above:.0f}% of weight above "
-                f"{args.split:.0f} meV ({int((syms == el).sum())} atoms, "
+            log(f"      {el}: {100*w_above[el]/n_above:.0f}%  "
+                f"({int((syms == el).sum())} atoms, "
                 f"{100*(syms == el).sum()/n_at:.0f}% of atoms)")
+        log("  (b) fraction of each element's OWN spectrum above the split, "
+            "which is what reduce_vdos.py prints:")
+        for el in sorted(w_own):
+            log(f"      {el}: {100*w_own[el]/max(w_tot[el], 1e-300):.0f}%")
         log(f"  ({n_above} of {freqs.size} modes lie above {args.split:.0f} meV)")
-        log("  (MD gave Al 61 / Co 16 / Ni 15 for the X-phase at three sizes, "
-            "Al 54 / Co 19 / Ni 16 for the W-phase, Al 54 / Co 16 for Al13Co4)")
+        log("  MD comparison, convention (b): Al 61 / Co 16 / Ni 15 for the "
+            "X-phase at three sizes, Al 54 / Co 19 / Ni 16 for the W-phase, "
+            "Al 54 / Co 16 for Al13Co4")
     else:
         log(f"  no modes above {args.split} meV (max {flat.max():.1f} meV)")
 
