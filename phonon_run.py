@@ -175,8 +175,11 @@ def main():
     ap.add_argument("--mesh", default="1,1,1",
                     help="q-mesh for DOS and participation ratio")
     ap.add_argument("--band", action="store_true",
-                    help="also compute a band path along the three axes and "
-                         "report zone-boundary gap centres")
+                    help="also compute band paths and report zone-boundary "
+                         "gap centres. Four paths: the two oblique primitive "
+                         "directions, the in-plane axis, and the true stacking "
+                         "direction at (-0.5, 0.5, 0). Needs --fc-supercell "
+                         "2,2,2 for the last of these to be commensurate.")
     ap.add_argument("--no-relax", action="store_true",
                     help="skip the relaxation (use if the input is already "
                          "relaxed to fmax 0.001)")
@@ -412,10 +415,22 @@ def main():
     # ---------------- band structure ----------------
     if args.band:
         log("--- band path (gap centres at the zone boundary) ---")
+        # Explicit paths. For the C-centred W-phase cell NO primitive axis
+        # lies along the stacking direction: a and b are oblique, each mixing
+        # the in-plane and stacking directions, and c is the 23.23 A in-plane
+        # axis. Because a itself carries a stacking component of 4.051 A, the
+        # lattice repeats every 4.051 A projected onto the stacking direction,
+        # so the smallest purely-stacking reciprocal vector is (-1, 1, 0) and
+        # the stacking zone boundary sits at half of it, (-0.5, 0.5, 0).
+        # The fourth path is commensurate only with force constants carrying a
+        # factor of two along BOTH a and b, so use --fc-supercell 2,2,2 or
+        # larger for it to mean anything.
         paths = [[[0, 0, 0], [0.5, 0, 0]],
                  [[0, 0, 0], [0, 0.5, 0]],
-                 [[0, 0, 0], [0, 0, 0.5]]]
-        labels = ["a*", "b*", "c* (stacking)"]
+                 [[0, 0, 0], [0, 0, 0.5]],
+                 [[0, 0, 0], [-0.5, 0.5, 0]]]
+        labels = ["a* (oblique)", "b* (oblique)",
+                  "c* (in-plane, 23.23 A)", "stacking (4.051 A)"]
         ph.run_band_structure(paths, with_eigenvectors=False)
         bs = ph.get_band_structure_dict()
         for name, fq in zip(labels, bs["frequencies"]):
