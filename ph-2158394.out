@@ -1,0 +1,97 @@
+CUDA: True Quadro RTX 6000
+=== harmonic run: ph_al13co4 ===
+read al13co4.vasp: 102 atoms, volume 1447.7 A^3
+/home/physics/estzqn/.local/lib/python3.11/site-packages/e3nn/o3/_wigner.py:10: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  _Jd, _W3j_flat, _W3j_indices = torch.load(os.path.join(os.path.dirname(__file__), 'constants.pt'))
+/home/physics/estzqn/.local/lib/python3.11/site-packages/mace/calculators/mace.py:226: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  torch.load(f=model_path, map_location=device)
+cuequivariance or cuequivariance_torch is not available. Cuequivariance acceleration will be disabled.
+Using medium MPA-0 model as default MACE-MP model, to use previous (before 3.10) default model please specify 'medium' as model argument
+Using Materials Project MACE for MACECalculator with /home/physics/estzqn/.cache/mace/macempa0mediummodel
+Using float64 for MACECalculator, which is slower but more accurate. Recommended for geometry optimization.
+calculator: mace
+relaxing positions at fixed cell to fmax 0.001...
+  E = -4.932331 eV/atom, max residual force 0.00070 eV/A
+force constants: fc-supercell 2,2,2 (816 atoms), displacement 0.01 A, 178 displaced configurations
+  8/178 | 0.2 min | 4.6 min left
+  16/178 | 0.4 min | 4.4 min left
+  24/178 | 0.6 min | 4.2 min left
+  32/178 | 0.9 min | 3.9 min left
+  40/178 | 1.1 min | 3.7 min left
+  48/178 | 1.3 min | 3.5 min left
+  56/178 | 1.5 min | 3.3 min left
+  64/178 | 1.7 min | 3.1 min left
+  72/178 | 1.9 min | 2.9 min left
+  80/178 | 2.2 min | 2.6 min left
+  88/178 | 2.4 min | 2.4 min left
+  96/178 | 2.6 min | 2.2 min left
+  104/178 | 2.8 min | 2.0 min left
+  112/178 | 3.0 min | 1.8 min left
+  120/178 | 3.2 min | 1.6 min left
+  128/178 | 3.5 min | 1.3 min left
+  136/178 | 3.7 min | 1.1 min left
+  144/178 | 3.9 min | 0.9 min left
+  152/178 | 4.1 min | 0.7 min left
+  160/178 | 4.3 min | 0.5 min left
+  168/178 | 4.5 min | 0.3 min left
+  176/178 | 4.7 min | 0.1 min left
+  178/178 | 4.8 min | 0.0 min left
+force constants done
+/gpfs/home/physics/estzqn/quasicrystal/phonon_run.py:269: DeprecationWarning: get_mesh_dict() is deprecated. Use the mesh property to access the Mesh result object; its qpoints, weights, frequencies, eigenvectors, and group_velocities attributes replace the dict keys.
+  md = ph.get_mesh_dict()
+mesh [2, 2, 2]: 8 q-points x 306 bands
+--- mode census ---
+  modes total          : 2448
+  imaginary (< -0.01)  : 0
+  max frequency        : 53.228 meV
+  lowest 10 real modes : [6.247, 6.247, 6.247, 6.247, 6.247, 6.247, 6.247, 6.247, 6.71, 6.71]
+--- participation ratio (Mihalkovic Eq. 7 form) ---
+  P for a fully extended mode = 1.0, for a single-atom mode = 0.00980
+   6-10 meV |    40 modes | mean P 0.7964 | min P 0.6934
+  10-20 meV |   560 modes | mean P 0.5848 | min P 0.3527
+  20-30 meV |   848 modes | mean P 0.5953 | min P 0.3246
+  30-40 meV |   552 modes | mean P 0.5241 | min P 0.1615
+  40-60 meV |   448 modes | mean P 0.3115 | min P 0.0936
+  ten lowest modes, energy and P:
+      6.247 meV   P = 0.8767
+      6.247 meV   P = 0.8767
+      6.247 meV   P = 0.8767
+      6.247 meV   P = 0.8767
+      6.247 meV   P = 0.8767
+      6.247 meV   P = 0.8767
+      6.247 meV   P = 0.8767
+      6.247 meV   P = 0.8767
+      6.710 meV   P = 0.8850
+      6.710 meV   P = 0.8850
+--- gaps in the mode spectrum (width > 0.3 meV, below 20 meV) ---
+    6.247 -   6.710 meV | centre   6.479 | width 0.463
+    6.710 -   8.368 meV | centre   7.539 | width 1.657
+    8.368 -   9.162 meV | centre   8.765 | width 0.795
+    9.162 -   9.841 meV | centre   9.502 | width 0.679
+   10.312 -  10.717 meV | centre  10.514 | width 0.405
+   10.814 -  11.237 meV | centre  11.026 | width 0.423
+   11.325 -  11.853 meV | centre  11.589 | width 0.528
+   12.035 -  12.379 meV | centre  12.207 | width 0.344
+   12.981 -  13.305 meV | centre  13.143 | width 0.324
+  successive gap-centre ratios: [1.164, 1.163, 1.084, 1.107, 1.049, 1.051, 1.053, 1.077]
+  (tau = 1.618; the 26-atom first ZB gap was 10.29 meV, the 60-atom 8.36, and the 60-atom centre ratios 1.304/1.283)
+--- element decomposition from eigenvectors (above 30.0 meV) ---
+  (a) share of the weight above the split, sums to 100%:
+      Al: 93%  (78 atoms, 76% of atoms)
+      Co: 7%  (24 atoms, 24% of atoms)
+  (b) fraction of each element's OWN spectrum above the split, which is what reduce_vdos.py prints:
+      Al: 50%
+      Co: 13%
+  (1000 of 2448 modes lie above 30 meV)
+  MD comparison, convention (b): Al 61 / Co 16 / Ni 15 for the X-phase at three sizes, Al 54 / Co 19 / Ni 16 for the W-phase, Al 54 / Co 16 for Al13Co4
+/gpfs/home/physics/estzqn/quasicrystal/phonon_run.py:387: DeprecationWarning: get_total_dos_dict() is deprecated. Use the total_dos property to access the TotalDos result object; its frequency_points and dos attributes replace the dict keys.
+  tdos = ph.get_total_dos_dict()
+/gpfs/home/physics/estzqn/quasicrystal/phonon_run.py:391: DeprecationWarning: get_projected_dos_dict() is deprecated. Use the projected_dos property to access the ProjectedDos result object; its frequency_points and projected_dos attributes replace the dict keys.
+  pdos = ph.get_projected_dos_dict()["projected_dos"]
+--- DOS-based decomposition (secondary; needs a real mesh) ---
+  no spectral weight above 30.0 meV, decomposition skipped (max frequency 53.2 meV)
+  Al: nan% of weight above 30 meV (78 atoms)
+  Co: nan% of weight above 30 meV (24 atoms)
+  (MD gave Al 61 / Co 16 / Ni 15 for the X-phase at three sizes, and Al 54 / Co 19 / Ni 16 for the W-phase)
+wrote ph_al13co4_modes.npz, ph_al13co4_dos.npz, ph_al13co4_phonopy.yaml
+total wall time 5.9 min

@@ -18,3 +18,17 @@ Using float32 for MACECalculator, which is faster but less accurate. Recommended
   T=   1300 K | -4.995974 eV/atom | best -4.998160 | acc 0.019 | 104 min
   T=   1222 K | -4.996020 eV/atom | best -4.998160 | acc 0.018 | 208 min
   T=   1144 K | -4.995715 eV/atom | best -4.998160 | acc 0.018 | 312 min
+  T=   1067 K | -4.995448 eV/atom | best -4.998160 | acc 0.018 | 417 min
+  T=    989 K | -4.995295 eV/atom | best -4.998160 | acc 0.019 | 521 min
+  T=    911 K | -4.995601 eV/atom | best -4.998160 | acc 0.015 | 625 min
+  T=    833 K | -4.996524 eV/atom | best -4.998160 | acc 0.016 | 729 min
+  T=    756 K | -4.996845 eV/atom | best -4.998160 | acc 0.011 | 833 min
+  T=    678 K | -4.997174 eV/atom | best -4.998160 | acc 0.010 | 937 min
+  T=    600 K | -4.997295 eV/atom | best -4.998160 | acc 0.010 | 1041 min
+best chemistry on frozen sites: -4.998160 eV/atom
+after relaxing positions too:   -5.018738 eV/atom
+=== validation against the reference structure ===
+  as-tiled/starting ordering (relaxed): -5.018736 eV/atom
+  search found:        -5.018738 eV/atom
+  difference:          -0.00 meV/atom
+  -> matches or beats the starting ordering.

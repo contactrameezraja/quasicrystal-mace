@@ -7,3 +7,4 @@ __pycache__/
 *_phonopy.yaml
 *_velocities.npy
 *_positions.npy
+*_corrupt.txt
