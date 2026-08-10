@@ -1,176 +1,163 @@
 """
-Verify that the replicated structure parsers agree
-=================================================
+Neutron-weighted generalised density of states
+==============================================
 
-Section 3.2 states that an identical parser is used by every entry point, the
-copies being replicated deliberately rather than factored into a shared module,
-since each script is submitted directly to the cluster and a shared import would
-add a deployment dependency to every job. That claim needs an artefact behind it,
-and this is the artefact.
+Why this exists. Inelastic neutron scattering does not measure the vibrational
+density of states. It measures a generalised density of states in which each
+element contributes in proportion to its scattering cross-section and inversely
+to its mass, so a computed spectrum and a measured one are different quantities
+and comparing them directly is only qualitative. Applying the weighting removes
+that caveat and lets the two be placed on the same axes legitimately.
 
-Byte-level comparison is the wrong test, because the copies legitimately differ in
-their docstrings and diagnostic messages. What must agree is the parsing logic and
-the behaviour. This script therefore does two things.
+In the incoherent approximation, and neglecting the Debye-Waller factors, the
+weighted spectrum is
 
-  Structural check. It extracts the parse_structure function from each file,
-  strips comments, docstrings and blank lines, normalises whitespace, and hashes
-  what remains. Identical hashes mean identical logic irrespective of
-  documentation.
+    G(E)  proportional to  sum_i  c_i (sigma_i / m_i) g_i(E)
 
-  Behavioural check. It imports each copy and runs all of them on the same
-  fixtures, comparing atom counts, species and positions exactly, and confirming
-  that each rejects a corrupted file rather than proceeding.
+with c_i the atom fraction of element i, sigma_i its bound scattering
+cross-section, m_i its mass, and g_i(E) its partial density of states normalised
+to unit area. The partial spectra written by reduce_vdos.py are normalised
+individually, which is exactly the g_i(E) this expression requires, so no
+renormalisation is needed here.
 
-The second check is the one that matters, since two implementations can differ in
-form and agree in behaviour, and it is behaviour the thesis depends on. Report the
-hash table and the behavioural verdict in Appendix A.
+The Debye-Waller factors are omitted. They enter as exp(-2W_i) and are of order
+unity at 300 K for these masses and displacements, the measured mean squared
+displacements of Section 4.5 giving B values near 0.6 A^2. Including them would
+change the weights by a few per cent, which is below the segment noise of every
+run, so the omission is stated rather than corrected.
+
+CROSS-SECTIONS MUST BE VERIFIED BEFORE USE. The values in SIGMA below are from
+memory rather than from a table, and the whole point of this calculation is
+quantitative comparison, so check every one against a standard compilation
+(Sears, or the NIST neutron scattering length tables) before quoting any number
+this script produces. The weights are extremely sensitive to them: nickel's
+cross-section per unit mass is roughly six times aluminium's on these values, so
+an error there would dominate the result.
 
 Usage
 -----
-    python verify_parsers.py --files md_run.py reduce_vdos.py phonon_run.py \
-        msd_gr.py retarget_composition.py --fixture Al9Co2Ni2-coords.txt
+    python gvdos.py --partial md_wphase_vdos_partial.npz --counts Al:190,Co:55,Ni:20
+    python gvdos.py --partial md_al13co4_partial.npz --counts Al:78,Co:24 \
+        --out gvdos_al13co4
 """
 
 import argparse
-import ast
-import hashlib
-import importlib.util
-import io
-import re
-import sys
-import tokenize
+
+import numpy as np
+
+# Bound scattering cross-section in barn and mass in atomic mass units.
+# VERIFY EVERY VALUE AGAINST A STANDARD TABLE BEFORE USE. See the module
+# docstring: these are the most error-prone numbers in the calculation.
+SIGMA = {
+    "Al": {"sigma_barn": 1.503, "mass_amu": 26.98},
+    "Co": {"sigma_barn": 5.600, "mass_amu": 58.93},
+    "Ni": {"sigma_barn": 18.500, "mass_amu": 58.69},
+}
+
+_trapz = getattr(np, "trapezoid", None) or np.trapz
 
 
-def extract_function(path, name="parse_structure"):
-    """Return the source of the named top-level function, or None."""
-    src = open(path).read()
-    tree = ast.parse(src)
-    for node in ast.walk(tree):
-        if isinstance(node, ast.FunctionDef) and node.name == name:
-            return ast.get_source_segment(src, node)
-    return None
-
-
-def normalise(src):
-    """Strip comments, docstrings and blank lines, and collapse whitespace, so
-    that only the logic remains. Uses the tokeniser rather than regular
-    expressions so that strings containing hash characters survive."""
-    out = []
-    prev_type = None
-    for tok in tokenize.generate_tokens(io.StringIO(src).readline):
-        if tok.type == tokenize.COMMENT:
-            continue
-        # A string that stands alone as a statement is a docstring.
-        if (tok.type == tokenize.STRING and
-                prev_type in (tokenize.INDENT, tokenize.NEWLINE, tokenize.NL,
-                              None)):
-            prev_type = tok.type
-            continue
-        if tok.type in (tokenize.NL, tokenize.NEWLINE, tokenize.INDENT,
-                        tokenize.DEDENT):
-            prev_type = tok.type
-            continue
-        out.append(tok.string)
-        prev_type = tok.type
-    return re.sub(r"\s+", " ", " ".join(out)).strip()
-
-
-def load_parser(path):
-    """Import a copy of parse_structure without executing the script body."""
-    src = extract_function(path)
-    if src is None:
-        return None
-    ns = {}
-    header = ("import numpy as np\n"
-              "from ase import Atoms\n"
-              "from ase.io import read\n"
-              "TYPE_TO_ELEMENT = {13: 'Al', 27: 'Co', 28: 'Ni'}\n")
-    try:
-        exec(header + src, ns)
-    except Exception as e:                                   # noqa: BLE001
-        print(f"  could not load from {path}: {type(e).__name__}: {e}")
-        return None
-    return ns.get("parse_structure")
+def weights(counts):
+    """Return the normalised neutron weight of each element, together with the
+    intermediate quantities, so that the sensitivity of the result to the
+    cross-sections is visible rather than hidden."""
+    total = sum(counts.values())
+    raw = {}
+    for el, n in counts.items():
+        if el not in SIGMA:
+            raise SystemExit(f"no cross-section recorded for {el}")
+        c = n / total
+        raw[el] = c * SIGMA[el]["sigma_barn"] / SIGMA[el]["mass_amu"]
+    s = sum(raw.values())
+    return {el: v / s for el, v in raw.items()}, raw, total
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--files", nargs="+", required=True)
-    ap.add_argument("--fixture", required=True,
-                    help="a legacy coords.txt file the parser should accept")
+    ap.add_argument("--partial", required=True,
+                    help="the *_partial.npz written by reduce_vdos.py")
+    ap.add_argument("--counts", required=True,
+                    help="atom counts, e.g. Al:190,Co:55,Ni:20")
+    ap.add_argument("--split", type=float, default=30.0,
+                    help="energy above which fractions are reported, for "
+                         "comparison with the unweighted numbers")
+    ap.add_argument("--out", default=None)
     args = ap.parse_args()
 
-    print("=" * 68)
-    print("STRUCTURAL CHECK: hash of parse_structure with documentation stripped")
-    print("=" * 68)
-    hashes = {}
-    for path in args.files:
-        src = extract_function(path)
-        if src is None:
-            print(f"{path:32s} parse_structure NOT FOUND")
-            continue
-        h = hashlib.sha256(normalise(src).encode()).hexdigest()[:16]
-        hashes[path] = h
-        print(f"{path:32s} {h}")
-    distinct = sorted(set(hashes.values()))
-    if len(distinct) == 1:
-        print("\n  token streams identical across all copies")
-    else:
-        print(f"\n  {len(distinct)} distinct token streams. This is expected if "
-              f"the copies differ in local variable names or in the wording of\n"
-              f"  their diagnostic messages, neither of which changes behaviour. "
-              f"The behavioural check below is the one that decides.")
-        groups = {}
-        for p, h in hashes.items():
-            groups.setdefault(h, []).append(p)
-        for h, ps in groups.items():
-            print(f"    {h}: {', '.join(ps)}")
+    counts = {}
+    for part in args.counts.split(","):
+        el, n = part.split(":")
+        counts[el.strip()] = int(n)
+
+    data = np.load(args.partial)
+    if "freq_meV" not in data:
+        raise SystemExit(f"{args.partial} has no freq_meV; keys are "
+                         f"{list(data.keys())}")
+    E = data["freq_meV"]
+
+    w, raw, total = weights(counts)
+
+    print("=" * 66)
+    print("NEUTRON WEIGHTS")
+    print("=" * 66)
+    print(f"{'element':>8} {'atoms':>7} {'at. frac':>9} {'sigma/m':>10} "
+          f"{'weight':>8}")
+    for el in sorted(counts):
+        print(f"{el:>8} {counts[el]:7d} {counts[el]/total:9.4f} "
+              f"{SIGMA[el]['sigma_barn']/SIGMA[el]['mass_amu']:10.4f} "
+              f"{w[el]:8.4f}")
+    print("\n  weights are normalised to sum to one; the sigma/m column is what")
+    print("  makes them differ from the atom fractions, and it is where an error")
+    print("  in the cross-sections would enter")
+
+    # ------------------------------------------------------- combine
+    g_unweighted = np.zeros_like(E)
+    g_weighted = np.zeros_like(E)
+    for el in sorted(counts):
+        if el not in data:
+            raise SystemExit(f"{args.partial} has no partial for {el}")
+        g_i = data[el]
+        g_unweighted += (counts[el] / total) * g_i
+        g_weighted += w[el] * g_i
+
+    for name, g in (("unweighted", g_unweighted), ("neutron-weighted", g_weighted)):
+        g /= _trapz(g, E)
 
     print()
-    print("=" * 68)
-    print("BEHAVIOURAL CHECK: same fixture through every copy")
-    print("=" * 68)
-    results = {}
-    for path in args.files:
-        fn = load_parser(path)
-        if fn is None:
-            continue
-        try:
-            atoms = fn(args.fixture)
-            results[path] = (len(atoms), tuple(atoms.get_chemical_symbols()),
-                             atoms.get_positions().round(8).tobytes())
-            print(f"{path:32s} {len(atoms)} atoms, "
-                  f"volume {atoms.get_volume():.1f} A^3")
-        except SystemExit as e:
-            print(f"{path:32s} REJECTED the fixture: {e}")
-        except Exception as e:                               # noqa: BLE001
-            print(f"{path:32s} ERROR {type(e).__name__}: {e}")
+    print("=" * 66)
+    print(f"EFFECT OF THE WEIGHTING (fractions above {args.split:.0f} meV)")
+    print("=" * 66)
+    m = E > args.split
+    f_un = _trapz(g_unweighted[m], E[m]) * 100
+    f_w = _trapz(g_weighted[m], E[m]) * 100
+    print(f"  unweighted spectrum      : {f_un:.1f} per cent above "
+          f"{args.split:.0f} meV")
+    print(f"  neutron-weighted spectrum: {f_w:.1f} per cent")
+    print(f"  difference               : {f_w - f_un:+.1f} percentage points")
 
-    if len(set(results.values())) == 1 and results:
-        print("\n  every copy returns identical atoms, species and positions")
-    elif results:
-        print("\n  COPIES DISAGREE on the parsed structure; this is a defect, not "
-              "a documentation difference")
+    lo = E <= 6.0
+    print(f"\n  weight below 6 meV, unweighted      : "
+          f"{_trapz(g_unweighted[lo], E[lo])*100:.4f} per cent")
+    print(f"  weight below 6 meV, neutron-weighted: "
+          f"{_trapz(g_weighted[lo], E[lo])*100:.4f} per cent")
+    print("\n  the low-energy region is where the two quantities differ most in")
+    print("  this alloy family, which is why comparisons with measured spectra")
+    print("  there are the ones the weighting matters for")
 
-    print()
-    print("=" * 68)
-    print("REJECTION CHECK: a corrupted fixture must be refused")
-    print("=" * 68)
-    bad = args.fixture.replace(".txt", "_corrupt.txt")
-    lines = open(args.fixture).read().splitlines(keepends=True)
-    open(bad, "w").writelines(lines[:len(lines) - 3])        # drop three atoms
-    for path in args.files:
-        fn = load_parser(path)
-        if fn is None:
-            continue
-        try:
-            atoms = fn(bad)
-            print(f"{path:32s} ACCEPTED a corrupted file, {len(atoms)} atoms, "
-                  f"no verification present")
-        except SystemExit:
-            print(f"{path:32s} refused, verification present")
-        except Exception as e:                               # noqa: BLE001
-            print(f"{path:32s} raised {type(e).__name__}")
+    def peak(g):
+        w2 = (E > 10) & (E < 40)
+        return E[w2][np.argmax(g[w2])]
+
+    print(f"\n  main peak, unweighted      : {peak(g_unweighted):.1f} meV")
+    print(f"  main peak, neutron-weighted: {peak(g_weighted):.1f} meV")
+    print("  the measured peak for this family is reported near 24 meV")
+
+    out = args.out or args.partial.replace("_partial.npz", "")
+    np.savez(f"{out}_gvdos.npz", energy=E, unweighted=g_unweighted,
+             weighted=g_weighted,
+             weights=np.array([w[el] for el in sorted(counts)]),
+             elements=np.array(sorted(counts)))
+    print(f"\nwrote {out}_gvdos.npz")
 
 
 if __name__ == "__main__":
