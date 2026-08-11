@@ -8,10 +8,13 @@ The MD/VACF spectrum gives spectral WEIGHT but not eigenvectors, so it cannot
 say whether a mode is extended or localized. Diagonalising the dynamical matrix
 gives both. That matters here for two reasons:
 
-  Third rung of the gap hierarchy.  The 26- and 60-atom dispersions gave first
-  zone-boundary gaps at 10.29 and 8.36 meV (ratio 1.23) and 60-atom gap-centre
-  ratios 1.304/1.283. Two points cannot show a drift toward tau; the 265-atom
-  W-phase is the third.
+  Zone-boundary gap structure.  Earlier readings of a cross-approximant gap
+  hierarchy were retracted: the reported sequence mixed gap EDGES for the two
+  smaller cells with a gap CENTRE for the W-phase, and one of those cells turned
+  out to be cubic rather than a decagonal approximant. Rebuilt on centres along
+  the same direction the values are 9.68, 9.21 and 5.61 meV, so the two smaller
+  cells are indistinguishable and no systematic ratio survives. Report gaps as a
+  characterisation of each structure, not as a hierarchy across them.
 
   Participation ratio.  Mihalkovic, Elhor & Suck (PRB 63, 214301) report that in
   complex decagonal-related structures the low-energy modes localize sharply,
@@ -317,8 +320,7 @@ def main():
     if list(np.abs(np.diag(fc_sc))) == [1, 1, 1] or freqs.shape[0] == 1:
         log("  NOTE: these are SPACINGS in the discrete mode list at the sampled")
         log("  q-point(s), which is NOT the same observable as the zone-boundary")
-        log("  pseudo-gaps read off the 26- and 60-atom dispersions (10.29 and")
-        log("  8.36 meV, centre ratios 1.304/1.283). To compare with those, run")
+        log("  pseudo-gaps obtained from a band path. To compare with those, run")
         log("  with --band and --fc-supercell 2,1,1 or larger, which costs a")
         log("  supercell of that many times the atoms in force evaluations.")
     if n_imag:
@@ -333,8 +335,8 @@ def main():
         centres = [g[2] for g in gaps]
         ratios = [float(round(b / a, 3)) for a, b in zip(centres, centres[1:])]
         log(f"  successive gap-centre ratios: {ratios}")
-        log(f"  (tau = 1.618; the 26-atom first ZB gap was 10.29 meV, "
-            f"the 60-atom 8.36, and the 60-atom centre ratios 1.304/1.283)")
+        log(f"  (tau = 1.618. Do not read these against the retracted "
+            f"cross-cell sequence; see the docstring)")
 
     # ---------------- element decomposition, from the eigenvectors ----------
     # Computed mode by mode rather than from phonopy's DOS routine, which needs
