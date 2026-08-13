@@ -796,3 +796,138 @@ NVE production: 200 ps (~0.021 meV resolution), 50 blocks...
   block 50/50 | 1314 min | ~0 min left | 50000 samples
 FINISHED. velocities (50000, 3120, 3)
 Energy drift: 0.0341 meV/atom (laptop 2x2x2 run gave 0.039)
+Loaded 26 atoms: {'Al': 18, 'Ni': 3, 'Co': 5}, volume 360.8 A^3
+model: mace | relax dtype: float64 | fmax 0.001 | cell relaxed | optimizer bfgs
+  relaxation took 0.1 min with bfgs
+Relaxed (float64): max residual force 0.00083 eV/A (the float64 26-atom relaxations gave 0.00083)
+  cell lengths before [12.128  4.051  7.636] -> after [12.064  4.055  7.573]
+MD dtype: float32
+=== MD: 2x2x2, 208 atoms, 624 modes, 300.0 K ===
+    supercell matrix rows [[2, 0, 0], [0, 2, 0], [0, 0, 2]], det 8
+    box lengths [24.13  8.11 15.15], angles [ 90.   105.71  90.  ]
+    {'Al': 144, 'Ni': 24, 'Co': 40}
+    seed 99
+NVT equilibration (10 ps)...
+  done in 170s, instantaneous T = 299 K
+NVE burn-in (2 ps, not recorded)...
+NVE production: 4 ps (~1.034 meV resolution), 50 blocks...
+  block 1/50 | 0 min | ~1 min left | 20 samples
+  block 2/50 | 0 min | ~1 min left | 40 samples
+  block 3/50 | 0 min | ~1 min left | 60 samples
+  block 4/50 | 0 min | ~1 min left | 80 samples
+  block 5/50 | 0 min | ~1 min left | 100 samples
+  block 6/50 | 0 min | ~1 min left | 120 samples
+  block 7/50 | 0 min | ~1 min left | 140 samples
+  block 8/50 | 0 min | ~1 min left | 160 samples
+  block 9/50 | 0 min | ~1 min left | 180 samples
+  block 10/50 | 0 min | ~1 min left | 200 samples
+  block 11/50 | 0 min | ~1 min left | 220 samples
+  block 12/50 | 0 min | ~1 min left | 240 samples
+  block 13/50 | 0 min | ~1 min left | 260 samples
+  block 14/50 | 0 min | ~1 min left | 280 samples
+  block 15/50 | 0 min | ~1 min left | 300 samples
+  block 16/50 | 0 min | ~1 min left | 320 samples
+  block 17/50 | 0 min | ~1 min left | 340 samples
+  block 18/50 | 0 min | ~1 min left | 360 samples
+  block 19/50 | 0 min | ~1 min left | 380 samples
+  block 20/50 | 0 min | ~1 min left | 400 samples
+  block 21/50 | 0 min | ~1 min left | 420 samples
+  block 22/50 | 0 min | ~1 min left | 440 samples
+  block 23/50 | 1 min | ~1 min left | 460 samples
+  block 24/50 | 1 min | ~1 min left | 480 samples
+  block 25/50 | 1 min | ~1 min left | 500 samples
+  block 26/50 | 1 min | ~1 min left | 520 samples
+  block 27/50 | 1 min | ~1 min left | 540 samples
+  block 28/50 | 1 min | ~0 min left | 560 samples
+  block 29/50 | 1 min | ~0 min left | 580 samples
+  block 30/50 | 1 min | ~0 min left | 600 samples
+  block 31/50 | 1 min | ~0 min left | 620 samples
+  block 32/50 | 1 min | ~0 min left | 640 samples
+  block 33/50 | 1 min | ~0 min left | 660 samples
+  block 34/50 | 1 min | ~0 min left | 680 samples
+  block 35/50 | 1 min | ~0 min left | 700 samples
+  block 36/50 | 1 min | ~0 min left | 720 samples
+  block 37/50 | 1 min | ~0 min left | 740 samples
+  block 38/50 | 1 min | ~0 min left | 760 samples
+  block 39/50 | 1 min | ~0 min left | 780 samples
+  block 40/50 | 1 min | ~0 min left | 800 samples
+  block 41/50 | 1 min | ~0 min left | 820 samples
+  block 42/50 | 1 min | ~0 min left | 840 samples
+  block 43/50 | 1 min | ~0 min left | 860 samples
+  block 44/50 | 1 min | ~0 min left | 880 samples
+  block 45/50 | 1 min | ~0 min left | 900 samples
+  block 46/50 | 1 min | ~0 min left | 920 samples
+  block 47/50 | 1 min | ~0 min left | 940 samples
+  block 48/50 | 1 min | ~0 min left | 960 samples
+  block 49/50 | 1 min | ~0 min left | 980 samples
+  block 50/50 | 1 min | ~0 min left | 1000 samples
+FINISHED. velocities (1000, 208, 3)
+Energy drift: 0.0324 meV/atom (laptop 2x2x2 run gave 0.039)
+read W-AlCoNi-265.vasp via ASE: 265 atoms, volume 3741.8 A^3, cellpar [20.229 20.226 23.338 89.882 89.876 23.071]
+Loaded 265 atoms: {'Co': 55, 'Ni': 20, 'Al': 190}, volume 3741.8 A^3
+model: mace | relax dtype: float64 | fmax 0.001 | cell relaxed | optimizer bfgs
+  relaxation took 0.7 min with bfgs
+Relaxed (float64): max residual force 0.00094 eV/A (the float64 26-atom relaxations gave 0.00083)
+  cell lengths before [20.229 20.226 23.338] -> after [20.086 20.084 23.227]
+MD dtype: float32
+=== MD: mat6_6_0_-2_2_0_0_0_1, 6360 atoms, 19080 modes, 300.0 K ===
+    supercell matrix rows [[6, 6, 0], [-2, 2, 0], [0, 0, 1]], det 24
+    box lengths [236.06  16.21  23.23], angles [90.02 89.88 90.02]
+    {'Co': 1320, 'Ni': 480, 'Al': 4560}
+    seed 61
+NVT equilibration (10 ps)...
+  done in 4849s, instantaneous T = 301 K
+NVE burn-in (2 ps, not recorded)...
+NVE production: 200 ps (~0.021 meV resolution), 50 blocks...
+  block 1/50 | 32 min | ~1578 min left | 1000 samples
+  block 2/50 | 64 min | ~1546 min left | 2000 samples
+  block 3/50 | 97 min | ~1514 min left | 3000 samples
+  block 4/50 | 129 min | ~1482 min left | 4000 samples
+  block 5/50 | 161 min | ~1450 min left | 5000 samples
+  block 6/50 | 193 min | ~1418 min left | 6000 samples
+  block 7/50 | 226 min | ~1386 min left | 7000 samples
+  block 8/50 | 258 min | ~1353 min left | 8000 samples
+  block 9/50 | 290 min | ~1321 min left | 9000 samples
+  block 10/50 | 322 min | ~1289 min left | 10000 samples
+  block 11/50 | 354 min | ~1257 min left | 11000 samples
+  block 12/50 | 387 min | ~1225 min left | 12000 samples
+  block 13/50 | 419 min | ~1192 min left | 13000 samples
+  block 14/50 | 451 min | ~1160 min left | 14000 samples
+  block 15/50 | 483 min | ~1128 min left | 15000 samples
+  block 16/50 | 516 min | ~1096 min left | 16000 samples
+  block 17/50 | 548 min | ~1063 min left | 17000 samples
+  block 18/50 | 580 min | ~1031 min left | 18000 samples
+  block 19/50 | 612 min | ~999 min left | 19000 samples
+  block 20/50 | 644 min | ~967 min left | 20000 samples
+  block 21/50 | 677 min | ~934 min left | 21000 samples
+  block 22/50 | 709 min | ~902 min left | 22000 samples
+  block 23/50 | 741 min | ~870 min left | 23000 samples
+  block 24/50 | 773 min | ~838 min left | 24000 samples
+  block 25/50 | 806 min | ~806 min left | 25000 samples
+  block 26/50 | 838 min | ~773 min left | 26000 samples
+  block 27/50 | 870 min | ~741 min left | 27000 samples
+  block 28/50 | 902 min | ~709 min left | 28000 samples
+  block 29/50 | 935 min | ~677 min left | 29000 samples
+  block 30/50 | 967 min | ~645 min left | 30000 samples
+  block 31/50 | 999 min | ~612 min left | 31000 samples
+  block 32/50 | 1031 min | ~580 min left | 32000 samples
+  block 33/50 | 1064 min | ~548 min left | 33000 samples
+  block 34/50 | 1096 min | ~516 min left | 34000 samples
+  block 35/50 | 1128 min | ~483 min left | 35000 samples
+  block 36/50 | 1160 min | ~451 min left | 36000 samples
+  block 37/50 | 1193 min | ~419 min left | 37000 samples
+  block 38/50 | 1225 min | ~387 min left | 38000 samples
+  block 39/50 | 1257 min | ~355 min left | 39000 samples
+  block 40/50 | 1289 min | ~322 min left | 40000 samples
+  block 41/50 | 1322 min | ~290 min left | 41000 samples
+  block 42/50 | 1354 min | ~258 min left | 42000 samples
+  block 43/50 | 1386 min | ~226 min left | 43000 samples
+  block 44/50 | 1418 min | ~193 min left | 44000 samples
+  block 45/50 | 1451 min | ~161 min left | 45000 samples
+  block 46/50 | 1483 min | ~129 min left | 46000 samples
+  block 47/50 | 1515 min | ~97 min left | 47000 samples
+  block 48/50 | 1547 min | ~64 min left | 48000 samples
+  block 49/50 | 1579 min | ~32 min left | 49000 samples
+  block 50/50 | 1612 min | ~0 min left | 50000 samples
+FINISHED. velocities (50000, 6360, 3)
+Energy drift: 0.0398 meV/atom (laptop 2x2x2 run gave 0.039)
