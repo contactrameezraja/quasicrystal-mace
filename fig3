@@ -1,0 +1,211 @@
+"""Regenerate fig3.png, the workflow figure of Section 3.1.
+
+Equation numbering matches the compiled dissertation:
+  (1) W-phase primitive-to-conventional transform   eq:transform
+  (2) kappa_SRME                                    eq:srme
+  (3) f_max relaxation criterion                    eq:fmax
+  (4) dynamical matrix                              eq:dynmat
+  (5) site weight p_i(s)                            eq:siteweight
+  (6) participation ratio P(s)                      eq:partratio
+  (7) velocity autocorrelation C(t)                 eq:vacf
+  (8) g(E) cosine transform                         eq:dos
+  (9) neutron weighting G(E)                        eq:neutron
+  (10) spectral floor E = h v_T / L                 eq:floor
+  (11) MSD                                          eq:msd
+  (12) Lindemann ratio                              eq:lindemann
+  (13) Metropolis criterion                         eq:metropolis
+
+Usage: python make_fig_workflow.py  ->  fig3.png (300 dpi)
+"""
+
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+from matplotlib.path import Path
+
+plt.rcParams.update({
+    "font.family": "serif",
+    "font.size": 8.0,
+    "text.color": "black",
+})
+
+FIG_W, FIG_H = 8.2, 11.0
+fig, ax = plt.subplots(figsize=(FIG_W, FIG_H))
+ax.set_xlim(0, 100)
+ax.set_ylim(0, 134)
+ax.axis("off")
+
+LW = 0.9
+
+
+def box(x, y, w, h, lines, fs=8.0, style="solid"):
+    """Rectangular node centred at (x, y); returns anchor points."""
+    r = mpatches.FancyBboxPatch(
+        (x - w / 2, y - h / 2), w, h,
+        boxstyle="square,pad=0", linewidth=LW,
+        edgecolor="black", facecolor="white", linestyle=style)
+    ax.add_patch(r)
+    ax.text(x, y, "\n".join(lines), ha="center", va="center",
+            fontsize=fs, linespacing=1.25)
+    return dict(top=(x, y + h / 2), bottom=(x, y - h / 2),
+                left=(x - w / 2, y), right=(x + w / 2, y))
+
+
+def hexagon(x, y, w, h, lines, fs=8.0):
+    """Hexagonal verification gate centred at (x, y)."""
+    d = h / 2
+    verts = [(x - w / 2 + d, y - h / 2), (x + w / 2 - d, y - h / 2),
+             (x + w / 2, y), (x + w / 2 - d, y + h / 2),
+             (x - w / 2 + d, y + h / 2), (x - w / 2, y),
+             (x - w / 2 + d, y - h / 2)]
+    p = mpatches.PathPatch(Path(verts, closed=True), linewidth=LW,
+                           edgecolor="black", facecolor="white")
+    ax.add_patch(p)
+    ax.text(x, y, "\n".join(lines), ha="center", va="center",
+            fontsize=fs, linespacing=1.25)
+    return dict(top=(x, y + h / 2), bottom=(x, y - h / 2),
+                left=(x - w / 2, y), right=(x + w / 2, y))
+
+
+def arrow(p1, p2, dashed=False, via=None):
+    style = (0, (4, 3)) if dashed else "solid"
+    pts = [p1] + (via or []) + [p2]
+    for a, b in zip(pts[:-1], pts[-len(pts) + 1:]):
+        pass
+    # draw polyline segments, arrowhead on the last
+    for i in range(len(pts) - 1):
+        a, b = pts[i], pts[i + 1]
+        if i == len(pts) - 2:
+            ax.annotate("", xy=b, xytext=a,
+                        arrowprops=dict(arrowstyle="-|>", linewidth=LW,
+                                        linestyle=style, color="black",
+                                        mutation_scale=9,
+                                        shrinkA=0, shrinkB=0))
+        else:
+            ax.plot([a[0], b[0]], [a[1], b[1]], linewidth=LW,
+                    linestyle=style, color="black")
+
+
+# ---------------- left column: main pipeline ----------------
+XL = 31
+dep = box(XL, 128, 47, 7.5, [
+    "Deposited approximants",
+    "X-phase (26), cubic Al-Co-Ni (60), W-phase (265)"])
+ver = hexagon(XL, 117, 52, 8.5, [
+    "Verification: atom count, composition, volume",
+    "failure halts before any force call, \u00a73.2"])
+wtr = box(XL, 106, 47, 7.5, [
+    "W-phase primitive to conventional axes",
+    "Eq. (1), fixes box extents and band-path labels"])
+rlx = box(XL, 95, 40, 7.5, [
+    "Relaxation to Eq. (3)",
+    "and supercell construction"])
+
+har = box(17.5, 82, 24, 9, [
+    "Harmonic route",
+    "force constants by",
+    "finite displacement"])
+dyn = box(44.5, 82, 28, 9, [
+    "Dynamics route",
+    "300 K protocol, \u00a73.5",
+    "thermostat off in production"])
+
+dia = box(17.5, 66.5, 24, 11, [
+    "Diagonalise, Eq. (4)",
+    "$g(E)$, projections",
+    "$P(s)$, Eqs. (5), (6)",
+    "band paths and gaps"])
+vac = box(44.5, 66.5, 28, 11, [
+    "Velocity autocorrelation",
+    "Eqs. (7), (8) $\\rightarrow g(E)$",
+    "projections",
+    "segment statistics"])
+
+fix = hexagon(44.5, 52.5, 27, 8.5, [
+    "Vibrating about",
+    "fixed sites?",
+    "Eqs. (11), (12)"])
+
+cmp_ = box(XL, 41, 50, 7.5, [
+    "Comparison of the two routes",
+    "their agreement is a designed check, not a coincidence"])
+flo = box(XL, 30, 52, 7.5, [
+    "Spectral floor, Definition 1, and the measured size law",
+    "then the $\\tau$ ratio test against its null model, \u00a73.7"])
+unc = box(XL, 19, 48, 7.5, [
+    "Uncertainty decomposed, \u00a73.9",
+    "statistical, finite size, numerical precision, model"])
+
+arrow(dep["bottom"], ver["top"])
+arrow(ver["bottom"], wtr["top"])
+arrow(wtr["bottom"], rlx["top"])
+arrow(rlx["bottom"], har["top"], via=[(17.5, 90)])
+arrow(rlx["bottom"], dyn["top"], via=[(44.5, 90)])
+arrow(har["bottom"], dia["top"])
+arrow(dyn["bottom"], vac["top"])
+arrow(vac["bottom"], fix["top"])
+arrow(dia["bottom"], cmp_["top"], via=[(17.5, 47.5)])
+arrow(fix["bottom"], cmp_["top"], via=[(44.5, 47.5)])
+arrow(cmp_["bottom"], flo["top"])
+arrow(flo["bottom"], unc["top"])
+
+# ---------------- right column ----------------
+XR = 77
+pot = box(XR, 128, 30, 7.5, [
+    "Three candidate",
+    "potentials, Eq. (2)"])
+srv = hexagon(XR, 117, 32, 8.5, [
+    "Relax, and survive",
+    "300 K intact?"])
+pri = box(XR, 106, 30, 7.5, [
+    "Primary potential",
+    "carried forward"])
+
+ela = box(XR, 92, 30, 9, [
+    "Measured elastic",
+    "constants",
+    "$\\rightarrow$ Eq. (10)",
+    "predicted floor"])
+
+ax.text(XR, 84.5, "supervisor-directed thread",
+        ha="center", va="center", fontsize=7.5, style="italic")
+
+mcg = box(XR, 76.5, 33, 9, [
+    "Monte Carlo generation",
+    "Eq. (13), \u00a73.10",
+    "melt-quench, replica",
+    "exchange, fixed site"])
+chm = hexagon(XR, 63.5, 32, 8.5, [
+    "Does the chemistry",
+    "improve on the input?"])
+ret = box(XR, 52.5, 32, 7.5, [
+    "Composition retargeting",
+    "\u00a73.2.2, box held fixed"])
+ax.text(XR, 45, "carries chemical disorder\nthat the reference\nstructures do not",
+        ha="center", va="center", fontsize=7.5, style="italic")
+
+arrow(pot["bottom"], srv["top"])
+arrow(srv["bottom"], pri["top"])
+arrow(pri["left"], rlx["right"], via=[(XR - 15 - 2, 106)])
+arrow(mcg["bottom"], chm["top"])
+arrow(chm["bottom"], ret["top"])
+
+# dashed: elastic constants run against the flow to the predicted floor
+arrow(ela["left"], flo["right"], dashed=True, via=[(59.5, 92), (59.5, 30)])
+# dashed: retargeted structure returns to the dynamics route
+arrow(ret["left"], dyn["right"], dashed=True, via=[(60.5, 52.5), (60.5, 82)])
+
+# ---------------- legend ----------------
+ly = 9
+ax.plot([10, 20], [ly, ly], color="black", linewidth=LW)
+ax.text(22, ly, "process flow", va="center", fontsize=7.5)
+ax.plot([42, 52], [ly, ly], color="black", linewidth=LW,
+        linestyle=(0, (4, 3)))
+ax.text(54, ly, "prediction or caveat carried forward",
+        va="center", fontsize=7.5)
+hexagon(15, 3.5, 10, 4.5, ["gate"], fs=7.5)
+ax.text(22, 3.5, "verification point at which failure halts the calculation",
+        va="center", fontsize=7.5)
+
+fig.savefig("fig3.png", dpi=300, bbox_inches="tight",
+            facecolor="white")
+print("wrote fig3.png")
