@@ -1,0 +1,14 @@
+# Stacking-direction zone-boundary gap centres, W-phase, 2x2x2 force constants.
+# Band-path extraction at q = (-0.5, 0.5, 0), Section 3.4 definition
+# (interval wider than 0.3 meV between consecutive sorted mode energies
+# below 20 meV; centres reported).
+# Source: Blythe band-path run of 16 August 2026 (ph_w265_band222_phonopy.yaml,
+# not in this repository); centres transcribed from the run record.
+# The first five successive ratios are 1.097, 1.082, 1.080, 1.085.
+# gap_index  centre_meV
+1  4.419
+2  4.847
+3  5.244
+4  5.663
+5  6.145
+6  7.830
