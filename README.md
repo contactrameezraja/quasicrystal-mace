@@ -64,5 +64,4 @@ Appendix A.1.
 - `dissertation_data.html` — a readable browser view of the key results
   tables; to be linked via GitHub Pages.
 
-Both exist in the repository already and will be documented after
-submission.
+Both exist in the repository already and will be documented here
