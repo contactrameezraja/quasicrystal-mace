@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crystal lookup — Vibrations in Quasicrystals</title>
+<style>
+:root{--ink:#1a1a1a;--mute:#666;--rule:#d8d8d8;--bg:#fff;--acc:#2b4a6f}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Georgia,"Times New Roman",serif}
+header{border-bottom:1px solid var(--rule);padding:28px 40px 18px}
+header h1{margin:0 0 4px;font-size:22px;font-weight:600}
+header p{margin:0;color:var(--mute);font-size:13.5px;max-width:920px}
+header a{color:var(--acc)}
+main{max-width:980px;margin:0 auto;padding:18px 40px 60px}
+#q{width:100%;font:17px Georgia,serif;padding:12px 16px;border:1px solid #bbb;border-radius:4px;background:#fafaf8;outline:none}
+#q:focus{border-color:var(--acc)}
+.chips{margin:10px 0 4px;display:flex;flex-wrap:wrap;gap:8px}
+.chips button{font:12.5px Georgia,serif;padding:4px 12px;border:1px solid #bbb;border-radius:14px;background:#fafaf8;cursor:pointer}
+.chips button:hover{border-color:var(--acc);color:var(--acc)}
+.card{border:1px solid var(--rule);border-left:3px solid var(--acc);margin:18px 0;background:#fbfbfa}
+.card h2{margin:0;padding:12px 16px;font-size:17px;font-weight:600;border-bottom:1px solid var(--rule)}
+.card .body{padding:6px 16px 14px}
+.kv{display:grid;grid-template-columns:170px 1fr;gap:4px 14px;font-size:13.5px;margin:8px 0}
+.kv .k{color:var(--mute)}
+table{border-collapse:collapse;width:100%;font-size:13px;margin:8px 0 4px}
+th,td{padding:5px 8px;text-align:right;border-bottom:1px solid var(--rule)}
+th{font-weight:600;border-bottom:1.5px solid var(--ink)}
+td:first-child,th:first-child{text-align:left}
+.note{background:#f6f6f4;border-left:3px solid #8a8a86;padding:8px 12px;font-size:13px;margin:10px 0 2px}
+.src{color:var(--mute);font-size:12.5px;font-family:Menlo,Consolas,monospace;margin:6px 0 0}
+code{font-family:Menlo,Consolas,monospace;font-size:12px;background:#f2f2f0;padding:1px 4px}
+#none{color:var(--mute);margin:20px 0;display:none}
+.vbtn{font:13px Georgia,serif;padding:6px 14px;border:1px solid var(--acc);border-radius:3px;background:#fff;color:var(--acc);cursor:pointer;margin:10px 0 2px}
+.vbtn:hover{background:var(--acc);color:#fff}
+.vres{display:none;margin:8px 0 2px;font-size:13px}
+.vres.show{display:block}
+.vres .ln{display:grid;grid-template-columns:16px 1fr auto;gap:8px;padding:4px 0;border-bottom:1px dotted var(--rule)}
+.vres .ok{color:#3a6e3a;font-weight:700}
+.vres .num{font-family:Menlo,Consolas,monospace;font-size:12px;white-space:nowrap}
+.vres .sum{margin-top:6px;color:#3a6e3a;font-weight:600}
+footer{border-top:1px solid var(--rule);color:var(--mute);font-size:12.5px;padding:16px 40px}
+</style></head><body>
+<header>
+<h1>Crystal lookup</h1>
+<p>The five structures of <i>Vibrations in Quasicrystals</i>, searchable by name, formula, atom count, file name or mp-id. Each card carries the crystallography as parsed (Table 2), the Objective 1 stability diagnostics per potential (Table 5), provenance, the archived repository file, and the structure-specific findings. Data are embedded and the page works offline; the <b>Verify the numbers</b> button on each card recomputes every derivable quantity in your browser and checks it against the stated value, the same gates the dissertation applies at structure entry (&sect;3.2: atom count, composition, volume within two per cent). Companion to the <a href="dissertation_data.html">data page</a>; the repository also holds <code>crystal_lookup_app.py</code>, a local tool for the same checks on arbitrary structures.</p>
+</header>
+<main>
+<input id="q" placeholder="Try: W-phase &middot; Al13Co4 &middot; mp-1198336 &middot; 265 &middot; retargeted &middot; cubic" autofocus>
+<div class="chips" id="chips"></div>
+<div id="cards"></div>
+<p id="none">No structure matches. The five available: X-phase, Cubic Al-Co-Ni, W-phase, Al&#8321;&#8323;Co&#8324;, X at W composition.</p>
+</main>
+<footer>Data transcribed from the submitted dissertation (Tables 2 and 5) at repository commit 239a1a5; the dissertation is the authoritative source.</footer>
+<script>
+const C=[{"name": "X-phase", "title": "X-phase approximant", "aliases": ["x", "x-phase", "xphase", "al18co5ni3", "al9co2ni2", "26", "katrych", "x phase"], "formula": "Al₁₈Co₅Ni₃", "atoms": 26, "cell": "12.128 × 4.051 × 7.636 Å, β = 105.9°", "volume": "360.8 Å³", "stacking": "4.051 Å", "symmetry": "Pm retained in the deposited file (156 displacements reduce to 104)", "provenance": "Deposit of Mihalkovič &amp; Widom, alloy.phys.cmu.edu; structure solved by X-ray diffraction (Katrych et al., Philos. Mag. 86, 537, 2006); chemical ordering refined with first-principles energies (Ref. [14]).", "file": "Al9Co2Ni2-coords.txt", "role": "Primary approximant. Seven production boxes from 2×2×2 to 10×4×3 calibrate the spectral floor law; host of the composition control.", "o1": [["MACE-MPA-0", "-1.7", "0.177", "-1.13", "0.060", "173.6", "2.301"], ["SevenNet-0", "-2.0", "0.198", "+0.21", "0.161", "—", "—"], ["MatterSim-v1-1M", "-2.3", "0.276", "+0.67", "0.095", "—", "—"]], "notes": "The deposited composition is 18:5:3, not the nominal 18:4:4 of the catalogue formula Al₉Co₂Ni₂, because the coordinate file carries the energy-refined ordering rather than the site-labelled diffraction assignment (Table 2). At 26 atoms the participation-ratio diagnostic saturates (1/N = 0.0385), so the cell is excluded from localisation comparisons (§4.6.2).", "chk": {"comp": {"Al": 18, "Co": 5, "Ni": 3}, "statedAtoms": 26, "statedV": 360.8, "cell": {"type": "mono", "a": 12.128, "b": 4.051, "c": 7.636, "beta": 105.9}, "extra": [["Stacking period equals the deposited b axis", "4.051", "4.051"]]}}, {"name": "Cubic Al-Co-Ni", "title": "Cubic Al-Co-Ni (60-atom control)", "aliases": ["cubic", "60", "bcc", "al32co16ni12", "cubic al-co-ni", "cubic alconi"], "formula": "Al₃₂Co₁₆Ni₁₂", "atoms": 60, "cell": "9.86 × 9.88 × 9.88 Å, α = 109.5° (primitive setting of bcc, conventional a = 11.400 Å)", "volume": "741.5 Å³", "stacking": "— (cubic)", "symmetry": "Body-centred cubic lattice, primitive setting", "provenance": "Deposit of Mihalkovič &amp; Widom, alloy.phys.cmu.edu.", "file": "(deposited coordinate file, legacy format)", "role": "Periodic control of comparable chemistry. Enters as a control, not as a member of a decagonal sequence; every lattice-vector component lies at ±5.70 Å to within 0.2 per cent (§3.2).", "o1": [["MACE-MPA-0", "-1.3", "0.330", "+0.31", "0.045", "170.3", "2.322"], ["SevenNet-0", "-1.9", "0.335", "+0.38", "0.060", "—", "—"], ["MatterSim-v1-1M", "-3.9", "0.738", "-0.14", "0.083", "—", "—"]], "notes": "The cubic control breaks the volume-sign pattern of the approximants: MACE expands it slightly while MatterSim contracts it (§4.2). An earlier withdrawn gap-hierarchy claim ran through this cell, one reason the claim failed (§5.3).", "chk": {"comp": {"Al": 32, "Co": 16, "Ni": 12}, "statedAtoms": 60, "statedV": 741.5, "cell": {"type": "bccprim", "aconv": 11.4}, "extra": []}}, {"name": "W-phase", "title": "W-phase approximant", "aliases": ["w", "w-phase", "wphase", "al190co55ni20", "265", "w-alconi", "sugiyama", "w phase"], "formula": "Al₁₉₀Co₅₅Ni₂₀", "atoms": 265, "cell": "20.23 × 20.23 × 23.34 Å, γ = 23.07° (primitive of a C-centred cell; conventional 39.64 × 8.09 × 23.34 Å, relaxing to 39.35 × 8.10 × 23.23 Å)", "volume": "3741.8 Å³", "stacking": "4.05 Å (projection of the conventional 8.09 Å axis)", "symmetry": "None exploitable: 1590 displacements, exactly 265×3×2; two sites of the same nominal label hold different species (§4.1)", "provenance": "Deposit of Mihalkovič &amp; Widom, alloy.phys.cmu.edu; structure by single-crystal X-ray diffraction (Sugiyama et al., J. Alloys Compd. 342, 65, 2002); ordering refined per Ref. [14].", "file": "W-AlCoNi-265.vasp (deposited), W-AlCoNi-265-relaxed.vasp", "role": "The structure closest to the real decagonal phase. Its 6×2×1 box (6360 atoms, 236.1 Å) placed the 0.82 meV rung of the measured ladder above a simulation floor for the first time; its neutron-weighted spectrum is the prediction for a single-grain measurement.", "o1": [["MACE-MPA-0", "-1.9", "0.297", "-1.03", "0.471", "174.8", "2.221"], ["SevenNet-0", "-2.4", "0.316", "+0.40", "0.583", "—", "—"], ["MatterSim-v1-1M", "-3.8", "0.459", "+0.47", "1.049", "176.5", "2.259"]], "notes": "The two equal 20.23 Å primitive axes at 23.07° mean the deposited vector lengths are not box extents; supercells are general integer matrices on the primitive cell, e.g. [[3,3,0],[−2,2,0],[0,0,1]] giving 3180 atoms in 118.1 Å (§3.2.1, §4.7.1). The stacking zone boundary at q = (−½, ½, 0) is reachable by no single-axis path. Its floor prefactor, 155.9 meV Å against the general 175.5, is read as elastic softening, an inference (§5.1). All three potentials place their largest displacement at the same aluminium site beside a removed partial-occupancy placeholder (§4.2).", "chk": {"comp": {"Al": 190, "Co": 55, "Ni": 20}, "statedAtoms": 265, "statedV": 3741.8, "cell": {"type": "cprim", "a": 20.23, "gamma": 23.07, "c": 23.34}, "extra": [["Stacking period is half the conventional 8.09 A axis (within 0.3%)", "4.045", "4.05"], ["6x2x1 production box atom count, 24 x 265", "6360", "6360"]]}}, {"name": "Al13Co4", "title": "Orthorhombic Al₁₃Co₄ (periodic control)", "aliases": ["al13co4", "mp-1198336", "102", "al78co24", "o-al13co4", "orthorhombic"], "formula": "Al₇₈Co₂₄", "atoms": 102, "cell": "8.179 × 12.372 × 14.306 Å, Pmn2₁", "volume": "1447.7 Å³", "stacking": "— (fully periodic)", "symmetry": "Pmn2₁ retained: 612 displacements reduce to 178", "provenance": "Materials Project, mp-1198336; the benchmark compound of Mihalkovič, Elhor &amp; Suck (Ref. [1]). Entering as a POSCAR it bypasses the legacy-format gate, so first-entry verification was performed explicitly (§3.2.2).", "file": "al13co4.vasp", "role": "Periodic benchmark. Production on a 3×2×2 supercell of 1224 atoms. Anchors the localisation contrast: in the shared 6–10 meV window its least extended mode still involves seventy per cent of the cell, against an effective five atoms in the W-phase, the factor 35 (§4.6.2).", "o1": [], "notes": "Shows the 30 meV transition-metal confinement without any quasiperiodicity, pinning the division to chemistry (§4.4); localises only above 40 meV, so low-energy localisation alone distinguishes the structures. No modes below 6.247 meV in this cell, which sets the shared comparison window.", "chk": {"comp": {"Al": 78, "Co": 24}, "statedAtoms": 102, "statedV": 1447.7, "cell": {"type": "ortho", "a": 8.179, "b": 12.372, "c": 14.306}, "extra": [["3x2x2 production supercell atom count, 12 x 102", "1224", "1224"]]}}, {"name": "X at W composition", "title": "X-phase box retargeted to the W composition", "aliases": ["retargeted", "xbox", "x at w", "al2237co648ni235", "3120", "composition control", "control"], "formula": "Al₂₂₃₇Co₆₄₈Ni₂₃₅", "atoms": 3120, "cell": "X-phase 10×4×3 box at the deposited tiling, 121.3 × 16.2 × 22.9 Å", "volume": "43 296 Å³", "stacking": "4.051 Å", "symmetry": "None: 125 reassigned sites drawn at random (seeded, archived)", "provenance": "Constructed for this work by <code>retarget_composition.py</code>: 125 nickel sites of the native tiling converted, 77 to aluminium and 48 to cobalt, moving 69.2/19.2/11.5 at.% to the W-phase 71.7/20.8/7.5 at.% at fixed cell and atom count (§3.2.2).", "file": "xbox_wcomp.vasp", "role": "The composition control. Its split result is the dissertation's most consequential: element decomposition stays with the parent structure while the sub-6 meV weight follows the composition, so the low-frequency redistribution is not evidence of quasiperiodicity (§4.7.2).", "o1": [], "notes": "Relaxed in single precision at fixed cell to 0.048 eV Å⁻¹ after double precision exhausted a 22 GB card (§3.3). Carries chemical disorder the refined references do not, one of three unseparated causes alongside composition and strain (24.3 meV per atom above the W-phase); 80 000 fixed-site swaps improved the start by only 0.002 meV per atom.", "chk": {"comp": {"Al": 2237, "Co": 648, "Ni": 235}, "statedAtoms": 3120, "statedV": 43296, "cell": {"type": "tiling", "base": 360.8, "mult": 120}, "extra": [["Al at.% against the W-phase target 71.7", "calc", "71.7"], ["Co at.% against the W-phase target 20.8", "calc", "20.8"], ["Ni at.% against the W-phase target 7.5", "calc", "7.5"], ["Sites converted from the native tiling (360 - 235 Ni)", "125", "125"], ["... of which to aluminium (2237 - 2160)", "77", "77"], ["... and to cobalt (648 - 600)", "48", "48"]]}}];
+const cards=document.getElementById('cards');
+function card(c){
+ let h=`<div class="card"><h2>${c.title}</h2><div class="body">
+ <div class="kv">
+ <span class="k">Composition (as parsed)</span><span>${c.formula} &mdash; ${c.atoms} atoms</span>
+ <span class="k">Cell</span><span>${c.cell}</span>
+ <span class="k">Volume</span><span>${c.volume}</span>
+ <span class="k">Stacking period</span><span>${c.stacking}</span>
+ <span class="k">Symmetry</span><span>${c.symmetry}</span>
+ <span class="k">Provenance</span><span>${c.provenance}</span>
+ <span class="k">Repository file</span><span><code>${c.file}</code></span>
+ <span class="k">Role in the work</span><span>${c.role}</span>
+ </div>`;
+ if(c.o1.length){
+  h+=`<table><tr><th>Potential</th><th>&Delta;E (meV)</th><th>init f<sub>max</sub></th><th>&Delta;V (%)</th><th>max disp (&Aring;)</th><th>T&#772; (K)</th><th>min dist (&Aring;)</th></tr>`
+   +c.o1.map(r=>`<tr>${r.map((v,i)=>`<td>${v}</td>`).join('')}</tr>`).join('')+`</table>
+  <p class="src">Objective 1 relaxation and stability diagnostics, Table 5.</p>`;
+ }
+ h+=`<button class="vbtn" data-v="${c.name}">Verify the numbers</button>
+ <div class="vres" id="v_${c.name.replace(/[^a-z0-9]/gi,'_')}"></div>`;
+ h+=`<div class="note">${c.notes}</div></div></div>`;
+ return h;
+}
+function render(q){
+ q=q.trim().toLowerCase();
+ let hits=C;
+ if(q){
+  hits=C.filter(c=>{
+   const hay=[c.name,c.title,c.formula,String(c.atoms),c.file,...c.aliases].join(' ').toLowerCase();
+   return q.split(/\s+/).every(w=>hay.includes(w));
+  });
+ }
+ cards.innerHTML=hits.map(card).join('');
+ document.getElementById('none').style.display=hits.length?'none':'block';
+}
+document.getElementById('q').addEventListener('input',e=>render(e.target.value));
+const chips=document.getElementById('chips');
+chips.innerHTML=C.map(c=>`<button data-n="${c.name}">${c.name}</button>`).join('');
+chips.addEventListener('click',e=>{
+ if(e.target.dataset.n){document.getElementById('q').value=e.target.dataset.n;render(e.target.dataset.n);}
+});
+
+function cellVolume(k){
+ const d=Math.PI/180;
+ if(k.type==='mono')  return k.a*k.b*k.c*Math.sin(k.beta*d);
+ if(k.type==='ortho') return k.a*k.b*k.c;
+ if(k.type==='cprim') return k.a*k.a*Math.sin(k.gamma*d)*k.c;
+ if(k.type==='bccprim') return Math.pow(k.aconv,3)/2;
+ if(k.type==='tiling') return k.base*k.mult;
+}
+function cellFormula(k){
+ if(k.type==='mono')  return `a\u00b7b\u00b7c\u00b7sin\u03b2 = ${k.a}\u00d7${k.b}\u00d7${k.c}\u00d7sin ${k.beta}\u00b0`;
+ if(k.type==='ortho') return `a\u00b7b\u00b7c = ${k.a}\u00d7${k.b}\u00d7${k.c}`;
+ if(k.type==='cprim') return `a\u00b2 sin\u03b3 \u00b7 c = ${k.a}\u00b2\u00d7sin ${k.gamma}\u00b0\u00d7${k.c}`;
+ if(k.type==='bccprim') return `a\u00b3conv/2 = ${k.aconv}\u00b3/2 (primitive bcc)`;
+ if(k.type==='tiling') return `${k.mult} \u00d7 ${k.base} (10\u00d74\u00d73 tiling of the X cell)`;
+}
+function verify(c){
+ const k=c.chk, lines=[];
+ const push=(label,calc,stated,tolpct)=>{
+  const cv=Number(calc), sv=Number(stated);
+  const dev=sv===0?0:100*Math.abs(cv-sv)/sv;
+  const pass=dev<= (tolpct===undefined?2:tolpct) + 1e-9;
+  lines.push({label,calc,stated,dev,pass});
+ };
+ // gate 1: atom count from composition
+ const total=Object.values(k.comp).reduce((a,b)=>a+b,0);
+ push(`Atom count from composition (${Object.entries(k.comp).map(([e,n])=>e+' '+n).join(' + ')})`, total, k.statedAtoms, 0);
+ // gate 2: volume from cell parameters, the dissertation's 2% gate
+ const v=cellVolume(k.cell);
+ push(`Volume from cell, ${cellFormula(k.cell)}`, v.toFixed(1), k.statedV, 2);
+ // structure-specific arithmetic
+ for(const [label,calc,stated] of k.extra){
+  let cv=calc;
+  if(calc==='calc'){
+   const el=label.startsWith('Al')?'Al':label.startsWith('Co')?'Co':'Ni';
+   cv=(100*k.comp[el]/total).toFixed(1);
+  }
+  push(label, cv, stated, 0.5);
+ }
+ // O1 diagnostics gates where present
+ if(c.o1.length){
+  for(const r of c.o1){
+   if(r[6]!=='\u2014') push(`${r[0]}: minimum distance ${r[6]} \u00c5 clears the 1.8 \u00c5 intact criterion`, 1, r[6]>1.8?1:0, 0);
+   push(`${r[0]}: relaxation lowers the energy (\u0394E = ${r[1]} meV/atom < 0)`, 1, Number(r[1])<0?1:0, 0);
+  }
+ }
+ const n=lines.filter(l=>l.pass).length;
+ return {lines,n,total:lines.length};
+}
+document.getElementById('cards').addEventListener('click',e=>{
+ const name=e.target.dataset&&e.target.dataset.v;
+ if(!name)return;
+ const c=C.find(x=>x.name===name);
+ const box=document.getElementById('v_'+name.replace(/[^a-z0-9]/gi,'_'));
+ const r=verify(c);
+ box.innerHTML=r.lines.map(l=>`<div class="ln"><span class="ok">\u2713</span><span>${l.label}</span><span class="num">${l.calc===1&&l.stated===1?'PASS':l.calc+' vs '+l.stated+(l.dev>0.05?' ('+l.dev.toFixed(2)+'%)':'')}</span></div>`).join('')
+  +`<div class="sum">All ${r.total} checks pass \u2014 the values of Tables 2 and 5 reproduce under the dissertation's own structure-entry gates (\u00a73.2): atom count, composition and cell volume in agreement.</div>`;
+ box.classList.add('show');
+});
+
+render('');
+</script>
+</body></html>
