@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Evidence Graph — Vibrations in Quasicrystals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<style>
+  :root{
+    --space:#070A12; --deep:#0B101C; --ink:#E9E6DC; --faint:#8B93A3; --rule:#232A3A;
+    --blue:#6FA8DC; --ltblue:#9DBFE4; --violet:#B08FE8; --teal:#5BC4B0;
+    --gold:#E8B54A; --green:#7CC98A; --red:#E86A5C; --grey:#A7AEBB; --dot:#C9C2B2;
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  html,body{height:100%}
+  body{
+    background:radial-gradient(ellipse 120% 90% at 50% -10%, #101830 0%, var(--space) 55%);
+    color:var(--ink);
+    font-family:"STIX Two Text", Georgia, serif;
+    display:flex; flex-direction:column; overflow:hidden;
+  }
+  header{
+    padding:20px 28px 14px; border-bottom:1px solid var(--rule);
+    display:flex; flex-wrap:wrap; align-items:baseline; gap:8px 24px;
+    background:rgba(7,10,18,.6); backdrop-filter:blur(4px); z-index:2;
+  }
+  header h1{
+    font-size:26px; font-weight:700; letter-spacing:.4px;
+    background:linear-gradient(100deg, #F2EEE2 30%, #E8B54A 55%, #9DBFE4 80%);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+  }
+  header .sub{font-size:14px; color:var(--faint); font-style:italic}
+  header .anchor{
+    margin-left:auto; font-family:"IBM Plex Mono",monospace; font-size:12px;
+    color:var(--faint); text-align:right; line-height:1.5;
+  }
+  header .anchor b{color:var(--gold); font-weight:500}
+  nav{
+    padding:10px 28px; border-bottom:1px solid var(--rule);
+    display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+    background:rgba(7,10,18,.6); z-index:2;
+  }
+  nav .lbl{font-size:12px; text-transform:uppercase; letter-spacing:.16em; color:var(--faint); margin-right:4px}
+  nav button{
+    font-family:"STIX Two Text",Georgia,serif; font-size:14px;
+    background:transparent; border:1px solid #3A4358; color:var(--ink);
+    padding:5px 14px; border-radius:2px; cursor:pointer;
+  }
+  nav button:hover{border-color:var(--gold); color:var(--gold)}
+  nav button.active{background:var(--gold); border-color:var(--gold); color:#0B101C}
+  nav button:focus-visible, input:focus-visible{outline:2px solid var(--gold); outline-offset:2px}
+  nav input{
+    font-family:"IBM Plex Mono",monospace; font-size:13px;
+    background:transparent; border:none; border-bottom:1px solid #3A4358;
+    padding:5px 4px; width:220px; color:var(--ink);
+  }
+  nav input::placeholder{color:#5A6375}
+  nav .clear{border-color:var(--rule); color:var(--faint); margin-left:auto}
+  main{flex:1; display:flex; min-height:0; position:relative}
+  #graph{flex:1; min-width:0; cursor:grab}
+  #graph:active{cursor:grabbing}
+  aside{
+    width:344px; border-left:1px solid var(--rule); padding:22px 24px;
+    overflow-y:auto; background:rgba(11,16,28,.88); backdrop-filter:blur(6px); z-index:2;
+  }
+  aside .type{
+    font-size:11px; text-transform:uppercase; letter-spacing:.16em;
+    color:#0B101C; display:inline-block; padding:3px 9px; margin-bottom:10px; font-weight:600;
+  }
+  aside h2{font-size:20px; font-weight:600; line-height:1.25; margin-bottom:10px; color:#F2EEE2}
+  aside h2.withdrawn{text-decoration:line-through; text-decoration-thickness:1.5px; text-decoration-color:var(--red)}
+  aside .detail{font-size:14.5px; line-height:1.55; margin-bottom:14px; color:#CFD4DE}
+  aside .ref{
+    font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--faint);
+    border-top:1px solid var(--rule); padding-top:10px; line-height:1.7;
+  }
+  aside .links{margin-top:14px}
+  aside .links h3{font-size:11px; text-transform:uppercase; letter-spacing:.14em; color:var(--faint); margin-bottom:6px}
+  aside .links a{
+    display:block; font-size:13.5px; color:var(--ltblue); text-decoration:none;
+    padding:2px 0; cursor:pointer; line-height:1.45;
+  }
+  aside .links a:hover{color:var(--gold)}
+  aside .links .rel{font-style:italic; color:var(--faint)}
+  aside .empty{font-size:14px; color:var(--faint); font-style:italic; line-height:1.6}
+  aside .empty p{margin-bottom:12px}
+  aside .empty b{color:var(--gold); font-weight:600}
+  footer{
+    border-top:1px solid var(--rule); padding:9px 28px;
+    display:flex; flex-wrap:wrap; gap:6px 18px; align-items:center;
+    font-size:12px; color:var(--faint);
+    background:rgba(7,10,18,.6); z-index:2;
+  }
+  footer .key{display:flex; align-items:center; gap:6px; white-space:nowrap}
+  footer .sw{width:9px; height:9px; border-radius:50%; display:inline-block; box-shadow:0 0 6px currentColor}
+  footer .sw.wd{border-radius:0; transform:rotate(45deg); background:transparent; border:1.5px solid var(--red); box-shadow:0 0 6px var(--red)}
+  footer .ded{margin-left:auto; font-style:italic; color:#9AA3B5}
+  svg text{font-family:"STIX Two Text",Georgia,serif; pointer-events:none; user-select:none}
+  .node{cursor:pointer}
+  .node .core{transition:opacity .3s}
+  .node.dim{opacity:.07}
+  .node text{fill:#D9DDE6; transition:opacity .3s; paint-order:stroke; stroke:rgba(7,10,18,.85); stroke-width:3px}
+  .node.dim text{opacity:0}
+  .node.sel .core{stroke:#F2EEE2 !important; stroke-width:2px !important}
+  .link{stroke:#5E6B85; stroke-opacity:.35; fill:none; transition:opacity .3s, stroke .3s}
+  .link.dim{opacity:.04}
+  .link.hl{stroke:var(--gold); stroke-opacity:.95; stroke-width:1.6px; filter:drop-shadow(0 0 3px rgba(232,181,74,.7))}
+  .link.pred{stroke-dasharray:5 4}
+  .star{fill:#DDE4F0}
+  @keyframes twinkle{0%,100%{opacity:var(--o)}50%{opacity:calc(var(--o)*.25)}}
+  .tw{animation:twinkle var(--d) ease-in-out infinite}
+  @media (prefers-reduced-motion: reduce){
+    .node .core,.node text,.link{transition:none}
+    .tw{animation:none}
+  }
+  @media (max-width:820px){
+    aside{position:absolute; right:0; top:0; bottom:0; box-shadow:-8px 0 24px rgba(0,0,0,.5); transform:translateX(100%); transition:transform .25s}
+    aside.open{transform:none}
+    header .anchor{display:none}
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>The Evidence Graph</h1>
+  <div class="sub">Vibrations in Quasicrystals, rendered as a constellation of claims and their provenance</div>
+  <div class="anchor">every path terminates at<br><b>commit 239a1a5 &middot; 24 August 2026</b></div>
+</header>
+<nav>
+  <span class="lbl">Constellations</span>
+  <button data-tour="cluster">The 175.5 cluster</button>
+  <button data-tour="withdrawal">The withdrawal trail</button>
+  <button data-tour="prediction">The prediction chain</button>
+  <input id="search" type="search" placeholder="find a node&hellip; (e.g. 0.65, W-phase, MACE)" aria-label="Search nodes">
+  <button class="clear" id="clearBtn">Reset view</button>
+</nav>
+<main>
+  <svg id="graph" role="img" aria-label="Interactive knowledge graph of the dissertation"></svg>
+  <aside id="panel">
+    <div class="empty" id="emptyState">
+      <p>Click any node to read it. Drag to rearrange, scroll to zoom.</p>
+      <p>Solid edges carry provenance and support. Dashed edges are predictions made before the measurement they name.</p>
+      <p>The red diamonds are the withdrawn claims, kept because the record of their withdrawal is part of the result.</p>
+      <p>The three constellations above light the subgraphs worth walking first. Decagons are the decagonal structures; the ten-pointed star is the commit every path traces back to.</p>
+    </div>
+    <div id="nodeView" hidden>
+      <span class="type" id="nType"></span>
+      <h2 id="nLabel"></h2>
+      <div class="detail" id="nDetail"></div>
+      <div class="ref" id="nRef"></div>
+      <div class="links" id="nLinks"></div>
+    </div>
+  </aside>
+</main>
+<footer>
+  <span class="key"><span class="sw" style="background:var(--blue); color:var(--blue)"></span>Structure</span>
+  <span class="key"><span class="sw" style="background:var(--violet); color:var(--violet)"></span>Potential</span>
+  <span class="key"><span class="sw" style="background:var(--ltblue); color:var(--ltblue)"></span>Run</span>
+  <span class="key"><span class="sw" style="background:var(--teal); color:var(--teal)"></span>Observable</span>
+  <span class="key"><span class="sw" style="background:var(--gold); color:var(--gold)"></span>Quantity</span>
+  <span class="key"><span class="sw" style="background:var(--green); color:var(--green)"></span>Claim</span>
+  <span class="key"><span class="sw wd"></span>Withdrawn</span>
+  <span class="key"><span class="sw" style="background:var(--grey); color:var(--grey)"></span>External</span>
+  <span class="key"><span class="sw" style="background:var(--dot); color:var(--dot)"></span>Artefact</span>
+</footer>
+
+<script>
+const TYPES = {
+  structure:{c:'#6FA8DC', r:11, name:'Structure'},
+  potential:{c:'#B08FE8', r:10, name:'Potential'},
+  run:{c:'#9DBFE4', r:7, name:'Production run'},
+  observable:{c:'#5BC4B0', r:9, name:'Observable'},
+  quantity:{c:'#E8B54A', r:10, name:'Quantity'},
+  claim:{c:'#7CC98A', r:11, name:'Standing claim'},
+  withdrawn:{c:'#E86A5C', r:10, name:'Withdrawn'},
+  external:{c:'#A7AEBB', r:9, name:'External reference'},
+  artefact:{c:'#C9C2B2', r:5, name:'Artefact'}
+};
+
+const nodes = [
+// ---------- STRUCTURES ----------
+{id:'s_x', t:'structure', label:'X-phase (26)',
+ d:'Al\u2081\u2088Co\u2085Ni\u2083, 26 atoms. Diffraction-solved site list with the refined chemical ordering of Ref. [14]. Cell 12.128 \u00d7 4.051 \u00d7 7.636 \u00c5, \u03b2 = 105.9\u00b0, V = 360.8 \u00c5\u00b3. Retains Pm symmetry in the harmonic route.',
+ ref:'Table 2 \u00b7 Katrych et al., Philos. Mag. 86, 537 (2006) \u00b7 Al9Co2Ni2-coords.txt'},
+{id:'s_w', t:'structure', label:'W-phase (265)',
+ d:'Al\u2081\u2089\u2080Co\u2085\u2085Ni\u2082\u2080, 265 atoms, primitive cell of a C-centred setting. Conventional cell 39.64 \u00d7 8.09 \u00d7 23.34 \u00c5 recovered by Eq. (1); the 8.09 \u00c5 axis is the stacking direction. Carries no exploitable symmetry, 1590 displacements.',
+ ref:'Table 2, \u00a73.2.1 \u00b7 Sugiyama et al., J. Alloys Compd. 342, 65 (2002) \u00b7 W-AlCoNi-265.vasp'},
+{id:'s_cubic', t:'structure', label:'Cubic control (60)',
+ d:'Al\u2083\u2082Co\u2081\u2086Ni\u2081\u2082, 60 atoms, primitive setting of body-centred cubic, conventional a = 11.400 \u00c5. Enters as a periodic control of comparable chemistry, not as a member of a decagonal sequence.',
+ ref:'Table 2 \u00b7 alloy.phys.cmu.edu deposit'},
+{id:'s_al13', t:'structure', label:'Al\u2081\u2083Co\u2084 (102)',
+ d:'Orthorhombic Al\u2087\u2088Co\u2082\u2084, Pmn2\u2081, mp-1198336. The periodic benchmark compound of Ref. [1], run through the identical pipeline. Its extended low-energy modes supply the denominator of the factor-35 contrast.',
+ ref:'Table 2, \u00a73.2.2 \u00b7 al13co4.vasp'},
+{id:'s_ret', t:'structure', label:'X at W composition (3120)',
+ d:'The composition control. 125 nickel sites of the 3120-site X-phase box reassigned (77 \u2192 Al, 48 \u2192 Co) to reach the W-phase composition at fixed cell, atom count and site geometry. Carries chemical disorder the refined references do not.',
+ ref:'\u00a73.2.2 \u00b7 xbox_wcomp.vasp, seeded draw archived'},
+
+// ---------- POTENTIALS ----------
+{id:'p_mace', t:'potential', label:'MACE-MPA-0',
+ d:'The primary potential. Equivariant message-passing with higher body order; the only candidate whose \u03ba_SRME (0.412) is confirmed for the parametrisation used. Holds every structure stable and perturbs the diffraction geometry least.',
+ ref:'\u00a73.3, \u00a74.2 \u00b7 Batatia et al. [26]'},
+{id:'p_ms', t:'potential', label:'MatterSim-v1-1M',
+ d:'The far contrast, from a different lineage, so agreement carries more weight. Completed the full workflow and supplies the second spectrum of the model term.',
+ ref:'\u00a73.3, Table 5, Table 16'},
+{id:'p_7n', t:'potential', label:'SevenNet-0',
+ d:'The near contrast (NequIP-derived). Completed relaxations only; its equivariant-operations library could not coexist with MACE\u2019s, one of the three recorded infrastructure failures.',
+ ref:'\u00a73.3, \u00a75.3, A.1'},
+
+// ---------- RUNS ----------
+{id:'r_x222', t:'run', label:'X 2\u00d72\u00d72',
+ d:'208 atoms, L = 24.1 \u00c5. Smallest box; onset 6.24 meV lies 14 per cent below C/L, the finite-size departure. Host of the precision experiment (single vs double, one seed) and the MatterSim spectral contrast.',
+ ref:'Tables 3, 8, 16 \u00b7 Figure 19'},
+{id:'r_x333', t:'run', label:'X 3\u00d73\u00d73',
+ d:'702 atoms, L = 36.2 \u00c5, onset 4.75 meV. Calibration box one of three; E\u00b7L = 171.9 meV \u00c5. Positions retained for the displacement diagnostics.',
+ ref:'Tables 3, 8, 15'},
+{id:'r_x444', t:'run', label:'X 4\u00d74\u00d74',
+ d:'1664 atoms, L = 48.3 \u00c5, onset 3.69 meV. Calibration box two; E\u00b7L = 178.1 meV \u00c5. The one production run without a recorded seed.',
+ ref:'Tables 3, 8 \u00b7 \u00a73.5'},
+{id:'r_x844', t:'run', label:'X 8\u00d74\u00d74',
+ d:'3328 atoms, L = 96.5 \u00c5. Designed predictively in place of a 6\u00d76\u00d76: elongation reaches lower at three-fifths of the atoms. Predicted onset near 1.7 meV, measured 1.83. Calibration box three; E\u00b7L = 176.6 meV \u00c5.',
+ ref:'Tables 3, 8 \u00b7 \u00a74.5.1 \u00b7 Figure 18'},
+{id:'r_x1043', t:'run', label:'X 10\u00d74\u00d73',
+ d:'3120 atoms, L = 120.6 \u00c5, onset 1.38 meV. One half of the matched-box comparison; dimensions within three per cent of the W 3\u00d72\u00d71.',
+ ref:'Tables 3, 8 \u00b7 \u00a74.7.1'},
+{id:'r_ret', t:'run', label:'Retargeted 10\u00d74\u00d73',
+ d:'3120 atoms at the deposited tiling (L = 121.3 \u00c5, the one genuinely fixed-cell row). Reproduces essentially the whole sub-6 meV difference between the natives; the split result of the composition control.',
+ ref:'Tables 3, 12 \u00b7 Figure 12'},
+{id:'r_w321', t:'run', label:'W 3\u00d72\u00d71',
+ d:'3180 atoms, L = 118.1 \u00c5 (deliberate convention against the log\u2019s 118.03), onset 1.32 meV. The other half of the matched-box comparison; calibrates the W-phase\u2019s own softer prefactor.',
+ ref:'Tables 3, 8 \u00b7 \u00a74.7.1'},
+{id:'r_w621', t:'run', label:'W 6\u00d72\u00d71',
+ d:'6360 atoms, L = 236.1 \u00c5, the largest box. Required the 47.7 GB of a Blythe L40 node. Designed to place the 0.82 meV rung above a simulation floor for the first time; measured onset 0.65 meV.',
+ ref:'Tables 3, 8 \u00b7 Figures 7, 8, 13'},
+{id:'r_al13', t:'run', label:'Al\u2081\u2083Co\u2084 3\u00d72\u00d72',
+ d:'1224 atoms, L = 28.7 \u00c5. The periodic control through the identical protocol; no modes below 6.247 meV in this cell.',
+ ref:'Tables 3, 10'},
+{id:'r_harm', t:'run', label:'Harmonic route',
+ d:'Finite-displacement force constants (0.01 \u00c5, halved as a check) with Phonopy, its automatic primitive-cell reduction disabled. Zero imaginary modes for every structure in every supercell. Supplies eigenvectors, gaps, and the mode character the dynamics cannot.',
+ ref:'Table 4, \u00a73.4 \u00b7 phonon_run.py'},
+
+// ---------- OBSERVABLES ----------
+{id:'o_floor', t:'observable', label:'Spectral floor (Def. 1)',
+ d:'The energy of the lowest resolved mode, identified by inspection because no single threshold rule serves all seven boxes (the scan is in A.2). Justified by outcome: seven onsets obeying one relation, the seventh identified after being predicted.',
+ ref:'\u00a73.7, Definition 1 \u00b7 A.2'},
+{id:'o_vdos', t:'observable', label:'VDOS, two routes',
+ d:'Harmonic diagonalisation and the cosine transform of the mass-weighted velocity autocorrelation, sharing only the potential and the relaxed structure. Agreement to two\u2013four percentage points on the element decomposition, with no external number to tune toward.',
+ ref:'\u00a73.4, \u00a73.6, \u00a74.4 \u00b7 Figure 5'},
+{id:'o_pr', t:'observable', label:'Participation ratio',
+ d:'The MES definition, adopted so the comparison is on identical terms. P = 1 spread over all atoms, 1/N confined to one. Reported with the effective participating count N\u00b7P for cross-cell comparison.',
+ ref:'Eqs. (5), (6), \u00a74.6.2 \u00b7 Figure 9'},
+{id:'o_gaps', t:'observable', label:'Zone-boundary gaps',
+ d:'Intervals wider than 0.3 meV below 20 meV along four explicit band paths. Compared on centres, never edges; edges shift with the local density of states while centres track the boundary. The rule an earlier claim failed by ignoring.',
+ ref:'\u00a73.4, \u00a74.6.3 \u00b7 Table 11, Figure 10'},
+{id:'o_vel', t:'observable', label:'Sound velocities',
+ d:'Long-wavelength acoustic slopes of the 26-atom dispersion, expressed as hv so no unit conversion intervenes. Five of six transverse velocities inside the measured range, the sixth 1.6 per cent below.',
+ ref:'Table 6, \u00a74.3.1'},
+{id:'o_msd', t:'observable', label:'MSD \u00b7 Lindemann \u00b7 g(r)',
+ d:'Atoms vibrate about fixed sites: the MSD plateaus and equals 2\u27e8u\u00b2\u27e9 to three per cent, every Lindemann ratio sits far below 0.1, and the pair distribution\u2019s first minimum falls to 0.114. Verified on synthetic references first.',
+ ref:'\u00a73.8, \u00a74.9 \u00b7 Table 15, Figure 14 \u00b7 msd_gr.py --self-test'},
+{id:'o_sq', t:'observable', label:'Structure factor S(Q)',
+ d:'Evaluated only at the wavevectors the box supports. The accessible window of the largest box contains no Bragg reflection at all, so the pseudo-gap mechanism has nothing to act on there. The mechanism of the null, visible directly.',
+ ref:'\u00a74.8 \u00b7 Figure 13 \u00b7 make_fig_sq.py'},
+{id:'o_gE', t:'observable', label:'Neutron-weighted G(E)',
+ d:'The incoherent-approximation weighting with Sears cross-sections converts computed spectra into the quantity an experiment measures. Nickel carries three to four times its atomic share below 30 meV. Reported as predictions for a W-phase single grain.',
+ ref:'Eq. (9), \u00a74.7.3 \u00b7 Table 13 \u00b7 gvdos.py'},
+
+// ---------- QUANTITIES ----------
+{id:'q_175', t:'quantity', label:'C = 175.5 meV \u00c5',
+ d:'The floor-law prefactor, the mean of E\u00b7L over the three intermediate X-phase boxes (171.9, 178.1, 176.6). Falls inside the harmonic transverse slopes (166.9\u2013188.5) and the measured velocities (169\u2013190). The same quantity obtained two ways distinguishes a calibration from a fitted parameter.',
+ ref:'Table 8, \u00a74.5 \u00b7 Figure 6 \u00b7 {run}_lengths.npz'},
+{id:'q_155', t:'quantity', label:'C_W = 155.9 meV \u00c5',
+ d:'The W-phase\u2019s own softer prefactor, calibrated at 118.1 \u00c5. Predicted 0.66 meV at 236.1 \u00c5 against 0.65 measured, twice its calibration length; read as elastic, though the elastic origin was not independently determined.',
+ ref:'\u00a74.5, Conclusion'},
+{id:'q_065', t:'quantity', label:'0.65 meV onset',
+ d:'The measured floor of the 6\u00d72\u00d71 W-phase box, rising two decades within 0.1 meV. Below the 0.82 meV rung: the rung\u2019s energy region is inside the accessible window of a realistic simulation for the first time.',
+ ref:'Table 8 \u00b7 Figures 7, 8'},
+{id:'q_082', t:'quantity', label:'The 0.82 meV rung',
+ d:'The fifth rung of the measured ladder, brought above a simulation floor for the first time by a box designed for that purpose from the calibration. The dissertation\u2019s headline predictive result.',
+ ref:'\u00a74.5.1 \u00b7 Figure 8 \u00b7 Ref. [2]'},
+{id:'q_183', t:'quantity', label:'1.7 predicted, 1.83 measured',
+ d:'The first predictive use of the calibration. The 8\u00d74\u00d74 box was designed in place of a 6\u00d76\u00d76 because elongation reaches lower at fixed cost; its onset was predicted before it ran.',
+ ref:'\u00a74.5.1, Table 8'},
+{id:'q_35', t:'quantity', label:'Factor 35 localisation',
+ d:'The minimum participation ratio of the W-phase lies a factor 35 below Al\u2081\u2083Co\u2084\u2019s in the shared 6\u201310 meV window (3.7 on the mean). Modes confined to an effective five atoms against a crystal whose least extended mode still involves seventy per cent of its cell.',
+ ref:'\u00a74.6.2, Table 10 \u00b7 Figure 9'},
+{id:'q_4419', t:'quantity', label:'4.419 meV stacking gap',
+ d:'First zone-boundary gap centre along the stacking path q = (\u22120.5, 0.5, 0), from the doubled force-constant set. Settled by ruling; provenance archived in stacking_bandpath_gaps.txt.',
+ ref:'Table 11 \u00b7 stacking_bandpath_gaps.txt'},
+{id:'q_uniform', t:'quantity', label:'Stacking ratios 1.080\u20131.097',
+ d:'The first five stacking-direction gap centres are close to uniformly spaced, far from \u03c4. Arithmetic, not geometric: the folding signature, produced by the one direction along which quasiperiodic pseudo-gaps cannot exist.',
+ ref:'\u00a74.6.3 \u00b7 Figure 10'},
+{id:'q_344', t:'quantity', label:'344 \u00c5 for the 0.51 rung',
+ d:'The calibration inverted prices every remaining rung. 0.51 meV needs 344 \u00c5 (a hardware statement, factor 1.5 above the largest box); 0.31, 0.19 and 0.12 meV lie beyond direct dynamics with any interaction model.',
+ ref:'Table 9, \u00a75.4'},
+{id:'q_p', t:'quantity', label:'p = 0.765 \u2013 1.000',
+ d:'The pre-registered \u03c4 test on all three eligible boxes. All consistent with chance; the most regularly folded box scores a deficit (0.064 against a null of 0.103), for which the rational comb supplies the mechanism.',
+ ref:'Table 14, \u00a74.8'},
+{id:'q_ord', t:'quantity', label:'\u22125.104818 eV/atom recovered',
+ d:'Fixed-site Monte Carlo from randomised species, starting 617 meV above the reference, reaches the DFT-derived ordering of Ref. [14] exactly, using only the machine-learned potential. The second external validation anchor.',
+ ref:'\u00a74.3.2 \u00b7 Figure 15(b)'},
+{id:'q_slopes', t:'quantity', label:'hv_T = 166.9\u2013188.5 meV \u00c5',
+ d:'Transverse acoustic slopes from harmonic force constants on a different cell, by a route sharing nothing with the dynamics. The independent confirmation of the fitted prefactor.',
+ ref:'Table 6, \u00a74.5'},
+
+// ---------- CLAIMS ----------
+{id:'c_floor', t:'claim', label:'The floor law holds and predicts',
+ d:'One relation, E_floor = C/L_long, across seven boxes of different sizes, shapes and structures. Used predictively twice before the runs it predicted. Converts finite size from the field\u2019s standing caveat into a design variable: any proposed simulation can be priced before a force is computed.',
+ ref:'\u00a74.5, \u00a75.2 \u00b7 Figure 6'},
+{id:'c_notau', t:'claim', label:'No \u03c4 structure in mode positions',
+ d:'Under the pre-registered test, the accessible mode positions carry no \u03c4 structure. Bounded honestly: the test excludes a pervasive structure, not one carried by two or three low-lying modes, and the null does not contradict the measured ladder \u2014 it bounds where the two can overlap.',
+ ref:'\u00a74.8, \u00a75.1 \u00b7 Table 14'},
+{id:'c_local', t:'claim', label:'Localisation distinguishes the approximant',
+ d:'What separates the quasiperiodic approximant is mode character, not mode position. The MES association of low-energy localisation with structural complexity is recovered with their own diagnostic on their own benchmark compound, now under a potential benchmarked independently of this system.',
+ ref:'\u00a74.6.2, \u00a75.1'},
+{id:'c_split', t:'claim', label:'The composition control splits',
+ d:'The element decomposition follows the structural motif; the low-frequency weight follows the retargeted composition almost entirely, holding under neutron weighting. The low-energy redistribution is therefore not evidence of quasiperiodicity in cells of this size \u2014 the error the control existed to catch.',
+ ref:'\u00a74.7.2, \u00a75.1 \u00b7 Table 12, Figure 12'},
+{id:'c_bound', t:'claim', label:'Geometry constructed, decoration searched',
+ d:'The positional search fails by 26\u201370 meV per atom and replica exchange does no better, while the same machinery recovers the reference ordering exactly on frozen sites. Site geometry must come from construction; only the chemical decoration can be left to search.',
+ ref:'\u00a74.11, A.5, \u00a75.1'},
+{id:'c_period', t:'claim', label:'Below ~250 \u00c5, periodicity dominates',
+ d:'The box\u2019s own comb and the structure\u2019s periodic axis organise the accessible low-energy spectrum, supported independently by gaps, mode ratios and branch counting. A quantitative warning to the field: \u03c4 claims from cells in this range should be treated as folding until proven otherwise.',
+ ref:'\u00a75.1, \u00a75.2'},
+
+// ---------- WITHDRAWN ----------
+{id:'w_gaps', t:'withdrawn', label:'Cross-approximant gap hierarchy',
+ d:'A gap sequence with ratios approaching \u03c4 was withdrawn when provenance checking showed it mixed gap edges with gap centres and ran through the cubic control. Rebuilt on centres it dissolved into two indistinguishable cells and no systematic sequence.',
+ ref:'\u00a74.6.3, \u00a75.3'},
+{id:'w_imag', t:'withdrawn', label:'19 imaginary modes',
+ d:'A count of 19 modes near \u22123.9 meV was a count of density-of-states grid points below zero at a 0.2 meV pitch, not of eigenvalues. Its apparent invariance under halved displacement followed from the fixed pitch. The committed force constants produce zero imaginary modes.',
+ ref:'\u00a74.6.1'},
+{id:'w_peak', t:'withdrawn', label:'Main-peak evidence',
+ d:'Withdrawn when neutron weighting moved the retargeted box\u2019s peak 3.1 meV by reversing the order of two comparable maxima. The peak position is not a robust observable for that structure; the control rests on integrated weight, the stronger argument.',
+ ref:'\u00a74.7.3, \u00a75.3'},
+{id:'w_infra', t:'withdrawn', label:'Three infrastructure failures',
+ d:'Walltime terminations recovered as a timing measurement and a resized schedule; an incomplete cell-free relaxation replaced by the fixed-cell protocol; a dependency conflict that confined SevenNet to relaxations. Each changed the method rather than the results, and each is recorded.',
+ ref:'\u00a75.3'},
+
+// ---------- EXTERNAL ----------
+{id:'e_mat', t:'external', label:'Matsuura et al., PRL 133 (2024)',
+ d:'The measurement that began all of this: seven intensity suppressions between 0.12 and 2.15 meV in a single grain of icosahedral Al\u2087\u2083Pd\u2081\u2089Mn\u2088, roughly scaled by \u03c4, at resolution down to 0.004 meV. Its 21-atom supporting chain is the gap this dissertation addresses.',
+ ref:'Ref. [2] \u00b7 \u00a72.2'},
+{id:'e_ladder', t:'external', label:'The measured ladder',
+ d:'0.12, 0.19, 0.31, 0.51, 0.82, 1.33, 2.15 meV; successive ratios 1.58\u20131.65. Three rungs now reached by simulation; four priced by the floor relation.',
+ ref:'Ref. [2] \u00b7 Table 9, Figure 13'},
+{id:'e_mes', t:'external', label:'Mihalkovi\u010d\u2013Elhor\u2013Suck, PRB 63 (2001)',
+ d:'The reference computational study, its design borrowed here: a complexity ladder at fixed chemistry, parallel interaction models, the participation ratio, the 30 meV element division. Two of the four validation anchors are its findings.',
+ ref:'Ref. [1] \u00b7 \u00a72.3'},
+{id:'e_vel', t:'external', label:'Measured velocities',
+ d:'Transverse 4100\u20134600 m s\u207b\u00b9, longitudinal near 7000, with transverse elastic isotropy about the periodic axis. hv_T spans 169\u2013190 meV \u00c5 \u2014 the band the fitted prefactor must fall inside, and does.',
+ ref:'Refs. [1, 5, 6] \u00b7 Table 6'},
+{id:'e_dft', t:'external', label:'Mihalkovi\u010d\u2013Widom ordering [14]',
+ d:'The chemical ordering refined by fixed-site Monte Carlo with density-functional energies. Recovered exactly by the machine-learned potential from 617 meV away \u2014 a validation neither the benchmark set nor the model selection contained.',
+ ref:'Ref. [14] \u00b7 \u00a74.3.2'},
+{id:'e_dep', t:'external', label:'alloy.phys.cmu.edu deposits',
+ d:'The diffraction-solved site lists, parsed with placeholder rows removed and gated at every production entry point against atom count and volume. A deliberately corrupted fixture is refused at entry.',
+ ref:'\u00a73.2, A.2 \u00b7 verify_parsers.py'},
+{id:'e_bench', t:'external', label:'\u03ba_SRME benchmark',
+ d:'The one phonon-derived quantity in common use for foundation potentials. MACE-MPA-0\u2019s 0.412 is the only value confirmed for the parametrisation used; the benchmark\u2019s warning \u2014 parametrisation matters, not only architecture \u2014 shaped Objective 1.',
+ ref:'Refs. [10, 30] \u00b7 \u00a73.3'},
+
+// ---------- ARTEFACTS ----------
+{id:'a_commit', t:'artefact', label:'commit 239a1a5',
+ d:'The permanent provenance anchor, 24 August 2026. Every load-bearing number in the dissertation reproduces from files committed at this hash; the two listed routines are reproduced verbatim from it.',
+ ref:'A.4 \u00b7 github.com/contactrameezraja/quasicrystal-mace'},
+{id:'a_reduce', t:'artefact', label:'reduce_vdos.py',
+ d:'Eqs. (7), (8): the Wiener\u2013Khinchin autocorrelation with zero-padding, the half-Hann window, the cosine transform. Verified against an explicit double loop over time origins. Carries the trajectory atom-count guard.',
+ ref:'A.4, Table 17'},
+{id:'a_phonon', t:'artefact', label:'phonon_run.py',
+ d:'Eqs. (4)\u2013(6): diagonalisation, projections, participation ratio, band paths and gap extraction. Its primitive-cell mismatch guard is what catches Phonopy\u2019s silent reduction.',
+ ref:'A.4, Table 17'},
+{id:'a_md', t:'artefact', label:'md_run.py',
+ d:'Relaxation to Eq. (3) and the corrected dynamics protocol: seeded Maxwell\u2013Boltzmann, momentum zeroed twice, thermostat off in production, energy conservation as the continuous check.',
+ ref:'Table 17 \u00b7 \u00a73.5'},
+{id:'a_mq', t:'artefact', label:'melt_quench.py',
+ d:'Eq. (13): the melt-quench, replica-exchange and fixed-site modes of the generation searches, with per-stage traces archived.',
+ ref:'Table 17, A.3, A.5'},
+{id:'a_npz', t:'artefact', label:'{run}_lengths.npz archives',
+ d:'The archived spectral reductions from which Tables 3, 8 and 12 recompute. The 24 GB of raw trajectories sit behind them under a sha256 manifest.',
+ ref:'A.3'},
+{id:'a_gapfile', t:'artefact', label:'stacking_bandpath_gaps.txt',
+ d:'The archived record of the stacking-direction gap ladder, the committed backing of Table 11 and Figure 10.',
+ ref:'Table 17'},
+{id:'a_o1', t:'artefact', label:'o1_*.json',
+ d:'The relaxation and stability results of all three potentials \u2014 the committed backing of Table 5, including the volume-sign disagreement that became the structural model term.',
+ ref:'A.3 \u00b7 Table 5'},
+{id:'a_fig6', t:'artefact', label:'Figure 6',
+ d:'Measured onset against 1/L_long for the seven production boxes, the line at C = 175.5 inside the shaded measured-velocity band. Regenerated from committed data by make_fig_floor.py.',
+ ref:'\u00a74.5 \u00b7 make_fig_floor.py'},
+{id:'a_t89', t:'artefact', label:'Tables 8 & 9',
+ d:'The calibration and its inversion: seven measured onsets against C/L with per-box deviations, and the length each remaining rung requires.',
+ ref:'\u00a74.5, \u00a74.5.2'}
+];
+
+const REL = {
+  sim:'simulated with', prod:'produced', der:'derives from', conf:'confirmed by',
+  pred:'predicted before measured', sup:'supports', wdr:'withdrawal concerns',
+  val:'validated against', casc:'cascades to'
+};
+const links = [
+['s_x','p_mace','sim'],['s_w','p_mace','sim'],['s_cubic','p_mace','sim'],['s_al13','p_mace','sim'],['s_ret','p_mace','sim'],
+['s_x','p_ms','sim'],['s_w','p_ms','sim'],['s_cubic','p_ms','sim'],
+['s_x','p_7n','sim'],['s_w','p_7n','sim'],['s_cubic','p_7n','sim'],
+['s_x','e_dep','der'],['s_w','e_dep','der'],['s_cubic','e_dep','der'],
+['s_ret','s_x','der'],
+['p_mace','e_bench','val'],['p_mace','e_vel','val'],['p_mace','e_dft','val'],['p_mace','e_mes','val'],
+['p_ms','a_o1','prod'],['p_7n','a_o1','prod'],['p_mace','a_o1','prod'],
+['r_x222','s_x','der'],['r_x333','s_x','der'],['r_x444','s_x','der'],['r_x844','s_x','der'],['r_x1043','s_x','der'],
+['r_ret','s_ret','der'],['r_w321','s_w','der'],['r_w621','s_w','der'],['r_al13','s_al13','der'],
+['r_harm','s_x','der'],['r_harm','s_w','der'],['r_harm','s_al13','der'],
+['r_x222','a_md','der'],['r_w621','a_md','der'],['r_harm','a_phonon','der'],
+['o_floor','r_x222','prod'],['o_floor','r_x333','prod'],['o_floor','r_x444','prod'],['o_floor','r_x844','prod'],
+['o_floor','r_x1043','prod'],['o_floor','r_w321','prod'],['o_floor','r_w621','prod'],
+['o_vdos','a_reduce','der'],['o_vdos','r_harm','der'],
+['o_pr','r_harm','der'],['o_pr','a_phonon','der'],
+['o_gaps','r_harm','der'],['o_gaps','a_gapfile','der'],
+['o_vel','r_harm','der'],
+['o_msd','r_x222','der'],['o_msd','r_x333','der'],
+['o_sq','r_w621','der'],
+['o_gE','o_vdos','der'],
+['q_175','o_floor','der'],['q_175','r_x333','der'],['q_175','r_x444','der'],['q_175','r_x844','der'],
+['q_175','q_slopes','conf'],['q_slopes','o_vel','der'],['q_slopes','e_vel','conf'],
+['q_175','a_npz','der'],['q_175','a_fig6','casc'],['q_175','a_t89','casc'],['q_175','q_344','casc'],
+['q_155','r_w321','der'],['q_155','q_065','pred'],
+['q_065','r_w621','prod'],['q_065','o_floor','der'],
+['q_082','q_065','conf'],['q_082','e_ladder','der'],['q_082','r_w621','pred'],
+['q_183','r_x844','pred'],['q_183','q_175','der'],
+['q_35','o_pr','der'],['q_35','r_al13','der'],['q_35','s_w','der'],
+['q_4419','o_gaps','der'],['q_4419','a_gapfile','der'],
+['q_uniform','o_gaps','der'],
+['q_344','a_t89','der'],['q_344','e_ladder','der'],
+['q_p','o_vdos','der'],['q_p','r_w321','der'],['q_p','r_x1043','der'],['q_p','r_x844','der'],
+['q_ord','e_dft','conf'],['q_ord','a_mq','der'],['q_ord','s_x','der'],
+['c_floor','q_175','sup'],['c_floor','q_155','sup'],['c_floor','q_183','sup'],['c_floor','q_065','sup'],['c_floor','q_344','sup'],
+['c_notau','q_p','sup'],['c_notau','o_sq','sup'],
+['c_local','q_35','sup'],['c_local','e_mes','conf'],
+['c_split','r_ret','sup'],['c_split','o_gE','sup'],
+['c_bound','a_mq','sup'],['c_bound','q_ord','sup'],
+['c_period','q_uniform','sup'],['c_period','c_notau','sup'],['c_period','o_sq','sup'],
+['w_gaps','o_gaps','wdr'],['w_gaps','s_cubic','wdr'],
+['w_imag','r_harm','wdr'],
+['w_peak','o_gE','wdr'],['w_peak','c_split','wdr'],
+['w_infra','p_7n','wdr'],['w_infra','s_ret','wdr'],
+['e_ladder','e_mat','der'],['q_082','e_mat','der'],
+['c_notau','e_ladder','conf'],
+['a_reduce','a_commit','der'],['a_phonon','a_commit','der'],['a_md','a_commit','der'],['a_mq','a_commit','der'],
+['a_npz','a_commit','der'],['a_gapfile','a_commit','der'],['a_o1','a_commit','der'],['a_fig6','a_commit','der'],['a_t89','a_commit','der']
+];
+
+const TOURS = {
+  cluster:{
+    nodes:['q_175','q_slopes','o_vel','e_vel','r_x333','r_x444','r_x844','o_floor','q_183','a_fig6','a_t89','q_344','a_npz','c_floor','q_155','q_065'],
+    text:'One number, two independent routes. The prefactor fitted from trajectories falls inside the harmonic slopes and the measured velocities, then fans out into every table it governs.'},
+  withdrawal:{
+    nodes:['w_gaps','w_imag','w_peak','w_infra','o_gaps','r_harm','o_gE','c_split','p_7n','s_cubic','s_ret'],
+    text:'Four red diamonds, each with its mechanism named. The record of what was withdrawn, and why, is part of the result.'},
+  prediction:{
+    nodes:['e_mat','e_ladder','o_floor','q_175','q_155','r_w621','q_065','q_082','q_344','a_t89','c_floor'],
+    text:'From Matsuura\u2019s ladder, through the calibration, to the box designed to reach 0.82 meV \u2014 and the price of every rung that remains.'}
+};
+
+// ---------- geometry helpers ----------
+function polygonPoints(n, r, rot){
+  const pts=[]; rot = rot||0;
+  for(let i=0;i<n;i++){
+    const a = rot + i*2*Math.PI/n - Math.PI/2;
+    pts.push([r*Math.cos(a), r*Math.sin(a)]);
+  }
+  return pts.map(p=>p.join(',')).join(' ');
+}
+function starPoints(n, r1, r2){
+  const pts=[];
+  for(let i=0;i<2*n;i++){
+    const r = i%2===0 ? r1 : r2;
+    const a = i*Math.PI/n - Math.PI/2;
+    pts.push([r*Math.cos(a), r*Math.sin(a)]);
+  }
+  return pts.map(p=>p.join(',')).join(' ');
+}
+
+// ---------- build graph ----------
+const svg = d3.select('#graph');
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let W = 0, H = 0;
+function size(){ const r = document.getElementById('graph').getBoundingClientRect(); W=r.width; H=r.height; }
+size();
+
+// glow filters
+const defs = svg.append('defs');
+[['glow',2.2],['glowBig',4]].forEach(([id,dev])=>{
+  const f = defs.append('filter').attr('id',id).attr('x','-80%').attr('y','-80%').attr('width','260%').attr('height','260%');
+  f.append('feGaussianBlur').attr('in','SourceGraphic').attr('stdDeviation',dev).attr('result','b');
+  const m = f.append('feMerge');
+  m.append('feMergeNode').attr('in','b');
+  m.append('feMergeNode').attr('in','SourceGraphic');
+});
+
+// starfield underlay (fixed, behind the zoomable group)
+const sky = svg.append('g').attr('class','sky').attr('pointer-events','none');
+function drawSky(){
+  sky.selectAll('*').remove();
+  const rng = d3.randomUniform.source(d3.randomLcg(0.618034));
+  const rx = rng(0,1);
+  const n = Math.round(W*H/6500);
+  for(let i=0;i<n;i++){
+    const big = rx()>0.93;
+    const c = sky.append('circle')
+      .attr('class','star'+((!reduced && rx()>0.65)?' tw':''))
+      .attr('cx', rx()*W).attr('cy', rx()*H)
+      .attr('r', big? rx()*1.1+0.8 : rx()*0.7+0.25)
+      .style('--o', (rx()*0.5+0.25).toFixed(2))
+      .style('--d', (rx()*5+3).toFixed(1)+'s')
+      .style('opacity', 'var(--o)');
+    if(big) c.attr('filter','url(#glow)');
+  }
+}
+drawSky();
+
+const gRoot = svg.append('g');
+const idx = new Map(nodes.map(n=>[n.id,n]));
+const linkObjs = links.map(([s,t,r])=>({source:s,target:t,rel:r}));
+const adj = new Map(nodes.map(n=>[n.id,new Set()]));
+linkObjs.forEach(l=>{adj.get(l.source).add(l.target); adj.get(l.target).add(l.source);});
+
+const sim = d3.forceSimulation(nodes)
+  .force('link', d3.forceLink(linkObjs).id(d=>d.id).distance(l=>{
+     const a=idx.get(l.source.id||l.source), b=idx.get(l.target.id||l.target);
+     return (a.t==='artefact'||b.t==='artefact') ? 55 : 85;
+  }).strength(.35))
+  .force('charge', d3.forceManyBody().strength(-260))
+  .force('center', d3.forceCenter(W/2, H/2))
+  .force('collide', d3.forceCollide().radius(d=>TYPES[d.t].r+16))
+  .force('x', d3.forceX(W/2).strength(.045))
+  .force('y', d3.forceY(H/2).strength(.06));
+if(reduced){ sim.alphaDecay(.15); }
+
+const link = gRoot.append('g').selectAll('path')
+  .data(linkObjs).join('path')
+  .attr('class', d=>'link'+(d.rel==='pred'?' pred':''));
+
+const node = gRoot.append('g').selectAll('g')
+  .data(nodes).join('g')
+  .attr('class','node')
+  .attr('tabindex',0)
+  .call(d3.drag()
+    .on('start',(e,d)=>{if(!e.active)sim.alphaTarget(.25).restart(); d.fx=d.x; d.fy=d.y;})
+    .on('drag',(e,d)=>{d.fx=e.x; d.fy=e.y;})
+    .on('end',(e,d)=>{if(!e.active)sim.alphaTarget(0); d.fx=null; d.fy=null;}))
+  .on('click',(e,d)=>{e.stopPropagation(); select(d.id);})
+  .on('keydown',(e,d)=>{if(e.key==='Enter')select(d.id);});
+
+node.each(function(d){
+  const g = d3.select(this), T = TYPES[d.t];
+  // soft halo behind every node
+  g.append('circle').attr('r', T.r*2.1).attr('fill', T.c).attr('opacity', .12).attr('filter','url(#glowBig)');
+  if(d.t==='structure'){
+    // decagon — the decagonal phase's own symmetry
+    g.append('polygon').attr('class','core').attr('points', polygonPoints(10, T.r*1.25))
+     .attr('fill', 'rgba(111,168,220,.14)').attr('stroke', T.c).attr('stroke-width',1.6)
+     .attr('filter','url(#glow)');
+    g.append('circle').attr('r', 2.4).attr('fill', '#EAF2FB');
+  } else if(d.t==='withdrawn'){
+    const s = T.r*1.55;
+    g.append('rect').attr('class','core').attr('x',-s/2).attr('y',-s/2).attr('width',s).attr('height',s)
+     .attr('transform','rotate(45)').attr('fill','rgba(232,106,92,.08)')
+     .attr('stroke', T.c).attr('stroke-width',1.8).attr('stroke-dasharray','3 2')
+     .attr('filter','url(#glow)');
+  } else if(d.t==='external'){
+    const s = T.r*1.6;
+    g.append('rect').attr('class','core').attr('x',-s/2).attr('y',-s/2).attr('width',s).attr('height',s)
+     .attr('fill','rgba(167,174,187,.16)').attr('stroke',T.c).attr('stroke-width',1.4);
+  } else if(d.id==='a_commit'){
+    // the anchor: a ten-pointed star
+    g.append('polygon').attr('class','core').attr('points', starPoints(10, 13, 5.5))
+     .attr('fill', '#E8B54A').attr('stroke','#F6E3B4').attr('stroke-width',1)
+     .attr('filter','url(#glowBig)');
+  } else {
+    g.append('circle').attr('class','core').attr('r', T.r)
+     .attr('fill', T.c).attr('stroke','rgba(7,10,18,.9)').attr('stroke-width',1.2)
+     .attr('filter', d.t==='quantity' ? 'url(#glowBig)' : 'url(#glow)');
+    if(d.t==='quantity') g.append('circle').attr('r', 2.6).attr('fill', '#FFF6DE');
+  }
+  g.append('text')
+    .attr('dy', -(T.r+8))
+    .attr('text-anchor','middle')
+    .attr('font-size', d.t==='quantity'||d.t==='claim' ? '13px' : '11.5px')
+    .attr('font-weight', d.t==='quantity'||d.t==='claim'||d.id==='a_commit' ? 600 : 400)
+    .attr('font-style', d.t==='withdrawn' ? 'italic' : null)
+    .style('font-family', d.t==='artefact' ? '"IBM Plex Mono",monospace' : null)
+    .style('font-size', d.t==='artefact' ? '10px' : null)
+    .attr('fill', d.t==='quantity' ? '#F3D89A' : (d.t==='withdrawn' ? '#F0A99F' : null))
+    .text(d.label);
+  if(d.t==='withdrawn'){
+    const tw = d.label.length*5.4;
+    g.append('line').attr('x1',-tw/2).attr('x2',tw/2)
+     .attr('y1',-(T.r+11.5)).attr('y2',-(T.r+11.5))
+     .attr('stroke','#E86A5C').attr('stroke-width',1.2);
+  }
+});
+
+sim.on('tick', ()=>{
+  link.attr('d', d=>`M${d.source.x},${d.source.y}L${d.target.x},${d.target.y}`);
+  node.attr('transform', d=>`translate(${d.x},${d.y})`);
+});
+
+svg.call(d3.zoom().scaleExtent([.3,3]).on('zoom', e=>gRoot.attr('transform', e.transform)))
+   .on('dblclick.zoom', null);
+svg.on('click', clear);
+
+// ---------- interaction ----------
+const panel = document.getElementById('panel');
+const emptyState = document.getElementById('emptyState');
+const nodeView = document.getElementById('nodeView');
+const INTRO = '<p>Click any node to read it. Drag to rearrange, scroll to zoom.</p><p>Solid edges carry provenance and support. Dashed edges are predictions made before the measurement they name.</p><p>The red diamonds are the withdrawn claims, kept because the record of their withdrawal is part of the result.</p><p>The three constellations above light the subgraphs worth walking first. Decagons are the decagonal structures; the ten-pointed star is the commit every path traces back to.</p>';
+
+function focus(ids, selId){
+  const keep = new Set(ids);
+  node.classed('dim', d=>!keep.has(d.id)).classed('sel', d=>d.id===selId);
+  link.classed('dim', d=>!(keep.has(d.source.id)&&keep.has(d.target.id)))
+      .classed('hl', d=>selId && (d.source.id===selId||d.target.id===selId));
+}
+function select(id){
+  const d = idx.get(id); if(!d) return;
+  focus([id, ...adj.get(id)], id);
+  document.querySelectorAll('nav button[data-tour]').forEach(b=>b.classList.remove('active'));
+  emptyState.hidden = true; nodeView.hidden = false;
+  const T = TYPES[d.t];
+  const el = document.getElementById('nType');
+  el.textContent = T.name; el.style.background = T.c;
+  const h = document.getElementById('nLabel');
+  h.textContent = d.label; h.className = d.t==='withdrawn' ? 'withdrawn' : '';
+  document.getElementById('nDetail').textContent = d.d;
+  document.getElementById('nRef').textContent = d.ref;
+  const L = document.getElementById('nLinks');
+  const conn = linkObjs.filter(l=>l.source.id===id||l.target.id===id);
+  L.innerHTML = conn.length ? '<h3>Connected ('+conn.length+')</h3>' : '';
+  conn.forEach(l=>{
+    const other = l.source.id===id ? l.target : l.source;
+    const a = document.createElement('a');
+    a.innerHTML = `<span class="rel">${REL[l.rel]}</span> \u2014 ${other.label}`;
+    a.onclick = ()=>select(other.id);
+    L.appendChild(a);
+  });
+  panel.classList.add('open');
+}
+function tour(key, btn){
+  const t = TOURS[key];
+  focus(t.nodes, null);
+  document.querySelectorAll('nav button[data-tour]').forEach(b=>b.classList.toggle('active', b===btn));
+  emptyState.hidden = false; nodeView.hidden = true;
+  emptyState.innerHTML = '<p><b style="font-style:normal">'+btn.textContent+'.</b></p><p>'+t.text+'</p><p>Click any lit node to read it.</p>';
+  panel.classList.add('open');
+}
+function clear(){
+  node.classed('dim',false).classed('sel',false);
+  link.classed('dim',false).classed('hl',false);
+  document.querySelectorAll('nav button[data-tour]').forEach(b=>b.classList.remove('active'));
+  nodeView.hidden = true; emptyState.hidden = false;
+  emptyState.innerHTML = INTRO;
+  panel.classList.remove('open');
+  document.getElementById('search').value='';
+}
+document.querySelectorAll('nav button[data-tour]').forEach(b=>b.onclick = ()=>tour(b.dataset.tour, b));
+document.getElementById('clearBtn').onclick = clear;
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') clear(); });
+document.getElementById('search').addEventListener('input', e=>{
+  const q = e.target.value.trim().toLowerCase();
+  if(!q){ node.classed('dim',false); link.classed('dim',false); return; }
+  const hits = nodes.filter(n=>(n.label+' '+n.d).toLowerCase().includes(q)).map(n=>n.id);
+  focus(hits, hits.length===1?hits[0]:null);
+  if(hits.length===1) select(hits[0]);
+});
+window.addEventListener('resize', ()=>{ size(); drawSky(); sim.force('center', d3.forceCenter(W/2,H/2)); sim.alpha(.2).restart(); });
+</script>
+</body>
+</html>

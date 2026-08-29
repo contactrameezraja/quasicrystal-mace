@@ -27,7 +27,7 @@ to rounding; the loop is described in the script's docstring but is not
 retained as a committed test. The displacement diagnostics were verified
 on synthetic references with known answers, \texttt{msd\_gr.py --self-test}
 generating one vibrating and one diffusing trajectory and recovering the
-plateau and the $6Dt$ rise respectively.
+plateau and the $6Dt$ rise respectively. The displacement diagnostics average over twenty time origins at forty logarithmically spaced lags up to half the trajectory, and a curve counts as a plateau when the fitted slope over its second half, divided by the plateau value, lies below 0.02 per picosecond.
 
 The onset identification of Definition~\ref{def:floor} is by inspection
 because no single threshold rule serves all the boxes. A rule declaring
@@ -40,7 +40,7 @@ box; required to serve the seventh spectrum as well, whose onset lies
 below every usable reference energy, the best rule errs by 30~per cent.
 The inspected onsets are justified by their outcome, the seven values
 obeying the single relation of Section~4.5 whose prefactor an independent
-route reproduces.
+route reproduces. The nickel--nickel partial of Section~4.9 is sensitive to the nickel count, its peak height falling from 7.59 to 6.24 as the count rises from 24 to 81, which is why the 702-atom values are reported.
 
 \subsection{Data and seeds}
 Raw trajectories of approximately 24~GB are archived with the
@@ -51,13 +51,15 @@ the earliest $4\times4\times4$ box, as Section~3.5 notes, and the seeded
 draw of the retargeted structure is archived as
 \texttt{xbox\_wcomp.vasp}. The Monte Carlo searches are archived as
 per-stage traces (\texttt{mq\_*\_trace.npy}) with their run logs; the
-fixed-site validation is archived as its run log.
+fixed-site validation is archived as its run log. A single swap evaluation timed at 15~ms for 26 atoms against 120~ms for a
+position update; at the 3180-atom supercell, 780~ms per attempt set the
+schedules of Section~3.10 at ten stages.
 
 \subsection{Code listings}
 \label{app:code}
 
 The two routines on which the principal quantitative claims rest are
-reproduced here verbatim from commit \texttt{b49a448} (23 August 2026) of the
+reproduced here verbatim from commit \texttt{239a1a5} (24 August 2026) of the
 repository named in Section~A.1. Every other script is mapped to its equations
 in Table~\ref{tab:codemap} and is available at the same commit; these two are
 listed because the spectra of Section~3.6 rest on the first and the factor-35
@@ -133,11 +135,8 @@ The deposited and relaxed structures are archived in the repository as
 refined ordering of Ref.~[14]), \texttt{W-AlCoNi-265.vasp} and
 \texttt{W-AlCoNi-265-relaxed.vasp} (W-phase, deposited and relaxed),
 \texttt{al13co4.vasp} (periodic control) and \texttt{xbox\_wcomp.vasp}
-(retargeted box). The generation searches of Section~4.11 are archived as
-their best structures (\texttt{mq\_*\_best.vasp}) alongside the per-stage
-traces (\texttt{mq\_*\_trace.npy}).
+(retargeted box). The generation searches of Section~\ref{app:gen} are archived as their best structures (\texttt{mq\_*\_best.vasp}) alongside the per-stage traces (\texttt{mq\_*\_trace.npy}).
 \clearpage
-\label{app:figs}
 
 \begin{table}[H]
 \centering
@@ -179,7 +178,7 @@ Script & Implements & Output \\
 \texttt{make\_fig\_sq.py}, \texttt{make\_fig\_gr.py} & the structure
   factor of the $6\times2\times1$ box at its allowed wavevectors; the
   archived $g(r)$ reductions replotted & Figures~13, 14 \\
-\texttt{make\_fig\_stacking\_centres.py} & the stacking gap-centre
+\texttt{make\_fig\_stacking\_}\allowbreak\texttt{centres.py} & the stacking gap-centre
   ladder of \S4.6.3, from the archived record
   \texttt{stacking\_bandpath\_gaps.txt} & Figure~10 \\
 \texttt{fig\_onset\_definition.py} & sensitivity of the onset to the
@@ -190,6 +189,37 @@ Script & Implements & Output \\
 \end{tabular}
 \end{table}
 \clearpage
+
+
+\subsection{The generation searches}
+\label{app:gen}
+The searches summarised in Section~\ref{sec:gen} are reported here in full.
+
+\subsubsection{The positional search fails, for an identifiable reason}
+\label{app:gen-pos}
+Five staged anneals from random positions in the fixed 26-atom cell reached at best 25.7, 38.8, 69.7, 65.9 and 51.6~meV per atom above the reference, five basins spanning 44~meV, and finished at 29.3, 42.4, 85.7, 93.8 and 51.6 (Figure~\ref{fig:gen}a), two having reached their best early, at stages 7 and 2, then drifted away, so single trajectories not only miss the minimum but fail to hold a basin. Replica exchange, the natural remedy, ran eight replicas over 1.2 million evaluations and 579 minutes to 56.1~meV above the reference, worse than the best anneal, with exchange acceptance of 0.44 to 0.60, the expected range and therefore not a tuning fault. Two explanations are consistent, a sampling volume roughly an order of magnitude below that of the published application~[13] and redrawing from the same distribution of frozen positional basins the anneals sampled.
+
+\subsubsection{The chemical ordering is recovered exactly}
+\label{app:gen-fixed}
+With positions frozen on the reference site list and species randomised, the
+same machinery succeeds completely, from 617~meV above the reference to the
+reference value after relaxation (Section~4.3, Figure~\ref{fig:gen}b).
+The entire 26 to 70~meV shortfall above is therefore the positional search's,
+not the chemistry's or the potential's.
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=\textwidth]{fig_structure_search_validation.png}
+\caption[The structure searches against the reference]{(a), the five staged anneals from random positions and the replica-exchange run against the reference energy. (b), the fixed-site search from randomised species, which recovers the reference exactly.}
+\label{fig:gen}
+\end{figure}
+\FloatBarrier
+
+\subsubsection{Tiling imposes no artificial chemistry}
+\label{app:gen-tiling}
+Fixed-site Monte Carlo on the 3180-atom supercell from the as-tiled arrangement, approximately 184\,000 swap attempts across schedules from 2500 down to 600~K, never moved from the as-tiled energy, acceptance falling to 0.003 to 0.008 with essentially every swap strongly uphill, and after relaxation the search's best differed from the untouched tiling by 0.002~meV per atom. The negative is trustworthy because the same machinery demonstrably finds better orderings when they exist (Section~\ref{app:gen-fixed}), and has a mechanism, the 265-atom chemistry itself deriving from fixed-site Monte Carlo with first-principles energies, so tiling inherits an already optimised ordering and the boundaries introduce no frustration worth relieving. The large boxes are therefore not detectably chemically strained by construction under the search applied; positions were frozen, so only a different arrangement on the same sites is excluded, not a different structure at the same composition.
+
+
+
 
 \subsection{Supplementary figures}
 
@@ -237,7 +267,8 @@ the observations of Section~4.5.1.}
 \label{fig:app_ladder}
 \end{figure}
 
-\begin{figure}[t]
+\clearpage
+\begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{f32_vs_f64_vdos_sharpened.png}
 \caption[The precision experiment]{The precision experiment of
