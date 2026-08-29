@@ -39,7 +39,7 @@ def norm(f, g):
 
 # ---------------- Figure 5: the two routes and the element decomposition ----
 fmd, smd = np.load("md_2x2x2_s11_vdos_total.npy"); smd = norm(fmd, smd)
-dh = np.load("ph_x26_check_dos.npz")
+dh = np.load("ph_x26_dos.npz")
 eh, th = dh["energy"], norm(dh["energy"], dh["total"])
 P = np.load("md_2x2x2_s11_vdos_partial.npz"); fp = P["freq_meV"]
 

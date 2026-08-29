@@ -81,7 +81,7 @@ ax1.set_ylabel(r"$S(Q)/N^{2}$")
 ax1.set_title("(a)  in-plane long axis, 6\u00d72\u00d71 W-phase box, 6360 atoms",
               loc="left", fontsize=9)
 ax1.text(np.sqrt(xlo * q1), 3e-6,
-         "no allowed $Q$\nbelow $2\\pi/L_{\\mathrm{box}}$",
+         "no $Q$ allowed\nbelow $2\\pi/L_{\\mathrm{box}}$",
          ha="center", va="center", fontsize=7.5,
          bbox=dict(facecolor=SHADE, edgecolor="none", pad=1.5))
 ax1.plot([], [], "ko-", ms=3.2, lw=1.4, label="Bragg reflections of the box")

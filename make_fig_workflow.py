@@ -11,9 +11,9 @@ from matplotlib.patches import FancyArrowPatch, Polygon, Rectangle
 plt.rcParams.update({"font.family": "serif", "mathtext.fontset": "cm",
                      "font.size": 9})
 
-fig, ax = plt.subplots(figsize=(8.3, 11.0))
+fig, ax = plt.subplots(figsize=(8.3, 9.6))
 ax.set_xlim(0, 100)
-ax.set_ylim(0, 132)
+ax.set_ylim(17, 132)
 ax.axis("off")
 FS = 9
 FSI = 8.5
@@ -97,15 +97,17 @@ dline((67.5, 59.5), (60.6, 59.5))
 dline((60.6, 59.5), (60.6, 83.5))
 arr((60.6, 83.5), (56.5, 83.5), dashed=True)
 
-ax.plot([12, 20], [13, 13], "k-", lw=0.9)
-ax.text(21.5, 13, "process flow", va="center", fontsize=FS)
-ax.plot([42, 50], [13, 13], "k", lw=0.9, linestyle=(0, (4, 3)))
-ax.text(51.5, 13, "prediction or caveat carried forward", va="center",
+# legend, in the white space of the right-hand column
+ax.plot([62, 69], [44, 44], "k-", lw=0.9)
+ax.text(70.5, 44, "process flow", va="center", fontsize=FS)
+ax.plot([62, 69], [38, 38], "k", lw=0.9, linestyle=(0, (4, 3)))
+ax.text(70.5, 38, "prediction or caveat\ncarried forward", va="center",
         fontsize=FS)
-pts = [(13, 6.3), (19, 6.3), (20.5, 8), (19, 9.7), (13, 9.7), (11.5, 8)]
+pts = [(62.5, 28.6), (68, 28.6), (69.4, 30.2), (68, 31.8), (62.5, 31.8),
+       (61.1, 30.2)]
 ax.add_patch(Polygon(pts, fill=False, lw=1.0))
-ax.text(16, 8, "gate", ha="center", va="center", fontsize=FS)
-ax.text(23, 8, "verification point at which failure halts the calculation",
+ax.text(65.25, 30.2, "gate", ha="center", va="center", fontsize=FS)
+ax.text(70.5, 30.2, "verification point at which\nfailure halts the calculation",
         va="center", fontsize=FS)
 
 fig.savefig("fig2_workflow_fullpage.png", dpi=200, bbox_inches="tight")
